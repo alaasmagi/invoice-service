@@ -1,6 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace DataAccess.Context;
 
-public class AppDbContext
+public class AppDbContext : DbContext
 {
     
 }

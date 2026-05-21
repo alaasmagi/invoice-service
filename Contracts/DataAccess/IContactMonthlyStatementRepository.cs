@@ -1,6 +1,8 @@
+using Base.Contracts.DataAccess;
+using Domain;
+
 namespace Contracts.DataAccess;
 
-public interface IContactMonthlyStatementRepository
+public interface IContactMonthlyStatementRepository : IBaseRepository<ContactMonthlyStatement>
 {
-    
 }

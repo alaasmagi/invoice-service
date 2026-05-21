@@ -11,4 +11,8 @@
       <PackageReference Include="alaasmagi.Base.Contracts.DataAccess" Version="1.1.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Domain\Domain.csproj" />
+    </ItemGroup>
+
 </Project>
