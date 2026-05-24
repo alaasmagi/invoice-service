@@ -3,7 +3,7 @@ using Domain;
 
 namespace DTO.DataAccess.Web.DTO;
 
-public class MonthlyStatementDto : BaseEntity
+public class MonthlyStatementDto : BaseEntityUserWithConcurrency
 {
     public Guid AddressId { get; set; }
 

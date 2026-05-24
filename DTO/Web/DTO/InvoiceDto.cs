@@ -2,7 +2,7 @@ using Base.Domain;
 
 namespace DTO.DataAccess.Web.DTO;
 
-public class InvoiceDto : BaseEntity
+public class InvoiceDto : BaseEntityUserWithConcurrency
 {
     public Guid ServiceId { get; set; }
 

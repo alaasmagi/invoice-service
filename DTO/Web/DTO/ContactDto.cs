@@ -3,7 +3,7 @@ using Domain;
 
 namespace DTO.DataAccess.Web.DTO;
 
-public class ContactDto : BaseEntity
+public class ContactDto : BaseEntityUserWithConcurrency
 {
     public string FullName { get; set; } = default!;
 

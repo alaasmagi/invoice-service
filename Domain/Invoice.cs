@@ -2,7 +2,7 @@ using Base.Domain;
 
 namespace Domain;
 
-public class Invoice : BaseEntity
+public class Invoice : BaseEntityUser
 {
     public Guid ServiceId { get; set; }
 

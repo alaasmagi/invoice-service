@@ -2,7 +2,7 @@ using Base.Domain;
 
 namespace DTO.DataAccess.DataAccess.DTO;
 
-public class AddressEntity : BaseEntity
+public class AddressEntity : BaseEntityUserWithMetaConcurrency
 {
     public string Name { get; set; } = default!;
     public string FullAddress { get; set; } = default!;

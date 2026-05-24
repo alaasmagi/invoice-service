@@ -2,7 +2,7 @@ using Base.Domain;
 
 namespace DTO.DataAccess.Web.DTO;
 
-public class AddressDto : BaseEntity
+public class AddressDto : BaseEntityUserWithConcurrency
 {
     public string Name { get; set; } = default!;
     public string FullAddress { get; set; } = default!;

@@ -2,7 +2,7 @@ using Base.Domain;
 
 namespace Domain;
 
-public class InvoiceAllocation : BaseEntity
+public class InvoiceAllocation : BaseEntityUser
 {
     public Guid InvoiceId { get; set; }
 

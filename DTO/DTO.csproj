@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="alaasmagi.Base.Domain" Version="1.1.0" />
-      <PackageReference Include="alaasmagi.Base.DTO" Version="1.1.0" />
+      <PackageReference Include="alaasmagi.Base.Domain" Version="1.1.1" />
+      <PackageReference Include="alaasmagi.Base.DTO" Version="1.1.1" />
     </ItemGroup>
 
     <ItemGroup>

@@ -2,7 +2,7 @@ using Base.Domain;
 
 namespace DTO.DataAccess.Web.DTO;
 
-public class InvoiceAllocationDto : BaseEntity
+public class InvoiceAllocationDto : BaseEntityUserWithConcurrency
 {
     public Guid InvoiceId { get; set; }
 

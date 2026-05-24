@@ -2,7 +2,7 @@ using Base.Domain;
 
 namespace Domain;
 
-public class Contact : BaseEntity
+public class Contact : BaseEntityUser
 {
     public string FullName { get; set; } = default!;
 

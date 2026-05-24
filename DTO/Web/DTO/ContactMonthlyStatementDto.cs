@@ -2,7 +2,7 @@ using Base.Domain;
 
 namespace DTO.DataAccess.Web.DTO;
 
-public class ContactMonthlyStatementDto : BaseEntity
+public class ContactMonthlyStatementDto : BaseEntityUserWithConcurrency
 {
     public Guid MonthlyStatementId { get; set; }
 

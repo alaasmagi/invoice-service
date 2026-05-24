@@ -3,7 +3,7 @@ using Domain;
 
 namespace DTO.DataAccess.Web.DTO;
 
-public class AddressContactDto : BaseEntity
+public class AddressContactDto : BaseEntityUserWithConcurrency
 {
     public Guid AddressId { get; set; }
 

@@ -2,7 +2,7 @@ using Base.Domain;
 
 namespace DTO.DataAccess.DataAccess.DTO;
 
-public class ContactEntity : BaseEntity
+public class ContactEntity : BaseEntityUserWithMetaConcurrency
 {
     public string FullName { get; set; } = default!;
 

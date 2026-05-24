@@ -2,7 +2,7 @@ using Base.Domain;
 
 namespace Domain;
 
-public class MonthlyStatement : BaseEntity
+public class MonthlyStatement : BaseEntityUser
 {
     public Guid AddressId { get; set; }
 

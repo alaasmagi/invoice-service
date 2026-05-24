@@ -2,7 +2,7 @@ using Base.Domain;
 
 namespace DTO.DataAccess.DataAccess.DTO;
 
-public class InvoiceAllocationEntity : BaseEntity
+public class InvoiceAllocationEntity : BaseEntityUserWithMetaConcurrency
 {
     public Guid InvoiceId { get; set; }
 

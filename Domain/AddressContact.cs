@@ -2,7 +2,7 @@ using Base.Domain;
 
 namespace Domain;
 
-public class AddressContact : BaseEntity
+public class AddressContact : BaseEntityUser
 {
     public Guid AddressId { get; set; }
 

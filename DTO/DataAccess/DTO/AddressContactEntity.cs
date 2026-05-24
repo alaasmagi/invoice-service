@@ -2,7 +2,7 @@ using Base.Domain;
 
 namespace DTO.DataAccess.DataAccess.DTO;
 
-public class AddressContactEntity : BaseEntity
+public class AddressContactEntity : BaseEntityUserWithMetaConcurrency
 {
     public Guid AddressId { get; set; }
 
