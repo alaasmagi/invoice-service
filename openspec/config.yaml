@@ -1,20 +1,131 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  Project overview
+  - Invoice management system for shared household costs
+  - Each authenticated Identity user manages only their own data
+  - The system stores addresses, contacts, address-contact relations, services, invoices, invoice allocations, monthly statements, and contact monthly statements
+  - Monthly statements are aggregated by address and calendar month
+  - Each monthly statement has a Send action that emails each contact their own amount
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  Tech stack
+  - ASP.NET Core 10 (MVC)
+  - Entity Framework Core 10
+  - ASP.NET Core Identity (authentication/authorization)
+  - PostgreSQL
+  - Bootstrap via wwwroot libs
+  - Razor views / MVC scaffolding
+  - ASP.NET Core code generator is used first for standard CRUD scaffolding, then views are adapted to the domain workflow
+
+  Solution architecture
+  - Domain
+  - DTO
+  - Contracts
+  - DataAccess
+  - Application
+  - Web
+  - Keep the current structure stable and do not reorganize folders unless absolutely necessary
+  - Domain contains pure business entities and enums only
+  - DTO contains DataAccess DTOs, Web DTOs, and mappers
+  - Contracts contains repository and application service interfaces
+  - DataAccess contains repository implementations and DbContexts
+  - Application contains use-case services
+  - Web contains MVC UI and Identity UI
+
+  Domain model rules
+  - Keep the existing naming exactly as defined in the project
+  - Do not rename domain classes for “cleaner” naming
+  - BaseEntity contains only Guid Id
+  - Metadata fields such as CreatedAt, UpdatedAt, DeletedAt, and similar audit fields do not belong in Domain entities
+  - Those metadata fields may be added later in DataAccess DTOs or persistence models
+  - Domain entities currently include:
+    - Address
+    - AddressContact
+    - AppUser
+    - Contact
+    - ContactMonthlyStatement
+    - Invoice
+    - InvoiceAllocation
+    - MonthlyStatement
+    - Service
+    - EAllocationMethod
+    - EMonthlyStatementStatus
+
+  Business rules
+  - An Address represents the shared location where bills are managed
+  - A Contact represents a person
+  - AddressContact represents the time-bounded relationship between a Contact and an Address
+  - Service represents a billable service provider or service type
+  - Invoice represents one incoming bill for one service at one address
+  - InvoiceAllocation represents one contact’s share of one invoice
+  - MonthlyStatement represents one address and one calendar month
+  - ContactMonthlyStatement represents one contact’s monthly total and email/payment state
+  - A monthly statement must aggregate all invoices for the same address and month
+  - A monthly statement must calculate each contact’s monthly amount
+  - A monthly statement must support a Send action that emails each contact their own amount
+  - Historical residency must be preserved so past invoices remain correct
+  - By default invoice allocation is equal split across active contacts
+  - The system must support ownership scoping so each Identity user sees only their own records
+
+  Identity and ownership rules
+  - ASP.NET Core Identity is used for authentication and authorization
+  - Domain data is user-scoped
+  - Every business record must be associated with the authenticated user, directly or through its aggregate root
+  - Queries must not expose another user’s data
+  - Write operations must verify ownership before update or delete
+  - Keep AppDbContext and AppIdentityDbContext separate
+  - Do not collapse them into one context
+
+  Entity Framework Core rules
+  - EF Core 10 with PostgreSQL
+  - Use explicit entity relationships and foreign keys
+  - Configure delete behavior deliberately
+  - Create migrations separately for AppDbContext and AppIdentityDbContext
+  - Do not merge migration history between the two contexts
+  - Repositories already exist and should remain the primary persistence abstraction
+  - Application services must use repository CRUD methods, not direct DbContext access unless explicitly required for a technical reason
+
+  Code style
+  - Nullable reference types are enabled
+  - Treat warnings seriously and keep code clean
+  - Prefer file-scoped namespaces
+  - Use `default!` for required string properties in entities
+  - Keep classes small and focused
+  - Use explicit code over reflection-heavy abstractions
+  - Do not use `ViewBag` or `ViewData`
+  - Use ViewModels whenever a view needs more than a single domain entity
+  - Simple views that only need one entity may use the domain entity directly
+
+  DTO and mapper rules
+  - DTO classes already exist for DataAccess and Web layers
+  - Create or complete mapper classes for Domain <-> DTO conversions
+  - Keep mapping explicit and easy to read
+  - Do not use AutoMapper
+  - Generate mapper methods for the current project entities
+  - Keep DTOs separate from Domain entities
+
+  Application service rules
+  - Application services already exist as the main use-case layer
+  - Fill in missing service methods using repository CRUD operations
+  - Services must cover:
+    - CreateAddressService
+    - CreateContactService
+    - CreateInvoiceService
+    - GenerateMonthlyStatementService
+    - SendMonthlyStatementService
+  - Services should contain business orchestration, not low-level persistence logic
+  - Do not bypass repositories with direct DbContext access from services unless necessary for a special query
+
+  Web rules
+  - Web is MVC-based
+  - Generate scaffolding first using ASP.NET Core code generator against AppDbContext and AppIdentityDbContext
+  - Then adapt the generated pages to the project’s monthly statement workflow and ownership rules
+  - The monthly statement UI must show the statement block, the calculated totals, the contacts included, and a Send button
+  - Web controllers and pages should call Application services instead of direct repository or DbContext access when possible
+
+  Output expectations
+  - Prefer incremental, minimal changes that fit the current solution structure
+  - Do not rename the existing projects
+  - Do not introduce unnecessary architecture layers
+  - When implementing a feature, produce all required interfaces, service methods, DTOs, mappers, context configuration, and scaffolding needed for that feature
+  - Keep the solution consistent with the current repository, DTO, Domain, Application, and Web separation
