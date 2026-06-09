@@ -8,21 +8,37 @@ public class AddressContactDtoMapper : IMapper<AddressContactDto, AddressContact
 {
     public AddressContactDto? Map(AddressContact? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new AddressContactDto
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            AddressId = entity.AddressId,
+            ContactId = entity.ContactId,
+            StartDate = entity.StartDate,
+            EndDate = entity.EndDate
+        };
     }
 
     public IEnumerable<AddressContactDto>? Map(IEnumerable<AddressContact>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 
     public AddressContact? Map(AddressContactDto? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new AddressContact
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            AddressId = entity.AddressId,
+            ContactId = entity.ContactId,
+            StartDate = entity.StartDate,
+            EndDate = entity.EndDate
+        };
     }
 
     public IEnumerable<AddressContact>? Map(IEnumerable<AddressContactDto>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 }

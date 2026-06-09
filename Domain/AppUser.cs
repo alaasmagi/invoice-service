@@ -1,8 +1,8 @@
-using Base.Domain;
+using Microsoft.AspNetCore.Identity;
 
 namespace Domain;
 
-public class AppUser : BaseEntity
+public class AppUser : IdentityUser
 {
-    public string Fullname { get; set; } = default!;
+    public string Fullname { get; set; } = string.Empty;
 }

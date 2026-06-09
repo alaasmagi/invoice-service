@@ -1,0 +1,13 @@
+@model DTO.DataAccess.DataAccess.DTO.ContactMonthlyStatementEntity
+@{
+    ViewData["Title"] = "Details Contact Monthly Statements";
+}
+<h1>Details Contact Monthly Statements</h1>
+<dl class="row">
+    <dt class="col-sm-2">Statement</dt><dd class="col-sm-10">@Model.MonthlyStatement.Address.Name @Model.MonthlyStatement.Period</dd>
+    <dt class="col-sm-2">Contact</dt><dd class="col-sm-10">@Model.Contact.FullName</dd>
+    <dt class="col-sm-2">Amount</dt><dd class="col-sm-10">@Model.Amount</dd>
+    <dt class="col-sm-2">Email Sent</dt><dd class="col-sm-10">@Model.EmailSent</dd>
+    <dt class="col-sm-2">Paid</dt><dd class="col-sm-10">@Model.Paid</dd>
+</dl>
+<p><a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> | <a asp-action="Index">Back</a></p>

@@ -8,21 +8,41 @@ public class InvoiceEntityMapper : IMapper<Invoice, InvoiceEntity>
 {
     public Invoice? Map(InvoiceEntity? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new Invoice
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            ServiceId = entity.ServiceId,
+            AddressId = entity.AddressId,
+            InvoiceDate = entity.InvoiceDate,
+            PeriodStart = entity.PeriodStart,
+            PeriodEnd = entity.PeriodEnd,
+            TotalSum = entity.TotalSum
+        };
     }
 
     public IEnumerable<Invoice>? Map(IEnumerable<InvoiceEntity>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 
     public InvoiceEntity? Map(Invoice? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new InvoiceEntity
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            ServiceId = entity.ServiceId,
+            AddressId = entity.AddressId,
+            InvoiceDate = entity.InvoiceDate,
+            PeriodStart = entity.PeriodStart,
+            PeriodEnd = entity.PeriodEnd,
+            TotalSum = entity.TotalSum
+        };
     }
 
     public IEnumerable<InvoiceEntity>? Map(IEnumerable<Invoice>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 }

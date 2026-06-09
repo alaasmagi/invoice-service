@@ -8,21 +8,37 @@ public class InvoiceAllocationEntityMapper : IMapper<InvoiceAllocation, InvoiceA
 {
     public InvoiceAllocation? Map(InvoiceAllocationEntity? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new InvoiceAllocation
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            InvoiceId = entity.InvoiceId,
+            ContactId = entity.ContactId,
+            AllocatedSum = entity.AllocatedSum,
+            CreatedAt = entity.CreatedAt
+        };
     }
 
     public IEnumerable<InvoiceAllocation>? Map(IEnumerable<InvoiceAllocationEntity>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 
     public InvoiceAllocationEntity? Map(InvoiceAllocation? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new InvoiceAllocationEntity
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            InvoiceId = entity.InvoiceId,
+            ContactId = entity.ContactId,
+            AllocatedSum = entity.AllocatedSum,
+            CreatedAt = entity.CreatedAt
+        };
     }
 
     public IEnumerable<InvoiceAllocationEntity>? Map(IEnumerable<InvoiceAllocation>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 }

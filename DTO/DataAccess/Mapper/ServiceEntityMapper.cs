@@ -8,21 +8,31 @@ public class ServiceEntityMapper : IMapper<Service, ServiceEntity>
 {
     public Service? Map(ServiceEntity? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new Service
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            Name = entity.Name
+        };
     }
 
     public IEnumerable<Service>? Map(IEnumerable<ServiceEntity>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 
     public ServiceEntity? Map(Service? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new ServiceEntity
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            Name = entity.Name
+        };
     }
 
     public IEnumerable<ServiceEntity>? Map(IEnumerable<Service>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 }

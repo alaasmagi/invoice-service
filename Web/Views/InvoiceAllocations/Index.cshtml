@@ -1,0 +1,14 @@
+@model IEnumerable<DTO.DataAccess.DataAccess.DTO.InvoiceAllocationEntity>
+@{
+    ViewData["Title"] = "Invoice Allocations";
+}
+<h1>Invoice Allocations</h1>
+<p><a asp-action="Create" class="btn btn-primary">Create New</a></p>
+<table class="table">
+    <thead><tr><th>Invoice</th><th>Contact</th><th>Amount</th><th></th></tr></thead>
+    <tbody>
+@foreach (var item in Model) {
+    <tr><td>@item.Invoice.InvoiceDate - @item.Invoice.Address.Name</td><td>@item.Contact.FullName</td><td>@item.AllocatedSum</td><td><a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | <a asp-action="Details" asp-route-id="@item.Id">Details</a> | <a asp-action="Delete" asp-route-id="@item.Id">Delete</a></td></tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,16 @@
+@model DTO.DataAccess.DataAccess.DTO.MonthlyStatementEntity
+@{
+    ViewData["Title"] = "Create Monthly Statement";
+}
+<h1>Create Monthly Statement</h1>
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3"><label asp-for="AddressId" class="form-label"></label><select asp-for="AddressId" class="form-select" asp-items="ViewBag.AddressId"></select></div>
+    <div class="mb-3"><label asp-for="Year" class="form-label"></label><input asp-for="Year" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="Month" class="form-label"></label><input asp-for="Month" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="TotalSum" class="form-label"></label><input asp-for="TotalSum" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="Status" class="form-label"></label><select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<Domain.EMonthlyStatementStatus>()"></select></div>
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

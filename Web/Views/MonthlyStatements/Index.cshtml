@@ -1,0 +1,28 @@
+@model IEnumerable<DTO.DataAccess.DataAccess.DTO.MonthlyStatementEntity>
+@{
+    ViewData["Title"] = "Monthly Statements";
+}
+<h1>Monthly Statements</h1>
+@if (TempData["StatusMessage"] is string message)
+{
+    <div class="alert alert-info">@message</div>
+}
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+    <a asp-action="Generate" class="btn btn-outline-primary">Generate</a>
+</p>
+<table class="table">
+    <thead><tr><th>Address</th><th>Period</th><th>Total</th><th>Status</th><th>Sent At</th><th></th></tr></thead>
+    <tbody>
+@foreach (var item in Model) {
+    <tr>
+        <td>@item.Address.Name</td>
+        <td>@item.Period</td>
+        <td>@item.TotalSum</td>
+        <td>@item.Status</td>
+        <td>@item.SentAt</td>
+        <td><a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | <a asp-action="Details" asp-route-id="@item.Id">Details</a> | <a asp-action="Delete" asp-route-id="@item.Id">Delete</a></td>
+    </tr>
+}
+    </tbody>
+</table>

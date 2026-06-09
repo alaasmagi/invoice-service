@@ -8,21 +8,35 @@ public class ContactEntityMapper : IMapper<Contact, ContactEntity>
 {
     public Contact? Map(ContactEntity? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new Contact
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            FullName = entity.FullName,
+            Email = entity.Email,
+            Phone = entity.Phone
+        };
     }
 
     public IEnumerable<Contact>? Map(IEnumerable<ContactEntity>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 
     public ContactEntity? Map(Contact? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new ContactEntity
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            FullName = entity.FullName,
+            Email = entity.Email,
+            Phone = entity.Phone
+        };
     }
 
     public IEnumerable<ContactEntity>? Map(IEnumerable<Contact>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 }

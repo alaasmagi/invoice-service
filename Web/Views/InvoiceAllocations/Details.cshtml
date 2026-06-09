@@ -1,0 +1,11 @@
+@model DTO.DataAccess.DataAccess.DTO.InvoiceAllocationEntity
+@{
+    ViewData["Title"] = "Details Invoice Allocations";
+}
+<h1>Details Invoice Allocations</h1>
+<dl class="row">
+    <dt class="col-sm-2">Invoice</dt><dd class="col-sm-10">@Model.Invoice.InvoiceDate - @Model.Invoice.Address.Name</dd>
+    <dt class="col-sm-2">Contact</dt><dd class="col-sm-10">@Model.Contact.FullName</dd>
+    <dt class="col-sm-2">Amount</dt><dd class="col-sm-10">@Model.AllocatedSum</dd>
+</dl>
+<p><a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> | <a asp-action="Index">Back</a></p>

@@ -1,0 +1,42 @@
+@model Web.Models.MonthlyStatementDetailViewModel
+@{
+    ViewData["Title"] = "Monthly Statement Details";
+}
+<h1>Monthly Statement Details</h1>
+<section class="mb-4">
+    <h2>@Model.Statement.Address.Name - @Model.Statement.Period</h2>
+    <dl class="row">
+        <dt class="col-sm-2">Total</dt><dd class="col-sm-10">@Model.Statement.TotalSum</dd>
+        <dt class="col-sm-2">Status</dt><dd class="col-sm-10">@Model.Statement.Status</dd>
+        <dt class="col-sm-2">Sent At</dt><dd class="col-sm-10">@Model.Statement.SentAt</dd>
+    </dl>
+    @if (Model.CanSend)
+    {
+        <form asp-action="Send" asp-route-id="@Model.Statement.Id" method="post">
+            <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+    }
+</section>
+<section class="mb-4">
+    <h3>Invoices</h3>
+    <table class="table">
+        <thead><tr><th>Date</th><th>Service</th><th>Period</th><th>Total</th></tr></thead>
+        <tbody>
+@foreach (var invoice in Model.Invoices) {
+            <tr><td>@invoice.InvoiceDate</td><td>@invoice.Service.Name</td><td>@invoice.PeriodStart - @invoice.PeriodEnd</td><td>@invoice.TotalSum</td></tr>
+}
+        </tbody>
+    </table>
+</section>
+<section>
+    <h3>Contacts</h3>
+    <table class="table">
+        <thead><tr><th>Contact</th><th>Email</th><th>Amount</th><th>Email Sent</th><th>Paid</th></tr></thead>
+        <tbody>
+@foreach (var contact in Model.Contacts) {
+            <tr><td>@contact.Contact.FullName</td><td>@contact.Contact.Email</td><td>@contact.Amount</td><td>@contact.EmailSent</td><td>@contact.Paid</td></tr>
+}
+        </tbody>
+    </table>
+</section>
+<p><a asp-action="Edit" asp-route-id="@Model.Statement.Id">Edit</a> | <a asp-action="Index">Back</a></p>

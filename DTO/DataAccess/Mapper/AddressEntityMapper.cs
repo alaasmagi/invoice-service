@@ -8,21 +8,33 @@ public class AddressEntityMapper : IMapper<Address, AddressEntity>
 {
     public Address? Map(AddressEntity? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new Address
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            Name = entity.Name,
+            FullAddress = entity.FullAddress
+        };
     }
 
     public IEnumerable<Address>? Map(IEnumerable<AddressEntity>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 
     public AddressEntity? Map(Address? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new AddressEntity
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            Name = entity.Name,
+            FullAddress = entity.FullAddress
+        };
     }
 
     public IEnumerable<AddressEntity>? Map(IEnumerable<Address>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 }

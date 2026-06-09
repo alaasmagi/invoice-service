@@ -430,6 +430,9 @@ FodyWeavers.xsd
 
 .idea/
 
+**/bin/
+**/obj/
+
 *.suo
 *.user
 .vs/
@@ -441,6 +444,9 @@ _UpgradeReport_Files/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+*.exe
+*.dll
 
 .env
 .pem

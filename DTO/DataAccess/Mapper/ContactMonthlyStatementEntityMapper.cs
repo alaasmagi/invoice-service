@@ -8,21 +8,43 @@ public class ContactMonthlyStatementEntityMapper : IMapper<ContactMonthlyStateme
 {
     public ContactMonthlyStatement? Map(ContactMonthlyStatementEntity? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new ContactMonthlyStatement
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            MonthlyStatementId = entity.MonthlyStatementId,
+            ContactId = entity.ContactId,
+            Amount = entity.Amount,
+            EmailSent = entity.EmailSent,
+            EmailSentAt = entity.EmailSentAt,
+            Paid = entity.Paid,
+            PaidAt = entity.PaidAt
+        };
     }
 
     public IEnumerable<ContactMonthlyStatement>? Map(IEnumerable<ContactMonthlyStatementEntity>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 
     public ContactMonthlyStatementEntity? Map(ContactMonthlyStatement? entity)
     {
-        throw new NotImplementedException();
+        return entity == null ? null : new ContactMonthlyStatementEntity
+        {
+            Id = entity.Id,
+            UserId = entity.UserId,
+            MonthlyStatementId = entity.MonthlyStatementId,
+            ContactId = entity.ContactId,
+            Amount = entity.Amount,
+            EmailSent = entity.EmailSent,
+            EmailSentAt = entity.EmailSentAt,
+            Paid = entity.Paid,
+            PaidAt = entity.PaidAt
+        };
     }
 
     public IEnumerable<ContactMonthlyStatementEntity>? Map(IEnumerable<ContactMonthlyStatement>? entities)
     {
-        throw new NotImplementedException();
+        return entities?.Select(Map)!;
     }
 }
