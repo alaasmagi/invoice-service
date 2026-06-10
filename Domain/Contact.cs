@@ -18,4 +18,7 @@ public class Contact : BaseEntityUser
 
     public ICollection<ContactMonthlyStatement> MonthlyStatementContacts { get; set; }
         = new List<ContactMonthlyStatement>();
+
+    public ICollection<MonthlyStatement> MonthlyStatements { get; set; }
+        = new List<MonthlyStatement>();
 }

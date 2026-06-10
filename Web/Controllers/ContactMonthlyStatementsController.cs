@@ -11,7 +11,7 @@ public class ContactMonthlyStatementsController(AppDbContext context) : UserScop
     public async Task<IActionResult> Index()
     {
         var userId = CurrentUserId();
-        var entities = await context.ContactMonthlyStatements.Include(e => e.MonthlyStatement).ThenInclude(e => e.Address).Include(e => e.Contact)
+        var entities = await context.ContactMonthlyStatements.Include(e => e.MonthlyStatement).ThenInclude(e => e.Contact).Include(e => e.Contact)
             .Where(e => e.UserId == userId)
             .OrderByDescending(e => e.MonthlyStatement.Year)
             .ThenByDescending(e => e.MonthlyStatement.Month)
@@ -23,7 +23,7 @@ public class ContactMonthlyStatementsController(AppDbContext context) : UserScop
     {
         if (id == null) return NotFound();
         var userId = CurrentUserId();
-        var entity = await context.ContactMonthlyStatements.Include(e => e.MonthlyStatement).ThenInclude(e => e.Address).Include(e => e.Contact)
+        var entity = await context.ContactMonthlyStatements.Include(e => e.MonthlyStatement).ThenInclude(e => e.Contact).Include(e => e.Contact)
             .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
         return entity == null ? NotFound() : View(entity);
     }
@@ -91,7 +91,7 @@ public class ContactMonthlyStatementsController(AppDbContext context) : UserScop
     {
         if (id == null) return NotFound();
         var userId = CurrentUserId();
-        var entity = await context.ContactMonthlyStatements.Include(e => e.MonthlyStatement).ThenInclude(e => e.Address).Include(e => e.Contact)
+        var entity = await context.ContactMonthlyStatements.Include(e => e.MonthlyStatement).ThenInclude(e => e.Contact).Include(e => e.Contact)
             .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
         return entity == null ? NotFound() : View(entity);
     }
@@ -112,8 +112,8 @@ public class ContactMonthlyStatementsController(AppDbContext context) : UserScop
 
     private async Task PopulateSelectLists(Guid userId)
     {
-        var statements = await context.MonthlyStatements.Include(e => e.Address).Where(e => e.UserId == userId).OrderByDescending(e => e.Year).ThenByDescending(e => e.Month).ToListAsync();
-        ViewData["MonthlyStatementId"] = new SelectList(statements.Select(e => new { e.Id, Label = $"{e.Address.Name} {e.Period}" }), "Id", "Label");
+        var statements = await context.MonthlyStatements.Include(e => e.Contact).Where(e => e.UserId == userId).OrderByDescending(e => e.Year).ThenByDescending(e => e.Month).ToListAsync();
+        ViewData["MonthlyStatementId"] = new SelectList(statements.Select(e => new { e.Id, Label = $"{e.Contact.FullName} {e.Period}" }), "Id", "Label");
         ViewData["ContactId"] = new SelectList(await context.Contacts.Where(e => e.UserId == userId).OrderBy(e => e.FullName).ToListAsync(), "Id", "FullName");
     }
 

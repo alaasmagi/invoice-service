@@ -21,4 +21,10 @@ public class AddressContact : BaseEntityUser
         return StartDate <= date
                && (EndDate == null || EndDate >= date);
     }
+
+    public bool IsActiveDuring(DateOnly periodStart, DateOnly periodEnd)
+    {
+        return StartDate <= periodEnd
+               && (EndDate == null || EndDate >= periodStart);
+    }
 }

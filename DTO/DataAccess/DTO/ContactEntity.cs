@@ -18,4 +18,7 @@ public class ContactEntity : BaseEntityUserWithMetaConcurrency
 
     public ICollection<InvoiceAllocationEntity> MonthlyStatementContacts { get; set; }
         = new List<InvoiceAllocationEntity>();
+
+    public ICollection<MonthlyStatementEntity> MonthlyStatements { get; set; }
+        = new List<MonthlyStatementEntity>();
 }

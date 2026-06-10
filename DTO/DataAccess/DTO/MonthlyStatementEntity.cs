@@ -5,9 +5,9 @@ namespace DTO.DataAccess.DataAccess.DTO;
 
 public class MonthlyStatementEntity : BaseEntityUserWithMetaConcurrency
 {
-    public Guid AddressId { get; set; }
+    public Guid ContactId { get; set; }
 
-    public AddressEntity Address { get; set; } = default!;
+    public ContactEntity Contact { get; set; } = default!;
 
     public int Year { get; set; }
 
@@ -23,11 +23,8 @@ public class MonthlyStatementEntity : BaseEntityUserWithMetaConcurrency
 
     public DateTime? SentAt { get; set; }
 
-    public ICollection<InvoiceEntity> Invoices { get; set; }
-        = new List<InvoiceEntity>();
-
-    public ICollection<ContactMonthlyStatementEntity> Contacts { get; set; }
-        = new List<ContactMonthlyStatementEntity>();
+    public ICollection<MonthlyStatementLineEntity> Lines { get; set; }
+        = new List<MonthlyStatementLineEntity>();
 
     public string Period => $"{Year:D4}-{Month:D2}";
 }

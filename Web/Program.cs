@@ -11,14 +11,14 @@ using DTO.DataAccess.DataAccess.Mapper;
 using DTO.DataAccess.Web.DTO;
 using DTO.DataAccess.Web.Mapper;
 using Microsoft.EntityFrameworkCore;
+using Web.Configuration;
 
+DotEnvConfiguration.LoadFromRepositoryRoot();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var identityConnectionString = builder.Configuration.GetConnectionString("IdentityConnection") ??
-                       throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-var appDbConnectionString = builder.Configuration.GetConnectionString("AppConnection") ??
-                          throw new InvalidOperationException("Connection string 'AppConnection' not found.");
+var identityConnectionString = RequiredConfiguration.IdentityConnectionString(builder.Configuration);
+var appDbConnectionString = RequiredConfiguration.AppConnectionString(builder.Configuration);
 builder.Services.AddDbContext<AppIdentityDbContext>(options =>
     options.UseNpgsql(identityConnectionString));
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -38,6 +38,7 @@ builder.Services.AddScoped<IMapper<ContactMonthlyStatement, ContactMonthlyStatem
 builder.Services.AddScoped<IMapper<Invoice, InvoiceEntity>, InvoiceEntityMapper>();
 builder.Services.AddScoped<IMapper<InvoiceAllocation, InvoiceAllocationEntity>, InvoiceAllocationEntityMapper>();
 builder.Services.AddScoped<IMapper<MonthlyStatement, MonthlyStatementEntity>, MonthlyStatementEntityMapper>();
+builder.Services.AddScoped<IMapper<MonthlyStatementLine, MonthlyStatementLineEntity>, MonthlyStatementLineEntityMapper>();
 builder.Services.AddScoped<IMapper<Service, ServiceEntity>, ServiceEntityMapper>();
 
 builder.Services.AddScoped<IMapper<AddressDto, Address>, AddressDtoMapper>();
@@ -47,6 +48,7 @@ builder.Services.AddScoped<IMapper<ContactMonthlyStatementDto, ContactMonthlySta
 builder.Services.AddScoped<IMapper<InvoiceDto, Invoice>, InvoiceDtoMapper>();
 builder.Services.AddScoped<IMapper<InvoiceAllocationDto, InvoiceAllocation>, InvoiceAllocationDtoMapper>();
 builder.Services.AddScoped<IMapper<MonthlyStatementDto, MonthlyStatement>, MonthlyStatementDtoMapper>();
+builder.Services.AddScoped<IMapper<MonthlyStatementLineDto, MonthlyStatementLine>, MonthlyStatementLineDtoMapper>();
 builder.Services.AddScoped<IMapper<ServiceDto, Service>, ServiceDtoMapper>();
 
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
@@ -56,6 +58,7 @@ builder.Services.AddScoped<IContactMonthlyStatementRepository, ContactMonthlySta
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IInvoiceAllocationRepository, InvoiceAllocationRepository>();
 builder.Services.AddScoped<IMonthlyStatementRepository, MonthlyStatementRepository>();
+builder.Services.AddScoped<IMonthlyStatementLineRepository, MonthlyStatementLineRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IBaseUow, DataAccessUow>();
 
@@ -64,7 +67,29 @@ builder.Services.AddScoped<ICreateContactService, CreateContactService>();
 builder.Services.AddScoped<ICreateInvoiceService, CreateInvoiceService>();
 builder.Services.AddScoped<IGenerateMonthlyStatementService, GenerateMonthlyStatementService>();
 builder.Services.AddScoped<ISendMonthlyStatementService, SendMonthlyStatementService>();
-builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
+
+var emailProvider = RequiredConfiguration.EmailProvider(builder.Configuration);
+if (emailProvider.Equals("Console", StringComparison.OrdinalIgnoreCase))
+{
+    if (!builder.Environment.IsDevelopment())
+    {
+        throw new InvalidOperationException("EMAIL_PROVIDER=Console is only allowed in Development.");
+    }
+
+    builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
+}
+else if (emailProvider.Equals("Brevo", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddSingleton(RequiredConfiguration.BrevoEmailOptions(builder.Configuration));
+    builder.Services.AddHttpClient<IEmailSender, BrevoEmailSender>(client =>
+    {
+        client.BaseAddress = new Uri("https://api.brevo.com/v3/");
+    });
+}
+else
+{
+    throw new InvalidOperationException($"Unsupported email provider '{emailProvider}'. Use 'Brevo' or 'Console'.");
+}
 
 builder.Services.AddControllersWithViews();
 

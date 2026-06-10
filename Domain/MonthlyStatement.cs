@@ -4,9 +4,9 @@ namespace Domain;
 
 public class MonthlyStatement : BaseEntityUser
 {
-    public Guid AddressId { get; set; }
+    public Guid ContactId { get; set; }
 
-    public Address Address { get; set; } = default!;
+    public Contact Contact { get; set; } = default!;
 
     public int Year { get; set; }
 
@@ -22,11 +22,8 @@ public class MonthlyStatement : BaseEntityUser
 
     public DateTime? SentAt { get; set; }
 
-    public ICollection<Invoice> Invoices { get; set; }
-        = new List<Invoice>();
-
-    public ICollection<ContactMonthlyStatement> Contacts { get; set; }
-        = new List<ContactMonthlyStatement>();
+    public ICollection<MonthlyStatementLine> Lines { get; set; }
+        = new List<MonthlyStatementLine>();
 
     public string Period => $"{Year:D4}-{Month:D2}";
 }

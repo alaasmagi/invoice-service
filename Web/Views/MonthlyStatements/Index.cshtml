@@ -8,20 +8,39 @@
     <div class="alert alert-info">@message</div>
 }
 <p>
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
-    <a asp-action="Generate" class="btn btn-outline-primary">Generate</a>
+    <a asp-action="Generate" class="btn btn-primary">Generate Person Statements</a>
+    <a asp-action="Create" class="btn btn-outline-primary">Create New</a>
 </p>
 <table class="table">
-    <thead><tr><th>Address</th><th>Period</th><th>Total</th><th>Status</th><th>Sent At</th><th></th></tr></thead>
+    <thead><tr><th>Person</th><th>Period</th><th>Total</th><th>Status</th><th>Sent At</th><th></th></tr></thead>
     <tbody>
 @foreach (var item in Model) {
+    var canSend = item.Status is Domain.EMonthlyStatementStatus.Draft
+        or Domain.EMonthlyStatementStatus.ReadyToSend
+        or Domain.EMonthlyStatementStatus.PartiallySent
+        or Domain.EMonthlyStatementStatus.Failed;
     <tr>
-        <td>@item.Address.Name</td>
+        <td>@item.Contact.FullName</td>
         <td>@item.Period</td>
         <td>@item.TotalSum</td>
         <td>@item.Status</td>
         <td>@item.SentAt</td>
-        <td><a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | <a asp-action="Details" asp-route-id="@item.Id">Details</a> | <a asp-action="Delete" asp-route-id="@item.Id">Delete</a></td>
+        <td>
+            <div class="d-flex gap-2 align-items-center">
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                <span>|</span>
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                <span>|</span>
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                @if (canSend)
+                {
+                    <form asp-action="Send" asp-route-id="@item.Id" method="post" class="d-inline">
+                        <input type="hidden" name="returnTo" value="Index" />
+                        <button type="submit" class="btn btn-sm btn-primary">Send</button>
+                    </form>
+                }
+            </div>
+        </td>
     </tr>
 }
     </tbody>

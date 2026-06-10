@@ -4,9 +4,14 @@ namespace Application;
 
 public class ConsoleEmailSender : IEmailSender
 {
-    public Task SendMonthlyStatementEmailAsync(string toEmail, string contactName, decimal amount, string period)
+    public Task SendMonthlyStatementEmailAsync(MonthlyStatementEmail email)
     {
-        Console.WriteLine($"Monthly statement email to {contactName} <{toEmail}> for {period}: {amount:C}");
+        Console.WriteLine($"Monthly statement email to {email.ContactName} <{email.ToEmail}> for {email.Period}: {email.TotalAmount:C}");
+        foreach (var line in email.Lines)
+        {
+            Console.WriteLine($"- {line.AddressName} / {line.ServiceName} / {line.InvoiceDate:yyyy-MM-dd}: {line.ContactAmount:C} of {line.InvoiceTotal:C} split between {line.ResidentCount}");
+        }
+
         return Task.CompletedTask;
     }
 }

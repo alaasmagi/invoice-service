@@ -1,4 +1,3 @@
-using Base.Contracts.DataAccess;
 using Contracts.Application;
 using Contracts.DataAccess;
 using Domain;
@@ -7,10 +6,9 @@ namespace Application;
 
 public class SendMonthlyStatementService(
     IMonthlyStatementRepository monthlyStatementRepository,
-    IContactMonthlyStatementRepository contactMonthlyStatementRepository,
+    IMonthlyStatementLineRepository monthlyStatementLineRepository,
     IContactRepository contactRepository,
-    IEmailSender emailSender,
-    IBaseUow uow) : ISendMonthlyStatementService
+    IEmailSender emailSender) : ISendMonthlyStatementService
 {
     public async Task SendAsync(Guid monthlyStatementId, Guid userId)
     {
@@ -21,54 +19,69 @@ public class SendMonthlyStatementService(
         }
 
         var statement = statementResponse.Value;
-        var contactStatementsResponse = await contactMonthlyStatementRepository.GetAllAsync(userId);
-        var contactStatements = contactStatementsResponse.Successful && contactStatementsResponse.Value != null
-            ? contactStatementsResponse.Value
-                .Where(contactStatement => contactStatement.MonthlyStatementId == monthlyStatementId)
-                .ToList()
-            : new List<ContactMonthlyStatement>();
-
-        var contactsResponse = await contactRepository.GetAllAsync(userId);
-        var contactsById = contactsResponse.Successful && contactsResponse.Value != null
-            ? contactsResponse.Value.ToDictionary(contact => contact.Id)
-            : new Dictionary<Guid, Contact>();
-
-        var sentCount = 0;
-        foreach (var contactStatement in contactStatements)
+        var contact = await GetContactAsync(statement.ContactId, userId);
+        var lines = await GetStatementLinesAsync(statement.Id, userId);
+        if (lines.Count == 0)
         {
-            if (!contactsById.TryGetValue(contactStatement.ContactId, out var contact))
-            {
-                continue;
-            }
-
-            try
-            {
-                await emailSender.SendMonthlyStatementEmailAsync(
-                    contact.Email,
-                    contact.FullName,
-                    contactStatement.Amount,
-                    statement.Period);
-
-                contactStatement.EmailSent = true;
-                contactStatement.EmailSentAt = DateTime.UtcNow;
-                sentCount++;
-            }
-            catch
-            {
-                contactStatement.EmailSent = false;
-            }
-
-            await contactMonthlyStatementRepository.UpdateAsync(contactStatement.Id, contactStatement, string.Empty, userId);
+            throw new InvalidOperationException("Monthly statement has no invoice lines to send.");
         }
 
-        statement.Status = sentCount == contactStatements.Count
-            ? EMonthlyStatementStatus.Sent
-            : sentCount == 0
-                ? EMonthlyStatementStatus.Failed
-                : EMonthlyStatementStatus.PartiallySent;
-        statement.SentAt = sentCount > 0 ? DateTime.UtcNow : null;
+        try
+        {
+            await emailSender.SendMonthlyStatementEmailAsync(new MonthlyStatementEmail
+            {
+                ToEmail = contact.Email,
+                ContactName = contact.FullName,
+                Period = statement.Period,
+                TotalAmount = statement.TotalSum,
+                Lines = lines
+                    .OrderBy(line => line.AddressName)
+                    .ThenBy(line => line.InvoiceDate)
+                    .ThenBy(line => line.ServiceName)
+                    .Select(line => new MonthlyStatementEmailLine
+                    {
+                        AddressName = line.AddressName,
+                        ServiceName = line.ServiceName,
+                        InvoiceDate = line.InvoiceDate,
+                        PeriodStart = line.PeriodStart,
+                        PeriodEnd = line.PeriodEnd,
+                        InvoiceTotal = line.InvoiceTotal,
+                        ResidentCount = line.ResidentCount,
+                        ContactAmount = line.AllocatedAmount
+                    })
+                    .ToList()
+            });
 
-        await monthlyStatementRepository.UpdateAsync(statement.Id, statement, string.Empty, userId);
-        await uow.SaveChangesAsync();
+            statement.Status = EMonthlyStatementStatus.Sent;
+            statement.SentAt = DateTime.UtcNow;
+        }
+        catch
+        {
+            statement.Status = EMonthlyStatementStatus.Failed;
+            statement.SentAt = null;
+        }
+
+        await monthlyStatementRepository.SetSendStatusAsync(statement.Id, userId, statement.Status, statement.SentAt);
+    }
+
+    private async Task<Contact> GetContactAsync(Guid contactId, Guid userId)
+    {
+        var response = await contactRepository.GetByIdAsync(contactId, userId);
+        if (!response.Successful || response.Value == null)
+        {
+            throw new InvalidOperationException("Monthly statement contact was not found.");
+        }
+
+        return response.Value;
+    }
+
+    private async Task<List<MonthlyStatementLine>> GetStatementLinesAsync(Guid statementId, Guid userId)
+    {
+        var response = await monthlyStatementLineRepository.GetAllAsync(userId);
+        return response.Successful && response.Value != null
+            ? response.Value
+                .Where(line => line.MonthlyStatementId == statementId)
+                .ToList()
+            : [];
     }
 }

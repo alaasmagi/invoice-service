@@ -12,7 +12,7 @@ public class MonthlyStatementEntityMapper : IMapper<MonthlyStatement, MonthlySta
         {
             Id = entity.Id,
             UserId = entity.UserId,
-            AddressId = entity.AddressId,
+            ContactId = entity.ContactId,
             Year = entity.Year,
             Month = entity.Month,
             TotalSum = entity.TotalSum,
@@ -33,7 +33,7 @@ public class MonthlyStatementEntityMapper : IMapper<MonthlyStatement, MonthlySta
         {
             Id = entity.Id,
             UserId = entity.UserId,
-            AddressId = entity.AddressId,
+            ContactId = entity.ContactId,
             Year = entity.Year,
             Month = entity.Month,
             TotalSum = entity.TotalSum,

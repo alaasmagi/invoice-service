@@ -13,6 +13,4 @@ public class Address : BaseEntityUser
     public ICollection<Invoice> Invoices { get; set; }
         = new List<Invoice>();
 
-    public ICollection<MonthlyStatement> MonthlyStatements { get; set; }
-        = new List<MonthlyStatement>();
 }

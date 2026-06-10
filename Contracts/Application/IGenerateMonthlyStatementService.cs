@@ -4,5 +4,5 @@ namespace Contracts.Application;
 
 public interface IGenerateMonthlyStatementService
 {
-    Task<MonthlyStatement?> GenerateAsync(Guid addressId, int year, int month, Guid userId);
+    Task<IReadOnlyList<MonthlyStatement>> GenerateAsync(int year, int month, Guid userId);
 }

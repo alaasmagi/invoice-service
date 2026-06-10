@@ -8,7 +8,7 @@
     <thead><tr><th>Statement</th><th>Contact</th><th>Amount</th><th>Email Sent</th><th>Paid</th><th></th></tr></thead>
     <tbody>
 @foreach (var item in Model) {
-    <tr><td>@item.MonthlyStatement.Address.Name @item.MonthlyStatement.Period</td><td>@item.Contact.FullName</td><td>@item.Amount</td><td>@item.EmailSent</td><td>@item.Paid</td><td><a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | <a asp-action="Details" asp-route-id="@item.Id">Details</a> | <a asp-action="Delete" asp-route-id="@item.Id">Delete</a></td></tr>
+    <tr><td>@item.MonthlyStatement.Contact.FullName @item.MonthlyStatement.Period</td><td>@item.Contact.FullName</td><td>@item.Amount</td><td>@item.EmailSent</td><td>@item.Paid</td><td><a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | <a asp-action="Details" asp-route-id="@item.Id">Details</a> | <a asp-action="Delete" asp-route-id="@item.Id">Delete</a></td></tr>
 }
     </tbody>
 </table>

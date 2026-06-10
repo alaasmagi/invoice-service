@@ -19,4 +19,7 @@ public class ContactDto : BaseEntityUserWithConcurrency
 
     public ICollection<ContactMonthlyStatementDto> MonthlyStatementContacts { get; set; }
         = new List<ContactMonthlyStatementDto>();
+
+    public ICollection<MonthlyStatementDto> MonthlyStatements { get; set; }
+        = new List<MonthlyStatementDto>();
 }

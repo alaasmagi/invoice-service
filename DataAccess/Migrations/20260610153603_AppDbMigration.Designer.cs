@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260609052302_AppDbMigration")]
+    [Migration("20260610153603_AppDbMigration")]
     partial class AppDbMigration
     {
         /// <inheritdoc />
@@ -253,7 +253,8 @@ namespace DataAccess.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<string>("ConcurrencyToken")
                         .IsRequired()
@@ -313,7 +314,8 @@ namespace DataAccess.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("AllocatedSum")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<string>("ConcurrencyToken")
                         .IsRequired()
@@ -384,9 +386,6 @@ namespace DataAccess.Migrations
                     b.Property<DateOnly>("InvoiceDate")
                         .HasColumnType("date");
 
-                    b.Property<Guid?>("MonthlyStatementEntityId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateOnly?>("PeriodEnd")
                         .HasColumnType("date");
 
@@ -397,7 +396,8 @@ namespace DataAccess.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("TotalSum")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -416,8 +416,6 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("InvoiceDate");
 
-                    b.HasIndex("MonthlyStatementEntityId");
-
                     b.HasIndex("ServiceId");
 
                     b.ToTable("Invoices", "invoice");
@@ -429,13 +427,13 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AddressId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("ConcurrencyToken")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
+
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -455,7 +453,8 @@ namespace DataAccess.Migrations
                         .HasColumnType("integer");
 
                     b.Property<decimal>("TotalSum")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -473,11 +472,99 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
+                    b.HasIndex("ContactId");
 
                     b.HasIndex("Year", "Month");
 
+                    b.HasIndex("UserId", "ContactId", "Year", "Month")
+                        .IsUnique();
+
                     b.ToTable("MonthlyStatements", "invoice");
+                });
+
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.MonthlyStatementLineEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AddressId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AddressName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<decimal>("AllocatedAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("ConcurrencyToken")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateOnly>("InvoiceDate")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("InvoiceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("InvoiceTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<Guid>("MonthlyStatementId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly?>("PeriodEnd")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("PeriodStart")
+                        .HasColumnType("date");
+
+                    b.Property<int>("ResidentCount")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
+
+                    b.HasIndex("InvoiceId");
+
+                    b.HasIndex("MonthlyStatementId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("MonthlyStatementLines", "invoice");
                 });
 
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.ServiceEntity", b =>
@@ -547,7 +634,7 @@ namespace DataAccess.Migrations
                         .IsRequired();
 
                     b.HasOne("DTO.DataAccess.DataAccess.DTO.MonthlyStatementEntity", "MonthlyStatement")
-                        .WithMany("Contacts")
+                        .WithMany()
                         .HasForeignKey("MonthlyStatementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -588,10 +675,6 @@ namespace DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DTO.DataAccess.DataAccess.DTO.MonthlyStatementEntity", null)
-                        .WithMany("Invoices")
-                        .HasForeignKey("MonthlyStatementEntityId");
-
                     b.HasOne("DTO.DataAccess.DataAccess.DTO.ServiceEntity", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId")
@@ -605,13 +688,48 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.MonthlyStatementEntity", b =>
                 {
-                    b.HasOne("DTO.DataAccess.DataAccess.DTO.AddressEntity", "Address")
+                    b.HasOne("DTO.DataAccess.DataAccess.DTO.ContactEntity", "Contact")
                         .WithMany("MonthlyStatements")
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Contact");
+                });
+
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.MonthlyStatementLineEntity", b =>
+                {
+                    b.HasOne("DTO.DataAccess.DataAccess.DTO.AddressEntity", "Address")
+                        .WithMany()
                         .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DTO.DataAccess.DataAccess.DTO.InvoiceEntity", "Invoice")
+                        .WithMany()
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DTO.DataAccess.DataAccess.DTO.MonthlyStatementEntity", "MonthlyStatement")
+                        .WithMany("Lines")
+                        .HasForeignKey("MonthlyStatementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DTO.DataAccess.DataAccess.DTO.ServiceEntity", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Address");
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("MonthlyStatement");
+
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.AddressEntity", b =>
@@ -619,8 +737,6 @@ namespace DataAccess.Migrations
                     b.Navigation("AddressContacts");
 
                     b.Navigation("Invoices");
-
-                    b.Navigation("MonthlyStatements");
                 });
 
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.ContactEntity", b =>
@@ -630,6 +746,8 @@ namespace DataAccess.Migrations
                     b.Navigation("InvoiceAllocations");
 
                     b.Navigation("MonthlyStatementContacts");
+
+                    b.Navigation("MonthlyStatements");
                 });
 
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.InvoiceEntity", b =>
@@ -639,9 +757,7 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.MonthlyStatementEntity", b =>
                 {
-                    b.Navigation("Contacts");
-
-                    b.Navigation("Invoices");
+                    b.Navigation("Lines");
                 });
 #pragma warning restore 612, 618
         }

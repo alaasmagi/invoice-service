@@ -6,10 +6,10 @@
 <form asp-action="Edit" method="post">
     <input type="hidden" asp-for="Id" />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="mb-3"><label asp-for="AddressId" class="form-label"></label><select asp-for="AddressId" class="form-select" asp-items="ViewBag.AddressId"></select></div>
+    <div class="mb-3"><label asp-for="ContactId" class="form-label"></label><select asp-for="ContactId" class="form-select" asp-items="ViewBag.ContactId"></select></div>
     <div class="mb-3"><label asp-for="Year" class="form-label"></label><input asp-for="Year" class="form-control" /></div>
     <div class="mb-3"><label asp-for="Month" class="form-label"></label><input asp-for="Month" class="form-control" /></div>
-    <div class="mb-3"><label asp-for="TotalSum" class="form-label"></label><input asp-for="TotalSum" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="TotalSum" class="form-label"></label><input asp-for="TotalSum" class="form-control" type="number" step="0.01" /></div>
     <div class="mb-3"><label asp-for="Status" class="form-label"></label><select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<Domain.EMonthlyStatementStatus>()"></select></div>
     <button type="submit" class="btn btn-primary">Save</button>
     <a asp-action="Index" class="btn btn-secondary">Back</a>

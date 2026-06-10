@@ -13,6 +13,4 @@ public class AddressEntity : BaseEntityUserWithMetaConcurrency
     public ICollection<InvoiceEntity> Invoices { get; set; }
         = new List<InvoiceEntity>();
 
-    public ICollection<MonthlyStatementEntity> MonthlyStatements { get; set; }
-        = new List<MonthlyStatementEntity>();
 }
