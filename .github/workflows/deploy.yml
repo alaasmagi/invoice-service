@@ -1,0 +1,114 @@
+name: Build and Deploy Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-invoice-service
+  cancel-in-progress: true
+
+env:
+  IMAGE_NAME: invoice-service
+  CONTAINER_NAME: invoice-service
+  REMOTE_APP_DIR: /opt/invoice-service
+  CONTAINER_PORT: "8080"
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build --pull -t "$IMAGE_NAME:${GITHUB_SHA}" .
+
+      - name: Save Docker image
+        run: docker save "$IMAGE_NAME:${GITHUB_SHA}" | gzip > image.tar.gz
+
+      - name: Create runtime env file from GitHub secrets
+        env:
+          IDENTITY_CONNECTION_STRING: ${{ secrets.IDENTITY_CONNECTION_STRING }}
+          APP_CONNECTION_STRING: ${{ secrets.APP_CONNECTION_STRING }}
+          EMAIL_PROVIDER: ${{ secrets.EMAIL_PROVIDER || 'Brevo' }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          BREVO_SENDER_EMAIL: ${{ secrets.BREVO_SENDER_EMAIL }}
+          BREVO_SENDER_NAME: ${{ secrets.BREVO_SENDER_NAME }}
+        run: |
+          {
+            printf 'ASPNETCORE_ENVIRONMENT=%s\n' 'Production'
+            printf 'ASPNETCORE_URLS=%s\n' "http://+:${CONTAINER_PORT}"
+            printf 'ConnectionStrings__IdentityConnection=%s\n' "$IDENTITY_CONNECTION_STRING"
+            printf 'ConnectionStrings__AppConnection=%s\n' "$APP_CONNECTION_STRING"
+            printf 'Email__Provider=%s\n' "$EMAIL_PROVIDER"
+            printf 'Brevo__ApiKey=%s\n' "$BREVO_API_KEY"
+            printf 'Brevo__SenderEmail=%s\n' "$BREVO_SENDER_EMAIL"
+            printf 'Brevo__SenderName=%s\n' "$BREVO_SENDER_NAME"
+          } > deploy.env
+          chmod 600 deploy.env
+
+      - name: Configure SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$VPS_PORT" "$VPS_HOST" >> ~/.ssh/known_hosts
+
+      - name: Upload image and env file to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" "sudo mkdir -p '$REMOTE_APP_DIR' && sudo chown '$VPS_USER' '$REMOTE_APP_DIR'"
+          scp -i ~/.ssh/deploy_key -P "$VPS_PORT" image.tar.gz deploy.env "$VPS_USER@$VPS_HOST:$REMOTE_APP_DIR/"
+
+      - name: Run container on VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+          HOST_PORT: ${{ secrets.APP_PORT || '8080' }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" \
+            IMAGE_NAME="$IMAGE_NAME" \
+            IMAGE_TAG="$GITHUB_SHA" \
+            CONTAINER_NAME="$CONTAINER_NAME" \
+            REMOTE_APP_DIR="$REMOTE_APP_DIR" \
+            HOST_PORT="$HOST_PORT" \
+            CONTAINER_PORT="$CONTAINER_PORT" \
+            'bash -s' <<'EOF_REMOTE'
+          set -euo pipefail
+
+          if docker info >/dev/null 2>&1; then
+            DOCKER="docker"
+          else
+            DOCKER="sudo docker"
+          fi
+
+          cd "$REMOTE_APP_DIR"
+          $DOCKER load < image.tar.gz
+          chmod 600 deploy.env
+
+          if $DOCKER ps -a --format '{{.Names}}' | grep -Fxq "$CONTAINER_NAME"; then
+            $DOCKER rm -f "$CONTAINER_NAME"
+          fi
+
+          $DOCKER run -d \
+            --name "$CONTAINER_NAME" \
+            --restart unless-stopped \
+            --env-file "$REMOTE_APP_DIR/deploy.env" \
+            -p "$HOST_PORT:$CONTAINER_PORT" \
+            "$IMAGE_NAME:$IMAGE_TAG"
+
+          $DOCKER image prune -f
+          EOF_REMOTE
