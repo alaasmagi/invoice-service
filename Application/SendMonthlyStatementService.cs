@@ -8,6 +8,7 @@ public class SendMonthlyStatementService(
     IMonthlyStatementRepository monthlyStatementRepository,
     IMonthlyStatementLineRepository monthlyStatementLineRepository,
     IContactRepository contactRepository,
+    IMonthlyStatementSenderPaymentDetailsProvider senderPaymentDetailsProvider,
     IEmailSender emailSender) : ISendMonthlyStatementService
 {
     public async Task SendAsync(Guid monthlyStatementId, Guid userId)
@@ -20,6 +21,8 @@ public class SendMonthlyStatementService(
 
         var statement = statementResponse.Value;
         var contact = await GetContactAsync(statement.ContactId, userId);
+        var senderPaymentDetails = await senderPaymentDetailsProvider.GetAsync(userId);
+        MonthlyStatementSenderPaymentDetailsValidator.EnsureCanSend(senderPaymentDetails);
         var lines = await GetStatementLinesAsync(statement.Id, userId);
         if (lines.Count == 0)
         {
@@ -32,6 +35,8 @@ public class SendMonthlyStatementService(
             {
                 ToEmail = contact.Email,
                 ContactName = contact.FullName,
+                SenderBankAccountName = senderPaymentDetails!.Fullname.Trim(),
+                SenderBankIban = senderPaymentDetails.BankIban.Trim(),
                 Period = statement.Period,
                 TotalAmount = statement.TotalSum,
                 Lines = lines

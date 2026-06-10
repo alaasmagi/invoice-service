@@ -6,4 +6,5 @@ public class AppUserDto : BaseEntityWithConcurrency
 {
     public string Fullname { get; set; } = default!;
     public string Email { get; set; } = default!;
+    public string? BankIban { get; set; }
 }

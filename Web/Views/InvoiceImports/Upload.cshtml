@@ -1,0 +1,17 @@
+@{
+    ViewData["Title"] = "Import invoice PDF";
+}
+
+<h1>Import invoice PDF</h1>
+
+<p class="text-muted">Upload a Telia or Enefit invoice PDF. The importer will match service and address records before creating invoices.</p>
+
+<form asp-action="Upload" method="post" enctype="multipart/form-data" class="mt-4">
+    <div class="mb-3">
+        <label for="pdfFile" class="form-label">PDF invoice</label>
+        <input id="pdfFile" name="pdfFile" type="file" accept="application/pdf,.pdf" class="form-control" required />
+        <div class="form-text">Maximum file size: 10 MB.</div>
+    </div>
+    <button type="submit" class="btn btn-primary">Import PDF</button>
+    <a asp-controller="Invoices" asp-action="Index" class="btn btn-outline-secondary">Back to invoices</a>
+</form>

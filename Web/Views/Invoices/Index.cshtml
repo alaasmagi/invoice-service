@@ -3,7 +3,10 @@
     ViewData["Title"] = "Invoices";
 }
 <h1>Invoices</h1>
-<p><a asp-action="Create" class="btn btn-primary">Create New</a></p>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+    <a asp-controller="InvoiceImports" asp-action="Upload" class="btn btn-outline-primary">Import PDF</a>
+</p>
 <table class="table">
     <thead><tr><th>Date</th><th>Address</th><th>Service</th><th>Total</th><th></th></tr></thead>
     <tbody>

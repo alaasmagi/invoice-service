@@ -4,6 +4,8 @@ public sealed class MonthlyStatementEmail
 {
     public string ToEmail { get; init; } = default!;
     public string ContactName { get; init; } = default!;
+    public string SenderBankAccountName { get; init; } = default!;
+    public string SenderBankIban { get; init; } = default!;
     public string Period { get; init; } = default!;
     public decimal TotalAmount { get; init; }
     public IReadOnlyList<MonthlyStatementEmailLine> Lines { get; init; } = [];

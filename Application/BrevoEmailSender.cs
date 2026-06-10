@@ -53,8 +53,8 @@ public sealed class BrevoEmailSender(HttpClient httpClient, BrevoEmailOptions op
 
         builder.AppendLine();
         builder.AppendLine("Makse andmed:");
-        builder.AppendLine($"Saaja: {options.BankAccountName}");
-        builder.AppendLine($"IBAN: {options.BankIban}");
+        builder.AppendLine($"Saaja: {email.SenderBankAccountName}");
+        builder.AppendLine($"IBAN: {email.SenderBankIban}");
         builder.AppendLine($"Selgitus: {email.ContactName} {email.Period}");
         builder.AppendLine();
         builder.AppendLine("Arve");
@@ -131,8 +131,8 @@ public sealed class BrevoEmailSender(HttpClient httpClient, BrevoEmailOptions op
                           <td style="padding:24px 26px;">
                             <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#d8c7a2;">Makse andmed</div>
                             <div style="margin-top:14px;font-size:15px;line-height:1.8;">
-                              <div><strong>Saaja:</strong> {{Html(options.BankAccountName)}}</div>
-                              <div><strong>IBAN:</strong> {{Html(options.BankIban)}}</div>
+                              <div><strong>Saaja:</strong> {{Html(email.SenderBankAccountName)}}</div>
+                              <div><strong>IBAN:</strong> {{Html(email.SenderBankIban)}}</div>
                               <div><strong>Selgitus:</strong> {{Html(email.ContactName)}} {{Html(email.Period)}}</div>
                             </div>
                           </td>

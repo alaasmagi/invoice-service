@@ -1,0 +1,35 @@
+@model Web.Models.BankDetailsViewModel
+@{
+    ViewData["Title"] = "Bank details";
+}
+
+<h1>Bank details</h1>
+
+@if (TempData["StatusMessage"] is string message)
+{
+    <div class="alert alert-success">@message</div>
+}
+
+<p class="text-muted">These payment details are shown in monthly statement emails.</p>
+
+<form asp-action="BankDetails" method="post" class="mt-4">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Fullname" class="form-label"></label>
+        <input asp-for="Fullname" class="form-control" autocomplete="name" />
+        <span asp-validation-for="Fullname" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BankIban" class="form-label"></label>
+        <input asp-for="BankIban" class="form-control" autocomplete="off" />
+        <span asp-validation-for="BankIban" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save bank details</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

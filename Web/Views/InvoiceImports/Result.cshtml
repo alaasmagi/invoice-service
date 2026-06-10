@@ -1,0 +1,91 @@
+@model Contracts.Application.PdfInvoiceImportResult
+@{
+    ViewData["Title"] = "PDF import result";
+}
+
+<h1>PDF import result</h1>
+
+@if (Model.FatalErrors.Count > 0)
+{
+    <div class="alert alert-danger">
+        <strong>Import failed.</strong>
+        <ul class="mb-0">
+            @foreach (var error in Model.FatalErrors)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
+else
+{
+    <div class="alert alert-success">
+        Imported @Model.CreatedInvoices.Count invoice(s) from @Model.ProviderName.
+    </div>
+}
+
+@if (Model.Warnings.Count > 0)
+{
+    <div class="alert alert-warning">
+        <strong>Warnings</strong>
+        <ul class="mb-0">
+            @foreach (var warning in Model.Warnings)
+            {
+                <li>@warning</li>
+            }
+        </ul>
+    </div>
+}
+
+@if (Model.CreatedInvoices.Count > 0)
+{
+    <section class="mb-4">
+        <h2>Created invoices</h2>
+        <table class="table">
+            <thead>
+            <tr><th>Date</th><th>Address</th><th>Service</th><th>Period</th><th>Total</th><th></th></tr>
+            </thead>
+            <tbody>
+            @foreach (var invoice in Model.CreatedInvoices)
+            {
+                <tr>
+                    <td>@invoice.InvoiceDate</td>
+                    <td>@invoice.AddressName</td>
+                    <td>@invoice.ServiceName</td>
+                    <td>@invoice.PeriodStart - @invoice.PeriodEnd</td>
+                    <td>@invoice.TotalSum</td>
+                    <td><a asp-controller="Invoices" asp-action="Details" asp-route-id="@invoice.InvoiceId">Details</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+}
+
+@if (Model.SkippedRows.Count > 0)
+{
+    <section class="mb-4">
+        <h2>Skipped rows</h2>
+        <table class="table">
+            <thead>
+            <tr><th>Address text</th><th>Amount</th><th>Reason</th><th>Source</th></tr>
+            </thead>
+            <tbody>
+            @foreach (var row in Model.SkippedRows)
+            {
+                <tr>
+                    <td>@row.AddressText</td>
+                    <td>@row.Amount</td>
+                    <td>@row.Reason</td>
+                    <td>@row.SourceText</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+}
+
+<p>
+    <a asp-action="Upload" class="btn btn-primary">Import another PDF</a>
+    <a asp-controller="Invoices" asp-action="Index" class="btn btn-outline-secondary">Back to invoices</a>
+</p>

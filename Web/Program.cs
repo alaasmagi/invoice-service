@@ -11,6 +11,7 @@ using DTO.DataAccess.DataAccess.Mapper;
 using DTO.DataAccess.Web.DTO;
 using DTO.DataAccess.Web.Mapper;
 using Microsoft.EntityFrameworkCore;
+using Web;
 using Web.Configuration;
 
 DotEnvConfiguration.LoadFromRepositoryRoot();
@@ -67,6 +68,12 @@ builder.Services.AddScoped<ICreateContactService, CreateContactService>();
 builder.Services.AddScoped<ICreateInvoiceService, CreateInvoiceService>();
 builder.Services.AddScoped<IGenerateMonthlyStatementService, GenerateMonthlyStatementService>();
 builder.Services.AddScoped<ISendMonthlyStatementService, SendMonthlyStatementService>();
+builder.Services.AddScoped<IMonthlyStatementSenderPaymentDetailsProvider, IdentityMonthlyStatementSenderPaymentDetailsProvider>();
+builder.Services.AddScoped<IPdfInvoiceImportService, PdfInvoiceImportService>();
+builder.Services.AddScoped<IPdfInvoiceTextExtractor, PdfInvoiceTextExtractor>();
+builder.Services.AddScoped<IPdfInvoiceProviderDetector, PdfInvoiceProviderDetector>();
+builder.Services.AddScoped<IPdfInvoiceParser, TeliaPdfInvoiceParser>();
+builder.Services.AddScoped<IPdfInvoiceParser, EnefitPdfInvoiceParser>();
 
 var emailProvider = RequiredConfiguration.EmailProvider(builder.Configuration);
 if (emailProvider.Equals("Console", StringComparison.OrdinalIgnoreCase))

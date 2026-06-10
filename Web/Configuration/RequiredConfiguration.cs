@@ -61,21 +61,7 @@ public static class RequiredConfiguration
                     Environment.GetEnvironmentVariable("BREVO_SENDER_NAME"),
                     configuration["Brevo:SenderName"]),
                 "Brevo sender name",
-                "Brevo:SenderName, Brevo__SenderName, or BREVO_SENDER_NAME"),
-            BankAccountName = Required(
-                FirstValue(
-                    Environment.GetEnvironmentVariable("Bank__AccountName"),
-                    Environment.GetEnvironmentVariable("BANK_ACCOUNT_NAME"),
-                    configuration["Bank:AccountName"]),
-                "bank account name",
-                "Bank:AccountName, Bank__AccountName, or BANK_ACCOUNT_NAME"),
-            BankIban = Required(
-                FirstValue(
-                    Environment.GetEnvironmentVariable("Bank__Iban"),
-                    Environment.GetEnvironmentVariable("BANK_IBAN"),
-                    configuration["Bank:Iban"]),
-                "bank IBAN",
-                "Bank:Iban, Bank__Iban, or BANK_IBAN")
+                "Brevo:SenderName, Brevo__SenderName, or BREVO_SENDER_NAME")
         };
     }
 
