@@ -5,6 +5,11 @@ namespace Web.Configuration;
 
 public static class RequiredConfiguration
 {
+    public sealed record ExternalAuthenticationOptions(string ClientId, string ClientSecret)
+    {
+        public bool IsConfigured => !string.IsNullOrWhiteSpace(ClientId) && !string.IsNullOrWhiteSpace(ClientSecret);
+    }
+
     public static string IdentityConnectionString(IConfiguration configuration)
     {
         return Required(
@@ -35,6 +40,32 @@ public static class RequiredConfiguration
             Environment.GetEnvironmentVariable("Email__Provider"),
             Environment.GetEnvironmentVariable("EMAIL_PROVIDER"),
             configuration["Email:Provider"]) ?? "Brevo";
+    }
+
+    public static ExternalAuthenticationOptions GoogleAuthentication(IConfiguration configuration)
+    {
+        return new ExternalAuthenticationOptions(
+            FirstValue(
+                Environment.GetEnvironmentVariable("Authentication__Google__ClientId"),
+                Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID"),
+                configuration["Authentication:Google:ClientId"]) ?? string.Empty,
+            FirstValue(
+                Environment.GetEnvironmentVariable("Authentication__Google__ClientSecret"),
+                Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET"),
+                configuration["Authentication:Google:ClientSecret"]) ?? string.Empty);
+    }
+
+    public static ExternalAuthenticationOptions MicrosoftAuthentication(IConfiguration configuration)
+    {
+        return new ExternalAuthenticationOptions(
+            FirstValue(
+                Environment.GetEnvironmentVariable("Authentication__Microsoft__ClientId"),
+                Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_ID"),
+                configuration["Authentication:Microsoft:ClientId"]) ?? string.Empty,
+            FirstValue(
+                Environment.GetEnvironmentVariable("Authentication__Microsoft__ClientSecret"),
+                Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_SECRET"),
+                configuration["Authentication:Microsoft:ClientSecret"]) ?? string.Empty);
     }
 
     public static BrevoEmailOptions BrevoEmailOptions(IConfiguration configuration)

@@ -32,10 +32,33 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<AppIdentityDbContext>();
 
+var authenticationBuilder = builder.Services.AddAuthentication();
+
+var googleAuthentication = RequiredConfiguration.GoogleAuthentication(builder.Configuration);
+if (googleAuthentication.IsConfigured)
+{
+    authenticationBuilder.AddGoogle(options =>
+    {
+        options.ClientId = googleAuthentication.ClientId;
+        options.ClientSecret = googleAuthentication.ClientSecret;
+    });
+}
+
+var microsoftAuthentication = RequiredConfiguration.MicrosoftAuthentication(builder.Configuration);
+if (microsoftAuthentication.IsConfigured)
+{
+    authenticationBuilder.AddMicrosoftAccount(options =>
+    {
+        options.ClientId = microsoftAuthentication.ClientId;
+        options.ClientSecret = microsoftAuthentication.ClientSecret;
+        options.AuthorizationEndpoint = "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize";
+        options.TokenEndpoint = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
+    });
+}
+
 builder.Services.AddScoped<IMapper<Address, AddressEntity>, AddressEntityMapper>();
 builder.Services.AddScoped<IMapper<AddressContact, AddressContactEntity>, AddressContactEntityMapper>();
 builder.Services.AddScoped<IMapper<Contact, ContactEntity>, ContactEntityMapper>();
-builder.Services.AddScoped<IMapper<ContactMonthlyStatement, ContactMonthlyStatementEntity>, ContactMonthlyStatementEntityMapper>();
 builder.Services.AddScoped<IMapper<Invoice, InvoiceEntity>, InvoiceEntityMapper>();
 builder.Services.AddScoped<IMapper<InvoiceAllocation, InvoiceAllocationEntity>, InvoiceAllocationEntityMapper>();
 builder.Services.AddScoped<IMapper<MonthlyStatement, MonthlyStatementEntity>, MonthlyStatementEntityMapper>();
@@ -45,7 +68,6 @@ builder.Services.AddScoped<IMapper<Service, ServiceEntity>, ServiceEntityMapper>
 builder.Services.AddScoped<IMapper<AddressDto, Address>, AddressDtoMapper>();
 builder.Services.AddScoped<IMapper<AddressContactDto, AddressContact>, AddressContactDtoMapper>();
 builder.Services.AddScoped<IMapper<ContactDto, Contact>, ContactDtoMapper>();
-builder.Services.AddScoped<IMapper<ContactMonthlyStatementDto, ContactMonthlyStatement>, ContactMonthlyStatementDtoMapper>();
 builder.Services.AddScoped<IMapper<InvoiceDto, Invoice>, InvoiceDtoMapper>();
 builder.Services.AddScoped<IMapper<InvoiceAllocationDto, InvoiceAllocation>, InvoiceAllocationDtoMapper>();
 builder.Services.AddScoped<IMapper<MonthlyStatementDto, MonthlyStatement>, MonthlyStatementDtoMapper>();
@@ -55,7 +77,6 @@ builder.Services.AddScoped<IMapper<ServiceDto, Service>, ServiceDtoMapper>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IAddressContactRepository, AddressContactRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
-builder.Services.AddScoped<IContactMonthlyStatementRepository, ContactMonthlyStatementRepository>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IInvoiceAllocationRepository, InvoiceAllocationRepository>();
 builder.Services.AddScoped<IMonthlyStatementRepository, MonthlyStatementRepository>();

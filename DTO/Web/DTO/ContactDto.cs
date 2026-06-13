@@ -17,9 +17,6 @@ public class ContactDto : BaseEntityUserWithConcurrency
     public ICollection<InvoiceAllocationDto> InvoiceAllocations { get; set; }
         = new List<InvoiceAllocationDto>();
 
-    public ICollection<ContactMonthlyStatementDto> MonthlyStatementContacts { get; set; }
-        = new List<ContactMonthlyStatementDto>();
-
     public ICollection<MonthlyStatementDto> MonthlyStatements { get; set; }
         = new List<MonthlyStatementDto>();
 }

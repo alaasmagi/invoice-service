@@ -15,10 +15,7 @@ public class Contact : BaseEntityUser
 
     public ICollection<InvoiceAllocation> InvoiceAllocations { get; set; }
         = new List<InvoiceAllocation>();
-
-    public ICollection<ContactMonthlyStatement> MonthlyStatementContacts { get; set; }
-        = new List<ContactMonthlyStatement>();
-
+    
     public ICollection<MonthlyStatement> MonthlyStatements { get; set; }
         = new List<MonthlyStatement>();
 }

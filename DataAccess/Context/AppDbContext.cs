@@ -11,9 +11,7 @@ public class AppDbContext : DbContext
 
     public DbSet<AddressEntity> Addresses => Set<AddressEntity>();
     public DbSet<AddressContactEntity> AddressContacts => Set<AddressContactEntity>();
-    public DbSet<AppUserEntity> AppUsers => Set<AppUserEntity>();
     public DbSet<ContactEntity> Contacts => Set<ContactEntity>();
-    public DbSet<ContactMonthlyStatementEntity> ContactMonthlyStatements => Set<ContactMonthlyStatementEntity>();
     public DbSet<InvoiceEntity> Invoices => Set<InvoiceEntity>();
     public DbSet<InvoiceAllocationEntity> InvoiceAllocations => Set<InvoiceAllocationEntity>();
     public DbSet<MonthlyStatementEntity> MonthlyStatements => Set<MonthlyStatementEntity>();
@@ -54,23 +52,6 @@ public class AppDbContext : DbContext
 
             entity.HasMany(e => e.MonthlyStatements)
                 .WithOne(e => e.Contact)
-                .HasForeignKey(e => e.ContactId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<ContactMonthlyStatementEntity>(entity =>
-        {
-            entity.HasIndex(e => e.MonthlyStatementId);
-            entity.HasIndex(e => e.ContactId);
-            entity.Property(e => e.Amount).HasPrecision(18, 2);
-
-            entity.HasOne(e => e.MonthlyStatement)
-                .WithMany()
-                .HasForeignKey(e => e.MonthlyStatementId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasOne(e => e.Contact)
-                .WithMany()
                 .HasForeignKey(e => e.ContactId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
