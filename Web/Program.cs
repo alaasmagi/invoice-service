@@ -13,6 +13,8 @@ using DTO.DataAccess.Web.Mapper;
 using Microsoft.EntityFrameworkCore;
 using Web;
 using Web.Configuration;
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Net;
 
 DotEnvConfiguration.LoadFromRepositoryRoot();
 
@@ -128,7 +130,18 @@ else
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor
+                               | ForwardedHeaders.XForwardedProto
+                               | ForwardedHeaders.XForwardedHost;
+
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
+app.UseForwardedHeaders();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
