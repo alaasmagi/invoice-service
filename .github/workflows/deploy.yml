@@ -122,7 +122,7 @@ jobs:
           PORT="${VPS_PORT:-22}"
 
           ssh -i ~/.ssh/deploy_key -p "${PORT}" "${VPS_USER}@${VPS_HOST}" \
-            "sudo mkdir -p '${REMOTE_APP_DIR}' && sudo chown '${VPS_USER}:${VPS_USER}' '${REMOTE_APP_DIR}'"
+            "mkdir -p '${REMOTE_APP_DIR}' && chown '${VPS_USER}:${VPS_USER}' '${REMOTE_APP_DIR}'"
 
           scp -i ~/.ssh/deploy_key -P "${PORT}" \
             image.tar.gz deploy.env docker-compose.yml \
