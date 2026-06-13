@@ -15,6 +15,7 @@ using Web;
 using Web.Configuration;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Net;
+using IPNetwork = System.Net.IPNetwork;
 
 DotEnvConfiguration.LoadFromRepositoryRoot();
 
@@ -132,12 +133,16 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor
-                               | ForwardedHeaders.XForwardedProto
-                               | ForwardedHeaders.XForwardedHost;
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto |
+        ForwardedHeaders.XForwardedHost;
 
     options.KnownIPNetworks.Clear();
-    options.KnownProxies.Clear();
+
+    options.KnownIPNetworks.Add(
+        new IPNetwork(IPAddress.Parse("172.18.0.0"), 16)
+    );
 });
 
 var app = builder.Build();
