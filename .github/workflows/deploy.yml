@@ -94,9 +94,9 @@ jobs:
             printf 'Authentication__Google__ClientSecret=%s\n' "${GOOGLE_CLIENT_SECRET}"
             printf 'Authentication__Microsoft__ClientId=%s\n' "${MICROSOFT_CLIENT_ID}"
             printf 'Authentication__Microsoft__ClientSecret=%s\n' "${MICROSOFT_CLIENT_SECRET}"
-          } > deploy.env
+          } > .env
 
-          chmod 600 deploy.env
+          chmod 600 .env
 
       - name: Configure SSH
         env:
@@ -125,7 +125,7 @@ jobs:
             "mkdir -p '${REMOTE_APP_DIR}' && chown '${VPS_USER}:${VPS_USER}' '${REMOTE_APP_DIR}'"
 
           scp -i ~/.ssh/deploy_key -P "${PORT}" \
-            image.tar.gz deploy.env docker-compose.yml \
+            image.tar.gz .env docker-compose.yml \
             "${VPS_USER}@${VPS_HOST}:${REMOTE_APP_DIR}/"
 
       - name: Run docker compose on VPS
@@ -169,10 +169,10 @@ jobs:
 
           gunzip -c image.tar.gz | $DOCKER load
 
-          chmod 600 deploy.env
+          chmod 600 .env
 
           export IMAGE_NAME IMAGE_TAG APP_PORT HOST_PORT
-          "${COMPOSE_CMD[@]}" --env-file deploy.env -f docker-compose.yml up -d --remove-orphans
+          "${COMPOSE_CMD[@]}" --env-file .env -f docker-compose.yml up -d --remove-orphans
 
           $DOCKER image prune -f
           EOF_REMOTE
