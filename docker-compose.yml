@@ -1,0 +1,10 @@
+services:
+  web:
+    image: ${IMAGE_NAME:-invoice-service}:${IMAGE_TAG:-latest}
+    container_name: ${CONTAINER_NAME:-invoice-service}
+    restart: unless-stopped
+    env_file:
+      - ${ENV_FILE:-.env}
+    ports:
+      - "${HOST_PORT:-8080}:${APP_PORT:-8080}"
+

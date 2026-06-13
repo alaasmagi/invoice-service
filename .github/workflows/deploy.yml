@@ -12,80 +12,140 @@ concurrency:
 
 env:
   IMAGE_NAME: invoice-service
-  CONTAINER_NAME: invoice-service
   REMOTE_APP_DIR: /opt/invoice-service
-  CONTAINER_PORT: "8080"
+  APP_PORT: "3000"
+  HOST_PORT: "3000"
 
 jobs:
   deploy:
     name: Build and deploy
     runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+       github.ref == 'refs/heads/main' &&
+       contains(github.event.head_commit.message, '[DEPLOY]'))
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build --pull -t "$IMAGE_NAME:${GITHUB_SHA}" .
+        run: |
+          set -euo pipefail
+          docker build --pull -t "${IMAGE_NAME}:${GITHUB_SHA}" .
 
       - name: Save Docker image
-        run: docker save "$IMAGE_NAME:${GITHUB_SHA}" | gzip > image.tar.gz
+        run: |
+          set -euo pipefail
+          docker save "${IMAGE_NAME}:${GITHUB_SHA}" | gzip > image.tar.gz
 
       - name: Create runtime env file from GitHub secrets
         env:
+          APP_PORT: ${{ secrets.CONTAINER_PORT || secrets.APP_PORT || env.APP_PORT }}
+          HOST_PORT: ${{ secrets.HOST_PORT || secrets.APP_PORT || env.HOST_PORT }}
           IDENTITY_CONNECTION_STRING: ${{ secrets.IDENTITY_CONNECTION_STRING }}
           APP_CONNECTION_STRING: ${{ secrets.APP_CONNECTION_STRING }}
-          EMAIL_PROVIDER: ${{ secrets.EMAIL_PROVIDER || 'Brevo' }}
+          EMAIL_PROVIDER: ${{ secrets.EMAIL_PROVIDER }}
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           BREVO_SENDER_EMAIL: ${{ secrets.BREVO_SENDER_EMAIL }}
           BREVO_SENDER_NAME: ${{ secrets.BREVO_SENDER_NAME }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
+          MICROSOFT_CLIENT_SECRET: ${{ secrets.MICROSOFT_CLIENT_SECRET }}
         run: |
+          set -euo pipefail
+
+          : "${IDENTITY_CONNECTION_STRING:?IDENTITY_CONNECTION_STRING is required}"
+          : "${APP_CONNECTION_STRING:?APP_CONNECTION_STRING is required}"
+
+          EMAIL_PROVIDER="${EMAIL_PROVIDER:-Brevo}"
+
+          case "${EMAIL_PROVIDER,,}" in
+            brevo)
+              : "${BREVO_API_KEY:?BREVO_API_KEY is required when EMAIL_PROVIDER=Brevo}"
+              : "${BREVO_SENDER_EMAIL:?BREVO_SENDER_EMAIL is required when EMAIL_PROVIDER=Brevo}"
+              : "${BREVO_SENDER_NAME:?BREVO_SENDER_NAME is required when EMAIL_PROVIDER=Brevo}"
+              ;;
+            console)
+              ;;
+            *)
+              echo "Unsupported EMAIL_PROVIDER='${EMAIL_PROVIDER}'. Use 'Brevo' or 'Console'." >&2
+              exit 1
+              ;;
+          esac
+
           {
             printf 'ASPNETCORE_ENVIRONMENT=%s\n' 'Production'
-            printf 'ASPNETCORE_URLS=%s\n' "http://+:${CONTAINER_PORT}"
-            printf 'ConnectionStrings__IdentityConnection=%s\n' "$IDENTITY_CONNECTION_STRING"
-            printf 'ConnectionStrings__AppConnection=%s\n' "$APP_CONNECTION_STRING"
-            printf 'Email__Provider=%s\n' "$EMAIL_PROVIDER"
-            printf 'Brevo__ApiKey=%s\n' "$BREVO_API_KEY"
-            printf 'Brevo__SenderEmail=%s\n' "$BREVO_SENDER_EMAIL"
-            printf 'Brevo__SenderName=%s\n' "$BREVO_SENDER_NAME"
+            printf 'APP_PORT=%s\n' "${APP_PORT}"
+            printf 'HOST_PORT=%s\n' "${HOST_PORT}"
+            printf 'ASPNETCORE_URLS=%s\n' "http://+:${APP_PORT}"
+
+            printf 'ConnectionStrings__IdentityConnection=%s\n' "${IDENTITY_CONNECTION_STRING}"
+            printf 'ConnectionStrings__AppConnection=%s\n' "${APP_CONNECTION_STRING}"
+
+            printf 'Email__Provider=%s\n' "${EMAIL_PROVIDER}"
+            printf 'Brevo__ApiKey=%s\n' "${BREVO_API_KEY}"
+            printf 'Brevo__SenderEmail=%s\n' "${BREVO_SENDER_EMAIL}"
+            printf 'Brevo__SenderName=%s\n' "${BREVO_SENDER_NAME}"
+
+            printf 'Authentication__Google__ClientId=%s\n' "${GOOGLE_CLIENT_ID}"
+            printf 'Authentication__Google__ClientSecret=%s\n' "${GOOGLE_CLIENT_SECRET}"
+            printf 'Authentication__Microsoft__ClientId=%s\n' "${MICROSOFT_CLIENT_ID}"
+            printf 'Authentication__Microsoft__ClientSecret=%s\n' "${MICROSOFT_CLIENT_SECRET}"
           } > deploy.env
+
           chmod 600 deploy.env
 
       - name: Configure SSH
         env:
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
           VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
         run: |
+          set -euo pipefail
+
           install -m 700 -d ~/.ssh
-          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          printf '%s\n' "${VPS_SSH_KEY}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p "$VPS_PORT" "$VPS_HOST" >> ~/.ssh/known_hosts
+          ssh-keyscan -H -p "${VPS_PORT:-22}" "${VPS_HOST}" >> ~/.ssh/known_hosts
 
-      - name: Upload image and env file to VPS
+      - name: Upload image and compose files to VPS
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
-          VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
         run: |
-          ssh -i ~/.ssh/deploy_key -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" "sudo mkdir -p '$REMOTE_APP_DIR' && sudo chown '$VPS_USER' '$REMOTE_APP_DIR'"
-          scp -i ~/.ssh/deploy_key -P "$VPS_PORT" image.tar.gz deploy.env "$VPS_USER@$VPS_HOST:$REMOTE_APP_DIR/"
+          set -euo pipefail
 
-      - name: Run container on VPS
+          PORT="${VPS_PORT:-22}"
+
+          ssh -i ~/.ssh/deploy_key -p "${PORT}" "${VPS_USER}@${VPS_HOST}" \
+            "sudo mkdir -p '${REMOTE_APP_DIR}' && sudo chown '${VPS_USER}:${VPS_USER}' '${REMOTE_APP_DIR}'"
+
+          scp -i ~/.ssh/deploy_key -P "${PORT}" \
+            image.tar.gz deploy.env docker-compose.yml \
+            "${VPS_USER}@${VPS_HOST}:${REMOTE_APP_DIR}/"
+
+      - name: Run docker compose on VPS
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
-          VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
-          HOST_PORT: ${{ secrets.APP_PORT || '8080' }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          APP_PORT: ${{ secrets.CONTAINER_PORT || secrets.APP_PORT || env.APP_PORT }}
+          HOST_PORT: ${{ secrets.HOST_PORT || secrets.APP_PORT || env.HOST_PORT }}
         run: |
-          ssh -i ~/.ssh/deploy_key -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" \
-            IMAGE_NAME="$IMAGE_NAME" \
-            IMAGE_TAG="$GITHUB_SHA" \
-            CONTAINER_NAME="$CONTAINER_NAME" \
-            REMOTE_APP_DIR="$REMOTE_APP_DIR" \
-            HOST_PORT="$HOST_PORT" \
-            CONTAINER_PORT="$CONTAINER_PORT" \
+          set -euo pipefail
+
+          PORT="${VPS_PORT:-22}"
+
+          ssh -i ~/.ssh/deploy_key -p "${PORT}" "${VPS_USER}@${VPS_HOST}" \
+            IMAGE_NAME="${IMAGE_NAME}" \
+            IMAGE_TAG="${GITHUB_SHA}" \
+            REMOTE_APP_DIR="${REMOTE_APP_DIR}" \
+            APP_PORT="${APP_PORT}" \
+            HOST_PORT="${HOST_PORT}" \
             'bash -s' <<'EOF_REMOTE'
           set -euo pipefail
 
@@ -95,20 +155,25 @@ jobs:
             DOCKER="sudo docker"
           fi
 
-          cd "$REMOTE_APP_DIR"
-          $DOCKER load < image.tar.gz
-          chmod 600 deploy.env
-
-          if $DOCKER ps -a --format '{{.Names}}' | grep -Fxq "$CONTAINER_NAME"; then
-            $DOCKER rm -f "$CONTAINER_NAME"
+          if $DOCKER compose version >/dev/null 2>&1; then
+            COMPOSE_CMD=($DOCKER compose)
+          elif command -v docker-compose >/dev/null 2>&1; then
+            COMPOSE_CMD=(docker-compose)
+          else
+            echo "Docker Compose is required on the target host." >&2
+            exit 1
           fi
 
-          $DOCKER run -d \
-            --name "$CONTAINER_NAME" \
-            --restart unless-stopped \
-            --env-file "$REMOTE_APP_DIR/deploy.env" \
-            -p "$HOST_PORT:$CONTAINER_PORT" \
-            "$IMAGE_NAME:$IMAGE_TAG"
+          cd "$REMOTE_APP_DIR"
+
+
+          gunzip -c image.tar.gz | $DOCKER load
+
+          chmod 600 deploy.env
+
+          export IMAGE_NAME IMAGE_TAG APP_PORT HOST_PORT
+          "${COMPOSE_CMD[@]}" --env-file deploy.env -f docker-compose.yml up -d --remove-orphans
 
           $DOCKER image prune -f
           EOF_REMOTE
+

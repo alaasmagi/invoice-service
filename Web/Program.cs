@@ -15,6 +15,13 @@ using Web;
 using Web.Configuration;
 
 DotEnvConfiguration.LoadFromRepositoryRoot();
+
+var configuredAppPort = Environment.GetEnvironmentVariable("APP_PORT") ?? Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(configuredAppPort) && string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ASPNETCORE_URLS")))
+{
+    Environment.SetEnvironmentVariable("ASPNETCORE_URLS", $"http://+:{configuredAppPort}");
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
