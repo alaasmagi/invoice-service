@@ -1,0 +1,12 @@
+@model string
+@{
+    ViewData["Title"] = "Sign-in error";
+}
+
+<h1>Sign-in error</h1>
+
+<div class="alert alert-danger" role="alert">
+    @Model
+</div>
+
+<a class="btn btn-primary" asp-controller="Auth" asp-action="Login">Try again</a>

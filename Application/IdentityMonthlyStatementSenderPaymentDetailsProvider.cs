@@ -1,14 +1,13 @@
 using Contracts.Application;
-using Domain;
-using Microsoft.AspNetCore.Identity;
+using Contracts.DataAccess;
 
 namespace Web;
 
-public sealed class IdentityMonthlyStatementSenderPaymentDetailsProvider(UserManager<AppUser> userManager) : IMonthlyStatementSenderPaymentDetailsProvider
+public sealed class IdentityMonthlyStatementSenderPaymentDetailsProvider(IAppUserRepository appUserRepository) : IMonthlyStatementSenderPaymentDetailsProvider
 {
     public async Task<MonthlyStatementSenderPaymentDetails?> GetAsync(Guid userId)
     {
-        var user = await userManager.FindByIdAsync(userId.ToString());
+        var user = await appUserRepository.GetByIdAsync(userId);
         return user == null
             ? null
             : new MonthlyStatementSenderPaymentDetails

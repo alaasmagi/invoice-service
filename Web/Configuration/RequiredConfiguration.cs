@@ -1,27 +1,11 @@
 using Application;
 using Microsoft.Extensions.Configuration;
+using Web.IdentityHub;
 
 namespace Web.Configuration;
 
 public static class RequiredConfiguration
 {
-    public sealed record ExternalAuthenticationOptions(string ClientId, string ClientSecret)
-    {
-        public bool IsConfigured => !string.IsNullOrWhiteSpace(ClientId) && !string.IsNullOrWhiteSpace(ClientSecret);
-    }
-
-    public static string IdentityConnectionString(IConfiguration configuration)
-    {
-        return Required(
-            FirstValue(
-                Environment.GetEnvironmentVariable("ConnectionStrings__IdentityConnection"),
-                Environment.GetEnvironmentVariable("IDENTITY_CONNECTION_STRING"),
-                configuration.GetConnectionString("IdentityConnection"),
-                configuration["ConnectionStrings:IdentityConnection"]),
-            "Identity database connection string",
-            "ConnectionStrings:IdentityConnection, ConnectionStrings__IdentityConnection, or IDENTITY_CONNECTION_STRING");
-    }
-
     public static string AppConnectionString(IConfiguration configuration)
     {
         return Required(
@@ -34,38 +18,44 @@ public static class RequiredConfiguration
             "ConnectionStrings:AppConnection, ConnectionStrings__AppConnection, or APP_CONNECTION_STRING");
     }
 
+    public static IdentityHubOptions IdentityHubOptions(IConfiguration configuration)
+    {
+        return new IdentityHubOptions
+        {
+            BaseUrl = Required(
+                FirstValue(
+                    Environment.GetEnvironmentVariable("IdentityHub__BaseUrl"),
+                    Environment.GetEnvironmentVariable("IDENTITY_BASE_URL"),
+                    configuration["IdentityHub:BaseUrl"]),
+                "Identity-hub base URL",
+                "IdentityHub:BaseUrl, IdentityHub__BaseUrl, or IDENTITY_BASE_URL"),
+            ClientId = Required(
+                FirstValue(
+                    Environment.GetEnvironmentVariable("IdentityHub__ClientId"),
+                    Environment.GetEnvironmentVariable("IDENTITY_CLIENT_ID"),
+                    configuration["IdentityHub:ClientId"]),
+                "Identity-hub client id",
+                "IdentityHub:ClientId, IdentityHub__ClientId, or IDENTITY_CLIENT_ID"),
+            ClientSecret = Required(
+                FirstValue(
+                    Environment.GetEnvironmentVariable("IdentityHub__ClientSecret"),
+                    Environment.GetEnvironmentVariable("IDENTITY_CLIENT_SECRET"),
+                    configuration["IdentityHub:ClientSecret"]),
+                "Identity-hub client secret",
+                "IdentityHub:ClientSecret, IdentityHub__ClientSecret, or IDENTITY_CLIENT_SECRET"),
+            CallbackUrl = FirstValue(
+                Environment.GetEnvironmentVariable("IdentityHub__CallbackUrl"),
+                Environment.GetEnvironmentVariable("IDENTITY_CALLBACK_URL"),
+                configuration["IdentityHub:CallbackUrl"])
+        };
+    }
+
     public static string EmailProvider(IConfiguration configuration)
     {
         return FirstValue(
             Environment.GetEnvironmentVariable("Email__Provider"),
             Environment.GetEnvironmentVariable("EMAIL_PROVIDER"),
             configuration["Email:Provider"]) ?? "Brevo";
-    }
-
-    public static ExternalAuthenticationOptions GoogleAuthentication(IConfiguration configuration)
-    {
-        return new ExternalAuthenticationOptions(
-            FirstValue(
-                Environment.GetEnvironmentVariable("Authentication__Google__ClientId"),
-                Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID"),
-                configuration["Authentication:Google:ClientId"]) ?? string.Empty,
-            FirstValue(
-                Environment.GetEnvironmentVariable("Authentication__Google__ClientSecret"),
-                Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET"),
-                configuration["Authentication:Google:ClientSecret"]) ?? string.Empty);
-    }
-
-    public static ExternalAuthenticationOptions MicrosoftAuthentication(IConfiguration configuration)
-    {
-        return new ExternalAuthenticationOptions(
-            FirstValue(
-                Environment.GetEnvironmentVariable("Authentication__Microsoft__ClientId"),
-                Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_ID"),
-                configuration["Authentication:Microsoft:ClientId"]) ?? string.Empty,
-            FirstValue(
-                Environment.GetEnvironmentVariable("Authentication__Microsoft__ClientSecret"),
-                Environment.GetEnvironmentVariable("MICROSOFT_CLIENT_SECRET"),
-                configuration["Authentication:Microsoft:ClientSecret"]) ?? string.Empty);
     }
 
     public static BrevoEmailOptions BrevoEmailOptions(IConfiguration configuration)

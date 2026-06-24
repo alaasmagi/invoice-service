@@ -10,11 +10,13 @@ using DTO.DataAccess.DataAccess.DTO;
 using DTO.DataAccess.DataAccess.Mapper;
 using DTO.DataAccess.Web.DTO;
 using DTO.DataAccess.Web.Mapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Web;
 using Web.Configuration;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Net;
+using Web.IdentityHub;
 using IPNetwork = System.Net.IPNetwork;
 
 DotEnvConfiguration.LoadFromRepositoryRoot();
@@ -27,11 +29,9 @@ if (!string.IsNullOrWhiteSpace(configuredAppPort) && string.IsNullOrWhiteSpace(E
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-var identityConnectionString = RequiredConfiguration.IdentityConnectionString(builder.Configuration);
 var appDbConnectionString = RequiredConfiguration.AppConnectionString(builder.Configuration);
-builder.Services.AddDbContext<AppIdentityDbContext>(options =>
-    options.UseNpgsql(identityConnectionString));
+var identityHubOptions = RequiredConfiguration.IdentityHubOptions(builder.Configuration);
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(appDbConnectionString));
 builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<AppDbContext>());
@@ -39,35 +39,35 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<AppIdentityDbContext>();
-
-var authenticationBuilder = builder.Services.AddAuthentication();
-
-var googleAuthentication = RequiredConfiguration.GoogleAuthentication(builder.Configuration);
-if (googleAuthentication.IsConfigured)
+builder.Services.Configure<IdentityHubOptions>(options =>
 {
-    authenticationBuilder.AddGoogle(options =>
-    {
-        options.ClientId = googleAuthentication.ClientId;
-        options.ClientSecret = googleAuthentication.ClientSecret;
-    });
-}
+    options.BaseUrl = identityHubOptions.BaseUrl;
+    options.ClientId = identityHubOptions.ClientId;
+    options.ClientSecret = identityHubOptions.ClientSecret;
+    options.CallbackUrl = identityHubOptions.CallbackUrl;
+});
 
-var microsoftAuthentication = RequiredConfiguration.MicrosoftAuthentication(builder.Configuration);
-if (microsoftAuthentication.IsConfigured)
-{
-    authenticationBuilder.AddMicrosoftAccount(options =>
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
     {
-        options.ClientId = microsoftAuthentication.ClientId;
-        options.ClientSecret = microsoftAuthentication.ClientSecret;
-        options.AuthorizationEndpoint = "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize";
-        options.TokenEndpoint = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
+        options.LoginPath = "/Auth/Login";
+        options.AccessDeniedPath = "/Auth/Login";
     });
-}
+builder.Services.AddAuthorization();
+
+builder.Services.AddHttpClient<IIdentityHubClient, IdentityHubClient>(client =>
+    {
+        client.BaseAddress = new Uri($"{identityHubOptions.BaseUrl.TrimEnd('/')}/");
+    })
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        AllowAutoRedirect = false
+    });
+builder.Services.AddScoped<IdentityHubAuthenticationService>();
 
 builder.Services.AddScoped<IMapper<Address, AddressEntity>, AddressEntityMapper>();
 builder.Services.AddScoped<IMapper<AddressContact, AddressContactEntity>, AddressContactEntityMapper>();
+builder.Services.AddScoped<IMapper<AppUser, AppUserEntity>, AppUserEntityMapper>();
 builder.Services.AddScoped<IMapper<Contact, ContactEntity>, ContactEntityMapper>();
 builder.Services.AddScoped<IMapper<Invoice, InvoiceEntity>, InvoiceEntityMapper>();
 builder.Services.AddScoped<IMapper<InvoiceAllocation, InvoiceAllocationEntity>, InvoiceAllocationEntityMapper>();
@@ -86,6 +86,7 @@ builder.Services.AddScoped<IMapper<ServiceDto, Service>, ServiceDtoMapper>();
 
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IAddressContactRepository, AddressContactRepository>();
+builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IInvoiceAllocationRepository, InvoiceAllocationRepository>();
@@ -171,9 +172,6 @@ app.MapStaticAssets();
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
-app.MapRazorPages()
     .WithStaticAssets();
 
 app.Run();

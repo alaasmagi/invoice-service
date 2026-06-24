@@ -1,11 +1,10 @@
-using Domain;
-using Microsoft.AspNetCore.Identity;
+using Contracts.DataAccess;
 using Microsoft.AspNetCore.Mvc;
 using Web.Models;
 
 namespace Web.Controllers;
 
-public class AccountProfileController(UserManager<AppUser> userManager) : UserScopedControllerBase
+public class AccountProfileController(IAppUserRepository appUserRepository) : UserScopedControllerBase
 {
     public async Task<IActionResult> BankDetails()
     {
@@ -30,30 +29,19 @@ public class AccountProfileController(UserManager<AppUser> userManager) : UserSc
             return View(model);
         }
 
-        user.Fullname = model.Fullname;
-        user.BankIban = model.BankIban;
-        var result = await userManager.UpdateAsync(user);
-        if (!result.Succeeded)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-
-            return View(model);
-        }
+        await appUserRepository.UpdateProfileAsync(CurrentUserId(), model.Fullname, model.BankIban);
 
         TempData["StatusMessage"] = "Bank details were saved.";
         return RedirectToAction(nameof(BankDetails));
     }
 
-    private async Task<AppUser> CurrentUserAsync()
+    private async Task<Domain.AppUser> CurrentUserAsync()
     {
-        var userId = CurrentUserId().ToString();
-        var user = await userManager.FindByIdAsync(userId);
+        var userId = CurrentUserId();
+        var user = await appUserRepository.GetByIdAsync(userId);
         if (user == null)
         {
-            throw new InvalidOperationException("Authenticated user was not found.");
+            user = await appUserRepository.UpsertFromClaimsAsync(userId, User.Identity?.Name);
         }
 
         return user;

@@ -1,10 +1,9 @@
-using Microsoft.AspNetCore.Identity;
+using Base.Domain;
 
 namespace Domain;
 
-public class AppUser : IdentityUser
+public class AppUser : BaseEntity
 {
-    public string Fullname { get; set; } = string.Empty;
-
+    public string Fullname { get; set; } = default!;
     public string? BankIban { get; set; }
 }

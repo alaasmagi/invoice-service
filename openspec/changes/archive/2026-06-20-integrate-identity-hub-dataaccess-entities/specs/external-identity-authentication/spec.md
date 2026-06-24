@@ -1,7 +1,4 @@
-## Purpose
-Define how invoice-service authenticates users through identity-hub, creates local cookie sessions, and preserves user-scoped data isolation.
-
-## Requirements
+## ADDED Requirements
 
 ### Requirement: Razor login redirects to identity-hub
 The system SHALL redirect browser login requests to identity-hub's Razor login page with the configured client id and a callback URL for invoice-service.
@@ -64,6 +61,8 @@ The system SHALL log users out by clearing the local invoice-service authenticat
 - **WHEN** a signed-in user submits logout
 - **THEN** invoice-service SHALL clear the local auth cookie
 - **THEN** the user SHALL no longer be authenticated in invoice-service
+
+## MODIFIED Requirements
 
 ### Requirement: Configured external providers are available on account pages
 The system SHALL NOT configure Google or Microsoft external sign-in providers locally in invoice-service. External provider choices SHALL be handled by identity-hub.

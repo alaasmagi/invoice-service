@@ -17,11 +17,19 @@ public class AppDbContext : DbContext
     public DbSet<MonthlyStatementEntity> MonthlyStatements => Set<MonthlyStatementEntity>();
     public DbSet<MonthlyStatementLineEntity> MonthlyStatementLines => Set<MonthlyStatementLineEntity>();
     public DbSet<ServiceEntity> Services => Set<ServiceEntity>();
+    public DbSet<AppUserEntity> AppUsers => Set<AppUserEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("invoice");
+
+        modelBuilder.Entity<AppUserEntity>(entity =>
+        {
+            entity.ToTable("AppUsers");
+            entity.Property(e => e.Fullname).HasMaxLength(256);
+            entity.Property(e => e.BankIban).HasMaxLength(64);
+        });
 
         modelBuilder.Entity<AddressEntity>(entity =>
         {

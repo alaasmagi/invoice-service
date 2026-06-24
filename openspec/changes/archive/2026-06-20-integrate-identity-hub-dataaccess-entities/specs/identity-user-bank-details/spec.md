@@ -1,7 +1,4 @@
-## Purpose
-Define how invoice-service stores and uses each authenticated user's local payment profile for monthly statement emails.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Identity user stores bank IBAN
 The system SHALL store the sender bank IBAN on the authenticated user's local invoice-service app profile.
