@@ -1,4 +1,6 @@
 using Application;
+using Application.RoleManagement;
+using Application.Roles;
 using Base.Contracts.DataAccess;
 using Base.Contracts.DTO;
 using Contracts.Application;
@@ -10,11 +12,14 @@ using DTO.DataAccess.DataAccess.DTO;
 using DTO.DataAccess.DataAccess.Mapper;
 using DTO.DataAccess.Web.DTO;
 using DTO.DataAccess.Web.Mapper;
+using Infrastructure.AuthService;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Web;
 using Web.Configuration;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.IdentityModel.Tokens;
 using System.Net;
 using Web.IdentityHub;
 using IPNetwork = System.Net.IPNetwork;
@@ -47,11 +52,30 @@ builder.Services.Configure<IdentityHubOptions>(options =>
     options.CallbackUrl = identityHubOptions.CallbackUrl;
 });
 
+builder.Services.Configure<AuthServiceOptions>(options =>
+{
+    options.BaseUrl = identityHubOptions.BaseUrl;
+    options.ClientId = Guid.Parse(identityHubOptions.ClientId);
+    options.ClientSecret = identityHubOptions.ClientSecret;
+});
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.LoginPath = "/Auth/Login";
         options.AccessDeniedPath = "/Auth/Login";
+    })
+    .AddJwtBearer(options =>
+    {
+        options.Authority = identityHubOptions.BaseUrl.TrimEnd('/');
+        options.Audience = identityHubOptions.ClientId;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            RoleClaimType = "roles"
+        };
     });
 builder.Services.AddAuthorization();
 
@@ -65,9 +89,15 @@ builder.Services.AddHttpClient<IIdentityHubClient, IdentityHubClient>(client =>
     });
 builder.Services.AddScoped<IdentityHubAuthenticationService>();
 
+builder.Services.AddHttpClient<IAuthServiceClient, AuthServiceClient>(client =>
+{
+    client.BaseAddress = new Uri($"{identityHubOptions.BaseUrl.TrimEnd('/')}/");
+});
+
 builder.Services.AddScoped<IMapper<Address, AddressEntity>, AddressEntityMapper>();
 builder.Services.AddScoped<IMapper<AddressContact, AddressContactEntity>, AddressContactEntityMapper>();
 builder.Services.AddScoped<IMapper<AppUser, AppUserEntity>, AppUserEntityMapper>();
+builder.Services.AddScoped<IMapper<AppRole, AppRoleEntity>, AppRoleEntityMapper>();
 builder.Services.AddScoped<IMapper<Contact, ContactEntity>, ContactEntityMapper>();
 builder.Services.AddScoped<IMapper<Invoice, InvoiceEntity>, InvoiceEntityMapper>();
 builder.Services.AddScoped<IMapper<InvoiceAllocation, InvoiceAllocationEntity>, InvoiceAllocationEntityMapper>();
@@ -87,6 +117,7 @@ builder.Services.AddScoped<IMapper<ServiceDto, Service>, ServiceDtoMapper>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IAddressContactRepository, AddressContactRepository>();
 builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
+builder.Services.AddScoped<IAppRoleRepository, AppRoleRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IInvoiceAllocationRepository, InvoiceAllocationRepository>();
@@ -106,6 +137,8 @@ builder.Services.AddScoped<IPdfInvoiceTextExtractor, PdfInvoiceTextExtractor>();
 builder.Services.AddScoped<IPdfInvoiceProviderDetector, PdfInvoiceProviderDetector>();
 builder.Services.AddScoped<IPdfInvoiceParser, TeliaPdfInvoiceParser>();
 builder.Services.AddScoped<IPdfInvoiceParser, EnefitPdfInvoiceParser>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IUserRoleManagementService, UserRoleManagementService>();
 
 var emailProvider = RequiredConfiguration.EmailProvider(builder.Configuration);
 if (emailProvider.Equals("Console", StringComparison.OrdinalIgnoreCase))

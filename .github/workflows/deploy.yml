@@ -44,21 +44,23 @@ jobs:
         env:
           APP_PORT: ${{ secrets.CONTAINER_PORT || secrets.APP_PORT || env.APP_PORT }}
           HOST_PORT: ${{ secrets.HOST_PORT || secrets.APP_PORT || env.HOST_PORT }}
-          IDENTITY_CONNECTION_STRING: ${{ secrets.IDENTITY_CONNECTION_STRING }}
           APP_CONNECTION_STRING: ${{ secrets.APP_CONNECTION_STRING }}
+          IDENTITY_BASE_URL: ${{ secrets.IDENTITY_BASE_URL }}
+          IDENTITY_CLIENT_ID: ${{ secrets.IDENTITY_CLIENT_ID }}
+          IDENTITY_CLIENT_SECRET: ${{ secrets.IDENTITY_CLIENT_SECRET }}
+          IDENTITY_CALLBACK_URL: ${{ secrets.IDENTITY_CALLBACK_URL }}
           EMAIL_PROVIDER: ${{ secrets.EMAIL_PROVIDER }}
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           BREVO_SENDER_EMAIL: ${{ secrets.BREVO_SENDER_EMAIL }}
           BREVO_SENDER_NAME: ${{ secrets.BREVO_SENDER_NAME }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
-          MICROSOFT_CLIENT_SECRET: ${{ secrets.MICROSOFT_CLIENT_SECRET }}
         run: |
           set -euo pipefail
 
-          : "${IDENTITY_CONNECTION_STRING:?IDENTITY_CONNECTION_STRING is required}"
           : "${APP_CONNECTION_STRING:?APP_CONNECTION_STRING is required}"
+          : "${IDENTITY_BASE_URL:?IDENTITY_BASE_URL is required}"
+          : "${IDENTITY_CLIENT_ID:?IDENTITY_CLIENT_ID is required}"
+          : "${IDENTITY_CLIENT_SECRET:?IDENTITY_CLIENT_SECRET is required}"
+          : "${IDENTITY_CALLBACK_URL:?IDENTITY_CALLBACK_URL is required}"
 
           EMAIL_PROVIDER="${EMAIL_PROVIDER:-Brevo}"
 
@@ -82,18 +84,17 @@ jobs:
             printf 'HOST_PORT=%s\n' "${HOST_PORT}"
             printf 'ASPNETCORE_URLS=%s\n' "http://+:${APP_PORT}"
 
-            printf 'ConnectionStrings__IdentityConnection=%s\n' "${IDENTITY_CONNECTION_STRING}"
             printf 'ConnectionStrings__AppConnection=%s\n' "${APP_CONNECTION_STRING}"
+
+            printf 'IDENTITY_BASE_URL=%s\n' "${IDENTITY_BASE_URL}"
+            printf 'IDENTITY_CLIENT_ID=%s\n' "${IDENTITY_CLIENT_ID}"
+            printf 'IDENTITY_CLIENT_SECRET=%s\n' "${IDENTITY_CLIENT_SECRET}"
+            printf 'IDENTITY_CALLBACK_URL=%s\n' "${IDENTITY_CALLBACK_URL}"
 
             printf 'Email__Provider=%s\n' "${EMAIL_PROVIDER}"
             printf 'Brevo__ApiKey=%s\n' "${BREVO_API_KEY}"
             printf 'Brevo__SenderEmail=%s\n' "${BREVO_SENDER_EMAIL}"
             printf 'Brevo__SenderName=%s\n' "${BREVO_SENDER_NAME}"
-
-            printf 'Authentication__Google__ClientId=%s\n' "${GOOGLE_CLIENT_ID}"
-            printf 'Authentication__Google__ClientSecret=%s\n' "${GOOGLE_CLIENT_SECRET}"
-            printf 'Authentication__Microsoft__ClientId=%s\n' "${MICROSOFT_CLIENT_ID}"
-            printf 'Authentication__Microsoft__ClientSecret=%s\n' "${MICROSOFT_CLIENT_SECRET}"
           } > .env
 
           chmod 600 .env
@@ -171,9 +172,10 @@ jobs:
 
           chmod 600 .env
 
+          $DOCKER network inspect proxy >/dev/null 2>&1 || $DOCKER network create proxy
+
           export IMAGE_NAME IMAGE_TAG APP_PORT HOST_PORT
           "${COMPOSE_CMD[@]}" --env-file .env -f docker-compose.yml up -d --remove-orphans
 
           $DOCKER image prune -f
           EOF_REMOTE
-

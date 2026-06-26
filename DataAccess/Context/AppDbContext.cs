@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<MonthlyStatementLineEntity> MonthlyStatementLines => Set<MonthlyStatementLineEntity>();
     public DbSet<ServiceEntity> Services => Set<ServiceEntity>();
     public DbSet<AppUserEntity> AppUsers => Set<AppUserEntity>();
+    public DbSet<AppRoleEntity> AppRoles => Set<AppRoleEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -29,6 +30,13 @@ public class AppDbContext : DbContext
             entity.ToTable("AppUsers");
             entity.Property(e => e.Fullname).HasMaxLength(256);
             entity.Property(e => e.BankIban).HasMaxLength(64);
+        });
+
+        modelBuilder.Entity<AppRoleEntity>(entity =>
+        {
+            entity.ToTable("AppRoles");
+            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.HasIndex(e => e.Name).IsUnique();
         });
 
         modelBuilder.Entity<AddressEntity>(entity =>
