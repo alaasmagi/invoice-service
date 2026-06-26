@@ -34,8 +34,8 @@ if (!string.IsNullOrWhiteSpace(configuredAppPort) && string.IsNullOrWhiteSpace(E
 
 var builder = WebApplication.CreateBuilder(args);
 
-var appDbConnectionString = RequiredConfiguration.AppConnectionString(builder.Configuration);
-var identityHubOptions = RequiredConfiguration.IdentityHubOptions(builder.Configuration);
+var appDbConnectionString = RequiredConfiguration.AppConnectionString();
+var identityHubOptions = RequiredConfiguration.IdentityHubOptions();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(appDbConnectionString));
@@ -140,7 +140,7 @@ builder.Services.AddScoped<IPdfInvoiceParser, EnefitPdfInvoiceParser>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserRoleManagementService, UserRoleManagementService>();
 
-var emailProvider = RequiredConfiguration.EmailProvider(builder.Configuration);
+var emailProvider = RequiredConfiguration.EmailProvider();
 if (emailProvider.Equals("Console", StringComparison.OrdinalIgnoreCase))
 {
     if (!builder.Environment.IsDevelopment())
@@ -152,7 +152,7 @@ if (emailProvider.Equals("Console", StringComparison.OrdinalIgnoreCase))
 }
 else if (emailProvider.Equals("Brevo", StringComparison.OrdinalIgnoreCase))
 {
-    builder.Services.AddSingleton(RequiredConfiguration.BrevoEmailOptions(builder.Configuration));
+    builder.Services.AddSingleton(RequiredConfiguration.BrevoEmailOptions());
     builder.Services.AddHttpClient<IEmailSender, BrevoEmailSender>(client =>
     {
         client.BaseAddress = new Uri("https://api.brevo.com/v3/");

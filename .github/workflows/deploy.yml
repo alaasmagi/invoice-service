@@ -84,17 +84,17 @@ jobs:
             printf 'HOST_PORT=%s\n' "${HOST_PORT}"
             printf 'ASPNETCORE_URLS=%s\n' "http://+:${APP_PORT}"
 
-            printf 'ConnectionStrings__AppConnection=%s\n' "${APP_CONNECTION_STRING}"
+            printf 'APP_CONNECTION_STRING=%s\n' "${APP_CONNECTION_STRING}"
 
             printf 'IDENTITY_BASE_URL=%s\n' "${IDENTITY_BASE_URL}"
             printf 'IDENTITY_CLIENT_ID=%s\n' "${IDENTITY_CLIENT_ID}"
             printf 'IDENTITY_CLIENT_SECRET=%s\n' "${IDENTITY_CLIENT_SECRET}"
             printf 'IDENTITY_CALLBACK_URL=%s\n' "${IDENTITY_CALLBACK_URL}"
 
-            printf 'Email__Provider=%s\n' "${EMAIL_PROVIDER}"
-            printf 'Brevo__ApiKey=%s\n' "${BREVO_API_KEY}"
-            printf 'Brevo__SenderEmail=%s\n' "${BREVO_SENDER_EMAIL}"
-            printf 'Brevo__SenderName=%s\n' "${BREVO_SENDER_NAME}"
+            printf 'EMAIL_PROVIDER=%s\n' "${EMAIL_PROVIDER}"
+            printf 'BREVO_API_KEY=%s\n' "${BREVO_API_KEY}"
+            printf 'BREVO_SENDER_EMAIL=%s\n' "${BREVO_SENDER_EMAIL}"
+            printf 'BREVO_SENDER_NAME=%s\n' "${BREVO_SENDER_NAME}"
           } > .env
 
           chmod 600 .env
