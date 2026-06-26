@@ -10,6 +10,7 @@ COPY Contracts/Contracts.csproj Contracts/
 COPY DataAccess/DataAccess.csproj DataAccess/
 COPY Domain/Domain.csproj Domain/
 COPY DTO/DTO.csproj DTO/
+COPY Infrastructure/Infrastructure.csproj Infrastructure/
 COPY Web/Web.csproj Web/
 RUN dotnet restore Web/Web.csproj
 
