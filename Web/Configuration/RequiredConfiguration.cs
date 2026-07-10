@@ -1,5 +1,6 @@
-using Application;
-using Web.IdentityHub;
+using Base.Keycloak.Authentication;
+using Base.Message.RabbitMQ;
+using Infrastructure.Messaging;
 
 namespace Web.Configuration;
 
@@ -8,53 +9,123 @@ public static class RequiredConfiguration
     public static string AppConnectionString()
     {
         return Required(
-            Environment.GetEnvironmentVariable("APP_CONNECTION_STRING"),
+            Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING"),
             "Application database connection string",
-            "APP_CONNECTION_STRING");
+            "DATABASE_CONNECTION_STRING");
     }
 
-    public static IdentityHubOptions IdentityHubOptions()
+    public static KeycloakOptions KeycloakOptions()
     {
-        return new IdentityHubOptions
+        var authority = Required(
+            Environment.GetEnvironmentVariable("KEYCLOAK_AUTHORITY"),
+            "Keycloak authority",
+            "KEYCLOAK_AUTHORITY");
+
+        var clientId = Required(
+            Environment.GetEnvironmentVariable("KEYCLOAK_CLIENT_ID"),
+            "Keycloak client id",
+            "KEYCLOAK_CLIENT_ID");
+
+        return new KeycloakOptions
         {
-            BaseUrl = Required(
-                Environment.GetEnvironmentVariable("IDENTITY_BASE_URL"),
-                "Identity-hub base URL",
-                "IDENTITY_BASE_URL"),
-            ClientId = Required(
-                Environment.GetEnvironmentVariable("IDENTITY_CLIENT_ID"),
-                "Identity-hub client id",
-                "IDENTITY_CLIENT_ID"),
+            Authority = authority,
+            ClientId = clientId,
+            Audience = clientId,
             ClientSecret = Required(
-                Environment.GetEnvironmentVariable("IDENTITY_CLIENT_SECRET"),
-                "Identity-hub client secret",
-                "IDENTITY_CLIENT_SECRET"),
-            CallbackUrl = Environment.GetEnvironmentVariable("IDENTITY_CALLBACK_URL")
+                Environment.GetEnvironmentVariable("KEYCLOAK_CLIENT_SECRET"),
+                "Keycloak client secret",
+                "KEYCLOAK_CLIENT_SECRET"),
+            RequireHttpsMetadata = !authority.StartsWith("http://localhost", StringComparison.OrdinalIgnoreCase) &&
+                                   !authority.StartsWith("http://127.0.0.1", StringComparison.OrdinalIgnoreCase),
+            IncludeClientRoles = true
         };
     }
 
-    public static string EmailProvider()
+    public static RabbitMqOptions RabbitMqOptions()
     {
-        return Environment.GetEnvironmentVariable("EMAIL_PROVIDER") ?? "Brevo";
-    }
+        var uri = new Uri(Required(
+            Environment.GetEnvironmentVariable("RABBITMQ_URI"),
+            "RabbitMQ URI",
+            "RABBITMQ_URI"));
 
-    public static BrevoEmailOptions BrevoEmailOptions()
-    {
-        return new BrevoEmailOptions
+        if (!uri.Scheme.Equals("amqp", StringComparison.OrdinalIgnoreCase) &&
+            !uri.Scheme.Equals("amqps", StringComparison.OrdinalIgnoreCase))
         {
-            ApiKey = Required(
-                Environment.GetEnvironmentVariable("BREVO_API_KEY"),
-                "Brevo API key",
-                "BREVO_API_KEY"),
-            SenderEmail = Required(
-                Environment.GetEnvironmentVariable("BREVO_SENDER_EMAIL"),
-                "Brevo sender email",
-                "BREVO_SENDER_EMAIL"),
-            SenderName = Required(
-                Environment.GetEnvironmentVariable("BREVO_SENDER_NAME"),
-                "Brevo sender name",
-                "BREVO_SENDER_NAME")
+            throw new InvalidOperationException("RABBITMQ_URI must use amqp:// or amqps://.");
+        }
+
+        var credentials = uri.UserInfo.Split(':', 2);
+        if (credentials.Length != 2 ||
+            string.IsNullOrWhiteSpace(credentials[0]) ||
+            string.IsNullOrWhiteSpace(credentials[1]))
+        {
+            throw new InvalidOperationException("RABBITMQ_URI must include username and password.");
+        }
+
+        return new RabbitMqOptions
+        {
+            Host = uri.Host,
+            Port = uri.IsDefaultPort ? DefaultRabbitMqPort(uri.Scheme) : uri.Port,
+            Username = Uri.UnescapeDataString(credentials[0]),
+            Password = Uri.UnescapeDataString(credentials[1]),
+            VirtualHost = RabbitMqVirtualHost(uri),
+            Exchange = Required(
+                Environment.GetEnvironmentVariable("RABBITMQ_EXCHANGE"),
+                "RabbitMQ exchange",
+                "RABBITMQ_EXCHANGE"),
+            UseTls = uri.Scheme.Equals("amqps", StringComparison.OrdinalIgnoreCase)
         };
+    }
+
+    public static InvoiceMessagingOptions InvoiceMessagingOptions(KeycloakOptions keycloakOptions)
+    {
+        return new InvoiceMessagingOptions
+        {
+            Queue = Required(
+                Environment.GetEnvironmentVariable("RABBITMQ_QUEUE"),
+                "RabbitMQ consumer queue",
+                "RABBITMQ_QUEUE"),
+            IdentitySource = $"identity.{KeycloakRealmName(keycloakOptions.Authority)}",
+            EmailSource = "invoice"
+        };
+    }
+
+    public static GlitchtipOptions GlitchtipOptions()
+    {
+        return new GlitchtipOptions(
+            Environment.GetEnvironmentVariable("GLITCHTIP_DSN"),
+            Environment.GetEnvironmentVariable("GLITCHTIP_RELEASE") ?? "invoice-service");
+    }
+
+    private static int DefaultRabbitMqPort(string scheme)
+    {
+        return scheme.Equals("amqps", StringComparison.OrdinalIgnoreCase) ? 5671 : 5672;
+    }
+
+    private static string RabbitMqVirtualHost(Uri uri)
+    {
+        var path = uri.AbsolutePath.Trim('/');
+        return string.IsNullOrWhiteSpace(path)
+            ? "/"
+            : Uri.UnescapeDataString(path);
+    }
+
+    private static string KeycloakRealmName(string authority)
+    {
+        var uri = new Uri(authority);
+        var pathParts = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var realmsIndex = Array.FindIndex(pathParts, part => part.Equals("realms", StringComparison.OrdinalIgnoreCase));
+        if (realmsIndex >= 0 && realmsIndex + 1 < pathParts.Length)
+        {
+            return pathParts[realmsIndex + 1];
+        }
+
+        if (pathParts.Length > 0)
+        {
+            return pathParts[^1];
+        }
+
+        throw new InvalidOperationException("KEYCLOAK_AUTHORITY must include the realm path, for example https://host/realms/invoice-service.");
     }
 
     private static string Required(string? value, string description, string keys)
@@ -66,5 +137,4 @@ public static class RequiredConfiguration
 
         throw new InvalidOperationException($"Missing required configuration: {description}. Set {keys}.");
     }
-
 }

@@ -5,9 +5,6 @@
             <span class="nav-link text-dark">Hello @User.Identity?.Name!</span>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="" asp-controller="AccountProfile" asp-action="BankDetails">Bank details</a>
-        </li>
-        <li class="nav-item">
             <form class="form-inline" asp-area="" asp-controller="Auth" asp-action="Logout" method="post">
                 <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
             </form>

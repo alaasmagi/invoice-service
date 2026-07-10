@@ -1,6 +1,7 @@
 using Contracts.Application;
 using Contracts.DataAccess;
 using Domain;
+using System.Globalization;
 
 namespace Application;
 
@@ -9,8 +10,10 @@ public class SendMonthlyStatementService(
     IMonthlyStatementLineRepository monthlyStatementLineRepository,
     IContactRepository contactRepository,
     IMonthlyStatementSenderPaymentDetailsProvider senderPaymentDetailsProvider,
-    IEmailSender emailSender) : ISendMonthlyStatementService
+    IMonthlyInvoiceEmailPublisher emailPublisher) : ISendMonthlyStatementService
 {
+    private static readonly CultureInfo EstonianCulture = CultureInfo.GetCultureInfo("et-EE");
+
     public async Task SendAsync(Guid monthlyStatementId, Guid userId)
     {
         var statementResponse = await monthlyStatementRepository.GetByIdAsync(monthlyStatementId, userId);
@@ -31,31 +34,7 @@ public class SendMonthlyStatementService(
 
         try
         {
-            await emailSender.SendMonthlyStatementEmailAsync(new MonthlyStatementEmail
-            {
-                ToEmail = contact.Email,
-                ContactName = contact.FullName,
-                SenderBankAccountName = senderPaymentDetails!.Fullname.Trim(),
-                SenderBankIban = senderPaymentDetails.BankIban.Trim(),
-                Period = statement.Period,
-                TotalAmount = statement.TotalSum,
-                Lines = lines
-                    .OrderBy(line => line.AddressName)
-                    .ThenBy(line => line.InvoiceDate)
-                    .ThenBy(line => line.ServiceName)
-                    .Select(line => new MonthlyStatementEmailLine
-                    {
-                        AddressName = line.AddressName,
-                        ServiceName = line.ServiceName,
-                        InvoiceDate = line.InvoiceDate,
-                        PeriodStart = line.PeriodStart,
-                        PeriodEnd = line.PeriodEnd,
-                        InvoiceTotal = line.InvoiceTotal,
-                        ResidentCount = line.ResidentCount,
-                        ContactAmount = line.AllocatedAmount
-                    })
-                    .ToList()
-            });
+            await emailPublisher.PublishAsync(BuildEmailContent(statement, contact, senderPaymentDetails!, lines));
 
             statement.Status = EMonthlyStatementStatus.Sent;
             statement.SentAt = DateTime.UtcNow;
@@ -88,5 +67,63 @@ public class SendMonthlyStatementService(
                 .Where(line => line.MonthlyStatementId == statementId)
                 .ToList()
             : [];
+    }
+
+    private static MonthlyInvoiceEmailContent BuildEmailContent(
+        MonthlyStatement statement,
+        Contact contact,
+        MonthlyStatementSenderPaymentDetails senderPaymentDetails,
+        IReadOnlyCollection<MonthlyStatementLine> lines)
+    {
+        var invoiceIdentifier = InvoiceIdentifier(statement.Id);
+        var invoiceDate = DateOnly.FromDateTime(DateTime.UtcNow);
+        var dueDate = invoiceDate.AddDays(14);
+        var invoicePeriod = $"{statement.Month:D2}.{statement.Year:D4}";
+
+        return new MonthlyInvoiceEmailContent
+        {
+            Email = contact.Email,
+            FullName = contact.FullName,
+            Locale = senderPaymentDetails.Locale,
+            InvoiceIdentifier = invoiceIdentifier,
+            InvoicePeriod = invoicePeriod,
+            InvoiceDate = FormatDate(invoiceDate),
+            InvoiceDueDate = FormatDate(dueDate),
+            InvoiceTotal = FormatMoney(statement.TotalSum),
+            Currency = "€",
+            InvoiceRows = lines
+                .OrderBy(line => line.AddressName)
+                .ThenBy(line => line.InvoiceDate)
+                .ThenBy(line => line.ServiceName)
+                .Select(line => new MonthlyInvoiceEmailRowContent
+                {
+                    Address = line.AddressName,
+                    Service = line.ServiceName,
+                    PeriodStart = FormatDate(line.PeriodStart ?? line.InvoiceDate),
+                    PeriodEnd = FormatDate(line.PeriodEnd ?? line.InvoiceDate),
+                    InvoiceAmount = FormatMoney(line.InvoiceTotal),
+                    Fractions = line.ResidentCount,
+                    InvoiceFraction = FormatMoney(line.AllocatedAmount)
+                })
+                .ToList(),
+            PaymentFullName = senderPaymentDetails.FullName.Trim(),
+            PaymentIban = senderPaymentDetails.BankIban.Trim(),
+            PaymentDescription = $"{invoiceIdentifier} {invoicePeriod}"
+        };
+    }
+
+    private static string InvoiceIdentifier(Guid statementId)
+    {
+        return statementId.ToString("N")[..7].ToUpperInvariant();
+    }
+
+    private static string FormatDate(DateOnly date)
+    {
+        return date.ToString("dd.MM.yyyy", EstonianCulture);
+    }
+
+    private static string FormatMoney(decimal amount)
+    {
+        return amount.ToString("N2", EstonianCulture);
     }
 }

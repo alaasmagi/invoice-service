@@ -20,85 +20,91 @@ public class AppUserRepository : BaseRepository<AppUser, AppUserEntity, IMapper<
         _mapper = repositoryMapper;
     }
 
-    public async Task<AppUser?> GetByIdAsync(Guid id)
+    public async Task<AppUser?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
         var entity = await _context.AppUsers
             .AsNoTracking()
-            .FirstOrDefaultAsync(user => user.Id == id);
+            .FirstOrDefaultAsync(user => user.Id == id, ct);
 
         return _mapper.Map(entity);
     }
 
-    public async Task<AppUser> UpsertFromClaimsAsync(Guid id, string? fullName)
+    public async Task<AppUser> UpsertFromIdentityEventAsync(
+        Guid id,
+        string? email,
+        string? username,
+        string? fullName,
+        string? locale,
+        CancellationToken ct = default)
     {
         var entity = await _context.AppUsers
-            .FirstOrDefaultAsync(user => user.Id == id);
+            .FirstOrDefaultAsync(user => user.Id == id, ct);
 
         if (entity == null)
         {
             entity = new AppUserEntity
             {
                 Id = id,
-                Fullname = NormalizeFullName(fullName)
+                Email = Normalize(email),
+                Username = Normalize(username),
+                FullName = Normalize(fullName),
+                Locale = NormalizeLocale(locale)
             };
-            StampNew(entity, id);
-            _context.AppUsers.Add(entity);
-        }
-        else if (string.IsNullOrWhiteSpace(entity.Fullname) && !string.IsNullOrWhiteSpace(fullName))
-        {
-            entity.Fullname = fullName.Trim();
-            StampExisting(entity, id);
-        }
-
-        await _context.SaveChangesAsync();
-        return _mapper.Map(entity)!;
-    }
-
-    public async Task UpdateProfileAsync(Guid id, string fullName, string? bankIban)
-    {
-        var entity = await _context.AppUsers
-            .FirstOrDefaultAsync(user => user.Id == id);
-
-        if (entity == null)
-        {
-            entity = new AppUserEntity
-            {
-                Id = id,
-                Fullname = fullName,
-                BankIban = bankIban
-            };
-            StampNew(entity, id);
+            StampNew(entity);
             _context.AppUsers.Add(entity);
         }
         else
         {
-            entity.Fullname = fullName;
-            entity.BankIban = bankIban;
-            StampExisting(entity, id);
+            entity.Email = Normalize(email);
+            entity.Username = Normalize(username);
+            entity.FullName = Normalize(fullName);
+            entity.Locale = NormalizeLocale(locale);
+            StampExisting(entity);
         }
 
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(ct);
+        return _mapper.Map(entity)!;
     }
 
-    private static string NormalizeFullName(string? fullName)
+    public async Task<bool> DeleteFromIdentityEventAsync(Guid id, CancellationToken ct = default)
     {
-        return string.IsNullOrWhiteSpace(fullName) ? string.Empty : fullName.Trim();
+        var entity = await _context.AppUsers
+            .FirstOrDefaultAsync(user => user.Id == id, ct);
+
+        if (entity == null)
+        {
+            return false;
+        }
+
+        _context.AppUsers.Remove(entity);
+        await _context.SaveChangesAsync(ct);
+        return true;
     }
 
-    private static void StampNew(AppUserEntity entity, Guid userId)
+    private static string Normalize(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
+    }
+
+    private static string NormalizeLocale(string? locale)
+    {
+        return string.IsNullOrWhiteSpace(locale) ? "et" : locale.Trim();
+    }
+
+    private static void StampNew(AppUserEntity entity)
     {
         var now = DateTime.UtcNow;
         entity.CreatedAt = now;
         entity.UpdatedAt = now;
-        entity.CreatedBy = userId.ToString();
-        entity.UpdatedBy = userId.ToString();
+        entity.CreatedBy = "keycloak";
+        entity.UpdatedBy = "keycloak";
         entity.ConcurrencyToken = Guid.NewGuid().ToString("N");
     }
 
-    private static void StampExisting(AppUserEntity entity, Guid userId)
+    private static void StampExisting(AppUserEntity entity)
     {
         entity.UpdatedAt = DateTime.UtcNow;
-        entity.UpdatedBy = userId.ToString();
+        entity.UpdatedBy = "keycloak";
         entity.ConcurrencyToken = Guid.NewGuid().ToString("N");
     }
 }

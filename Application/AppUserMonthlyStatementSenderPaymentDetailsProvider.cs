@@ -1,9 +1,9 @@
 using Contracts.Application;
 using Contracts.DataAccess;
 
-namespace Web;
+namespace Application;
 
-public sealed class IdentityMonthlyStatementSenderPaymentDetailsProvider(IAppUserRepository appUserRepository) : IMonthlyStatementSenderPaymentDetailsProvider
+public sealed class AppUserMonthlyStatementSenderPaymentDetailsProvider(IAppUserRepository appUserRepository) : IMonthlyStatementSenderPaymentDetailsProvider
 {
     public async Task<MonthlyStatementSenderPaymentDetails?> GetAsync(Guid userId)
     {
@@ -12,7 +12,8 @@ public sealed class IdentityMonthlyStatementSenderPaymentDetailsProvider(IAppUse
             ? null
             : new MonthlyStatementSenderPaymentDetails
             {
-                Fullname = user.Fullname,
+                FullName = user.FullName,
+                Locale = user.Locale,
                 BankIban = user.BankIban ?? string.Empty
             };
     }

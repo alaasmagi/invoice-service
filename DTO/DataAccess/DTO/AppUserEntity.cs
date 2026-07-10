@@ -4,6 +4,9 @@ namespace DTO.DataAccess.DataAccess.DTO;
 
 public class AppUserEntity : BaseEntityWithMetaConcurrency
 {
-    public string Fullname { get; set; } = default!;
+    public string Email { get; set; } = default!;
+    public string Username { get; set; } = default!;
+    public string FullName { get; set; } = default!;
+    public string Locale { get; set; } = "et";
     public string? BankIban { get; set; }
 }

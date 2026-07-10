@@ -11,7 +11,10 @@ public class AppUserEntityMapper : IMapper<AppUser, AppUserEntity>
         return entity == null ? null : new AppUser
         {
             Id = entity.Id,
-            Fullname = entity.Fullname,
+            Email = entity.Email,
+            Username = entity.Username,
+            FullName = entity.FullName,
+            Locale = entity.Locale,
             BankIban = entity.BankIban
         };
     }
@@ -26,7 +29,10 @@ public class AppUserEntityMapper : IMapper<AppUser, AppUserEntity>
         return entity == null ? null : new AppUserEntity
         {
             Id = entity.Id,
-            Fullname = entity.Fullname,
+            Email = entity.Email,
+            Username = entity.Username,
+            FullName = entity.FullName,
+            Locale = entity.Locale,
             BankIban = entity.BankIban
         };
     }

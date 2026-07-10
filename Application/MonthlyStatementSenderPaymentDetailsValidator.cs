@@ -11,7 +11,7 @@ public static class MonthlyStatementSenderPaymentDetailsValidator
             throw new InvalidOperationException("Sender profile was not found.");
         }
 
-        if (string.IsNullOrWhiteSpace(details.Fullname))
+        if (string.IsNullOrWhiteSpace(details.FullName))
         {
             throw new InvalidOperationException("Sender full name must be configured before sending monthly statement emails.");
         }

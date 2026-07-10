@@ -181,8 +181,8 @@ public class MonthlyStatementsController(
 
             TempData["StatusMessage"] = status switch
             {
-                EMonthlyStatementStatus.Sent => "Monthly statement email was sent.",
-                EMonthlyStatementStatus.Failed => "Monthly statement email could not be sent. Check email configuration and recipient address.",
+                EMonthlyStatementStatus.Sent => "Monthly statement email command was published.",
+                EMonthlyStatementStatus.Failed => "Monthly statement email command could not be published. Check RabbitMQ configuration.",
                 _ => "Monthly statement send action completed."
             };
         }

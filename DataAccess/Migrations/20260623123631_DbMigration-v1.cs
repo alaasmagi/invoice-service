@@ -40,7 +40,10 @@ namespace DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Fullname = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Email = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: false),
+                    Username = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    FullName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Locale = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
                     BankIban = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     CreatedBy = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -315,6 +318,18 @@ namespace DataAccess.Migrations
                 schema: "invoice",
                 table: "Addresses",
                 column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppUsers_Email",
+                schema: "invoice",
+                table: "AppUsers",
+                column: "Email");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppUsers_Username",
+                schema: "invoice",
+                table: "AppUsers",
+                column: "Username");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InvoiceAllocations_ContactEntityId",
