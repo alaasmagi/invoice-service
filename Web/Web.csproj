@@ -39,4 +39,8 @@
       <_ContentIncludedByDefault Remove="Views\ContactMonthlyStatements\Index.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Views\BillingWorkspace\" />
+    </ItemGroup>
+
 </Project>
