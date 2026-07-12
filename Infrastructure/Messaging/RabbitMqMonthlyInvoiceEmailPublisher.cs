@@ -19,6 +19,6 @@ public sealed class RabbitMqMonthlyInvoiceEmailPublisher(
             Content = content
         };
 
-        return publisher.PublishAsync(DefaultMessageTypes.Email, envelope, ct);
+        return publisher.PublishAsync(envelope.Type, envelope, ct);
     }
 }
