@@ -1,69 +1,96 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-bs-theme="dark">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>@ViewData["Title"] - Web</title>
+    <meta name="color-scheme" content="dark light"/>
+    <title>@ViewData["Title"] - Invoice Service</title>
+    <script>
+        (() => {
+            const storageKey = "invoice-service-theme";
+            let theme = "dark";
+
+            try {
+                const savedTheme = localStorage.getItem(storageKey);
+                const preferredLight = window.matchMedia?.("(prefers-color-scheme: light)").matches;
+                theme = savedTheme || (preferredLight ? "light" : "dark");
+            } catch {
+                theme = "dark";
+            }
+
+            document.documentElement.setAttribute("data-theme", theme);
+            document.documentElement.setAttribute("data-bs-theme", theme);
+        })();
+    </script>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/Web.styles.css" asp-append-version="true"/>
 </head>
-<body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Web</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+<body class="app-shell">
+<header class="app-header">
+    <nav class="navbar navbar-expand-lg app-navbar">
+        <div class="container-fluid app-nav-container">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Invoice Service</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <div id="mainNavigation" class="navbar-collapse collapse">
                 <ul class="navbar-nav flex-grow-1">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <a class="nav-link" asp-area="" asp-controller="Addresses" asp-action="Index">Addresses</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Addresses" asp-action="Index">Addresses</a>
+                        <a class="nav-link" asp-area="" asp-controller="Contacts" asp-action="Index">Contacts</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Contacts" asp-action="Index">Contacts</a>
+                        <a class="nav-link" asp-area="" asp-controller="Services" asp-action="Index">Services</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Services" asp-action="Index">Services</a>
+                        <a class="nav-link" asp-area="" asp-controller="Invoices" asp-action="Index">Invoices</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Invoices" asp-action="Index">Invoices</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="MonthlyStatements" asp-action="Index">Statements</a>
+                        <a class="nav-link" asp-area="" asp-controller="MonthlyStatements" asp-action="Index">Statements</a>
                     </li>
                 </ul>
-                <partial name="_LoginPartial"/>
+                <div class="app-nav-actions">
+                    <button id="themeToggle" class="app-theme-toggle" type="button" role="switch" aria-checked="true">
+                        <span class="theme-switch-track" aria-hidden="true">
+                            <span class="theme-switch-thumb"></span>
+                        </span>
+                        <span data-theme-toggle-label>Dark</span>
+                    </button>
+                    <partial name="_LoginPartial"/>
+                </div>
             </div>
         </div>
     </nav>
 </header>
-<div class="container">
-    <main role="main" class="pb-3">
+
+<div class="container app-page-container">
+    <main role="main" class="app-main">
         @RenderBody()
     </main>
 </div>
 
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; Aleksander Laasmägi @DateTime.Now.Year -
+<footer class="app-footer">
+    <div class="container app-page-container">
+        <span>&copy; Aleksander Laasmägi @DateTime.Now.Year</span>
+        <span aria-hidden="true">/</span>
         <a href="https://alaasmagi.dev" target="_blank" rel="noopener noreferrer">
-            View portfolio
+            Portfolio
         </a>
-        -
+        <span aria-hidden="true">/</span>
         <a href="https://github.com/alaasmagi/invoice-service"
            target="_blank" rel="noopener noreferrer">
-            Source code
+            Source
         </a>
+        <span aria-hidden="true">/</span>
+        <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
     </div>
 </footer>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>

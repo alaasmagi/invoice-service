@@ -1,8 +1,63 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="app-home">
+    <section class="app-hero">
+        <div class="app-hero-copy">
+            <div class="app-kicker">Invoice operations</div>
+            <h1>Track invoices, residents, allocations, and monthly statements from one workspace.</h1>
+            <p>
+                Import utility invoices, keep address and contact records tidy, split costs, and send monthly statements without leaving the service.
+            </p>
+            <div class="app-hero-actions">
+                <a asp-controller="Invoices" asp-action="Index" class="btn btn-primary">Open invoices</a>
+                <a asp-controller="MonthlyStatements" asp-action="Generate" class="btn btn-secondary">Generate statements</a>
+            </div>
+        </div>
+        <aside class="app-panel">
+            <div>
+                <div class="app-panel-title">Primary workflow</div>
+                <div class="app-panel-value">Import, split, send</div>
+            </div>
+            <p class="app-panel-note">
+                Start with a PDF import, review the invoice, then generate person-level statements for the selected month.
+            </p>
+        </aside>
+    </section>
+
+    <section class="app-quick-grid" aria-label="Primary sections">
+        <a asp-controller="Invoices" asp-action="Index" class="app-card">
+            <span class="app-badge">Billing</span>
+            <div>
+                <h2>Invoices</h2>
+                <p>Create invoices manually or import provider PDFs for Telia and Enefit.</p>
+            </div>
+            <span class="app-card-link">View invoices</span>
+        </a>
+        <a asp-controller="MonthlyStatements" asp-action="Index" class="app-card">
+            <span class="app-badge">Statements</span>
+            <div>
+                <h2>Monthly statements</h2>
+                <p>Review generated statements, inspect invoice shares, and send drafts.</p>
+            </div>
+            <span class="app-card-link">View statements</span>
+        </a>
+        <a asp-controller="Contacts" asp-action="Index" class="app-card">
+            <span class="app-badge">People</span>
+            <div>
+                <h2>Contacts</h2>
+                <p>Manage the residents and recipients connected to each address.</p>
+            </div>
+            <span class="app-card-link">View contacts</span>
+        </a>
+        <a asp-controller="Addresses" asp-action="Index" class="app-card">
+            <span class="app-badge">Places</span>
+            <div>
+                <h2>Addresses</h2>
+                <p>Maintain homes, service locations, and contact assignments.</p>
+            </div>
+            <span class="app-card-link">View addresses</span>
+        </a>
+    </section>
 </div>

@@ -20,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 using System.Net;
+using Web.Filters;
 using IPNetwork = System.Net.IPNetwork;
 
 namespace Web.Configuration;
@@ -134,7 +135,9 @@ public static class InvoiceServiceApplication
         builder.Services.AddRepositories();
         builder.Services.AddApplicationServices();
 
-        builder.Services.AddControllersWithViews();
+        builder.Services.AddScoped<CurrentAppUserViewDataFilter>();
+        builder.Services.AddControllersWithViews(options =>
+            options.Filters.Add<CurrentAppUserViewDataFilter>());
         builder.Services.ConfigureForwardedHeaders();
     }
 

@@ -13,8 +13,8 @@ concurrency:
 env:
   IMAGE_NAME: invoice-service
   REMOTE_APP_DIR: /opt/invoice-service
-  APP_PORT: "3000"
-  HOST_PORT: "3000"
+  APP_PORT: "8080"
+  HOST_PORT: "8080"
 
 jobs:
   deploy:
@@ -42,59 +42,45 @@ jobs:
 
       - name: Create runtime env file from GitHub secrets
         env:
-          APP_PORT: ${{ secrets.CONTAINER_PORT || secrets.APP_PORT || env.APP_PORT }}
-          HOST_PORT: ${{ secrets.HOST_PORT || secrets.APP_PORT || env.HOST_PORT }}
-          APP_CONNECTION_STRING: ${{ secrets.APP_CONNECTION_STRING }}
-          IDENTITY_BASE_URL: ${{ secrets.IDENTITY_BASE_URL }}
-          IDENTITY_CLIENT_ID: ${{ secrets.IDENTITY_CLIENT_ID }}
-          IDENTITY_CLIENT_SECRET: ${{ secrets.IDENTITY_CLIENT_SECRET }}
-          IDENTITY_CALLBACK_URL: ${{ secrets.IDENTITY_CALLBACK_URL }}
-          EMAIL_PROVIDER: ${{ secrets.EMAIL_PROVIDER }}
-          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
-          BREVO_SENDER_EMAIL: ${{ secrets.BREVO_SENDER_EMAIL }}
-          BREVO_SENDER_NAME: ${{ secrets.BREVO_SENDER_NAME }}
+          APP_PORT: ${{ secrets.APP_PORT || env.APP_PORT }}
+          HOST_PORT: ${{ secrets.HOST_PORT || env.HOST_PORT }}
+          DATABASE_CONNECTION_STRING: ${{ secrets.DATABASE_CONNECTION_STRING }}
+          RABBITMQ_URI: ${{ secrets.RABBITMQ_URI }}
+          RABBITMQ_QUEUE: ${{ secrets.RABBITMQ_QUEUE }}
+          RABBITMQ_EXCHANGE: ${{ secrets.RABBITMQ_EXCHANGE }}
+          GLITCHTIP_DSN: ${{ secrets.GLITCHTIP_DSN }}
+          GLITCHTIP_RELEASE: ${{ secrets.GLITCHTIP_RELEASE || 'invoice-service' }}
+          KEYCLOAK_AUTHORITY: ${{ secrets.KEYCLOAK_AUTHORITY }}
+          KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
+          KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
         run: |
           set -euo pipefail
 
-          : "${APP_CONNECTION_STRING:?APP_CONNECTION_STRING is required}"
-          : "${IDENTITY_BASE_URL:?IDENTITY_BASE_URL is required}"
-          : "${IDENTITY_CLIENT_ID:?IDENTITY_CLIENT_ID is required}"
-          : "${IDENTITY_CLIENT_SECRET:?IDENTITY_CLIENT_SECRET is required}"
-          : "${IDENTITY_CALLBACK_URL:?IDENTITY_CALLBACK_URL is required}"
-
-          EMAIL_PROVIDER="${EMAIL_PROVIDER:-Brevo}"
-
-          case "${EMAIL_PROVIDER,,}" in
-            brevo)
-              : "${BREVO_API_KEY:?BREVO_API_KEY is required when EMAIL_PROVIDER=Brevo}"
-              : "${BREVO_SENDER_EMAIL:?BREVO_SENDER_EMAIL is required when EMAIL_PROVIDER=Brevo}"
-              : "${BREVO_SENDER_NAME:?BREVO_SENDER_NAME is required when EMAIL_PROVIDER=Brevo}"
-              ;;
-            console)
-              ;;
-            *)
-              echo "Unsupported EMAIL_PROVIDER='${EMAIL_PROVIDER}'. Use 'Brevo' or 'Console'." >&2
-              exit 1
-              ;;
-          esac
+          : "${DATABASE_CONNECTION_STRING:?DATABASE_CONNECTION_STRING is required}"
+          : "${RABBITMQ_URI:?RABBITMQ_URI is required}"
+          : "${RABBITMQ_QUEUE:?RABBITMQ_QUEUE is required}"
+          : "${RABBITMQ_EXCHANGE:?RABBITMQ_EXCHANGE is required}"
+          : "${KEYCLOAK_AUTHORITY:?KEYCLOAK_AUTHORITY is required}"
+          : "${KEYCLOAK_CLIENT_ID:?KEYCLOAK_CLIENT_ID is required}"
+          : "${KEYCLOAK_CLIENT_SECRET:?KEYCLOAK_CLIENT_SECRET is required}"
 
           {
             printf 'ASPNETCORE_ENVIRONMENT=%s\n' 'Production'
             printf 'APP_PORT=%s\n' "${APP_PORT}"
             printf 'HOST_PORT=%s\n' "${HOST_PORT}"
-            printf 'ASPNETCORE_URLS=%s\n' "http://+:${APP_PORT}"
 
-            printf 'APP_CONNECTION_STRING=%s\n' "${APP_CONNECTION_STRING}"
+            printf 'DATABASE_CONNECTION_STRING=%s\n' "${DATABASE_CONNECTION_STRING}"
 
-            printf 'IDENTITY_BASE_URL=%s\n' "${IDENTITY_BASE_URL}"
-            printf 'IDENTITY_CLIENT_ID=%s\n' "${IDENTITY_CLIENT_ID}"
-            printf 'IDENTITY_CLIENT_SECRET=%s\n' "${IDENTITY_CLIENT_SECRET}"
-            printf 'IDENTITY_CALLBACK_URL=%s\n' "${IDENTITY_CALLBACK_URL}"
+            printf 'RABBITMQ_URI=%s\n' "${RABBITMQ_URI}"
+            printf 'RABBITMQ_QUEUE=%s\n' "${RABBITMQ_QUEUE}"
+            printf 'RABBITMQ_EXCHANGE=%s\n' "${RABBITMQ_EXCHANGE}"
 
-            printf 'EMAIL_PROVIDER=%s\n' "${EMAIL_PROVIDER}"
-            printf 'BREVO_API_KEY=%s\n' "${BREVO_API_KEY}"
-            printf 'BREVO_SENDER_EMAIL=%s\n' "${BREVO_SENDER_EMAIL}"
-            printf 'BREVO_SENDER_NAME=%s\n' "${BREVO_SENDER_NAME}"
+            printf 'GLITCHTIP_DSN=%s\n' "${GLITCHTIP_DSN}"
+            printf 'GLITCHTIP_RELEASE=%s\n' "${GLITCHTIP_RELEASE}"
+
+            printf 'KEYCLOAK_AUTHORITY=%s\n' "${KEYCLOAK_AUTHORITY}"
+            printf 'KEYCLOAK_CLIENT_ID=%s\n' "${KEYCLOAK_CLIENT_ID}"
+            printf 'KEYCLOAK_CLIENT_SECRET=%s\n' "${KEYCLOAK_CLIENT_SECRET}"
           } > .env
 
           chmod 600 .env
@@ -134,8 +120,8 @@ jobs:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
           VPS_PORT: ${{ secrets.VPS_PORT }}
-          APP_PORT: ${{ secrets.CONTAINER_PORT || secrets.APP_PORT || env.APP_PORT }}
-          HOST_PORT: ${{ secrets.HOST_PORT || secrets.APP_PORT || env.HOST_PORT }}
+          APP_PORT: ${{ secrets.APP_PORT || env.APP_PORT }}
+          HOST_PORT: ${{ secrets.HOST_PORT || env.HOST_PORT }}
         run: |
           set -euo pipefail
 
