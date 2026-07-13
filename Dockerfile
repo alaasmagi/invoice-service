@@ -20,6 +20,10 @@ RUN dotnet publish Web/Web.csproj -c Release -o /app/publish --no-restore
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libkrb5-3 && \
+    rm -rf /var/lib/apt/lists/*
+
 ENV APP_PORT=8080 \
     ASPNETCORE_ENVIRONMENT=Production
 
