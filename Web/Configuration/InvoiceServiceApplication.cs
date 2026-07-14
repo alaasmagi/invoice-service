@@ -119,6 +119,7 @@ public static class InvoiceServiceApplication
             options.UseNpgsql(appDbConnectionString));
         builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<AppDbContext>());
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+        builder.Services.AddHealthChecks();
 
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddKeycloakOidc(keycloakOptions);

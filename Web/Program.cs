@@ -3,6 +3,7 @@ using Web.Configuration;
 InvoiceServiceApplication.Run(args, app =>
 {
     app.UseForwardedHeaders();
+    app.UseHealthChecks("/health");
 
     if (app.Environment.IsDevelopment())
     {
