@@ -18,11 +18,35 @@ public class AppDbContext : DbContext
     public DbSet<MonthlyStatementLineEntity> MonthlyStatementLines => Set<MonthlyStatementLineEntity>();
     public DbSet<ServiceEntity> Services => Set<ServiceEntity>();
     public DbSet<AppUserEntity> AppUsers => Set<AppUserEntity>();
+    public DbSet<PublishedInvoiceEmailEntity> PublishedInvoiceEmails => Set<PublishedInvoiceEmailEntity>();
+    public DbSet<ProcessedInboxMessageEntity> ProcessedInboxMessages => Set<ProcessedInboxMessageEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("invoice");
+
+        modelBuilder.Entity<PublishedInvoiceEmailEntity>(entity =>
+        {
+            entity.ToTable("PublishedInvoiceEmails");
+            entity.Property(e => e.InvoiceIdentifier).HasMaxLength(64);
+            entity.Property(e => e.Recipient).HasMaxLength(320);
+            entity.Property(e => e.EnvelopeId).HasMaxLength(64);
+            // Second layer of dedup after the natural key: the deterministic envelope id is unique.
+            entity.HasIndex(e => e.EnvelopeId).IsUnique();
+            entity.HasIndex(e => new { e.UserId, e.MonthlyStatementId }).IsUnique();
+            entity.HasIndex(e => new { e.UserId, e.Year, e.Month });
+        });
+
+        modelBuilder.Entity<ProcessedInboxMessageEntity>(entity =>
+        {
+            entity.ToTable("ProcessedInboxMessages");
+            entity.Property(e => e.EnvelopeId).HasMaxLength(64);
+            entity.Property(e => e.Source).HasMaxLength(64);
+            entity.Property(e => e.Action).HasMaxLength(64);
+            entity.HasIndex(e => e.EnvelopeId).IsUnique();
+            entity.HasIndex(e => e.ProcessedAt);
+        });
 
         modelBuilder.Entity<AppUserEntity>(entity =>
         {

@@ -2,5 +2,6 @@ namespace Contracts.Application;
 
 public static class InvoiceMessageActions
 {
-    public const string MonthlyInvoice = "monthly.invoice";
+    // Single hyphenated segment; the routing-key builder rejects dots.
+    public const string Invoice = MessagingContract.InvoiceAction;
 }

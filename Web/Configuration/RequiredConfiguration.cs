@@ -77,16 +77,15 @@ public static class RequiredConfiguration
         };
     }
 
-    public static InvoiceMessagingOptions InvoiceMessagingOptions(KeycloakOptions keycloakOptions)
+    public static InvoiceMessagingOptions InvoiceMessagingOptions()
     {
         return new InvoiceMessagingOptions
         {
+            // Pre-declared on the broker, bound to identity-hub.events with identity-hub.invoice.#.
             Queue = Required(
                 Environment.GetEnvironmentVariable("RABBITMQ_QUEUE"),
                 "RabbitMQ consumer queue",
-                "RABBITMQ_QUEUE"),
-            IdentitySource = $"identity.{KeycloakRealmName(keycloakOptions.Authority)}",
-            EmailSource = "invoice"
+                "RABBITMQ_QUEUE")
         };
     }
 
@@ -108,24 +107,6 @@ public static class RequiredConfiguration
         return string.IsNullOrWhiteSpace(path)
             ? "/"
             : Uri.UnescapeDataString(path);
-    }
-
-    private static string KeycloakRealmName(string authority)
-    {
-        var uri = new Uri(authority);
-        var pathParts = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        var realmsIndex = Array.FindIndex(pathParts, part => part.Equals("realms", StringComparison.OrdinalIgnoreCase));
-        if (realmsIndex >= 0 && realmsIndex + 1 < pathParts.Length)
-        {
-            return pathParts[realmsIndex + 1];
-        }
-
-        if (pathParts.Length > 0)
-        {
-            return pathParts[^1];
-        }
-
-        throw new InvalidOperationException("KEYCLOAK_AUTHORITY must include the realm path, for example https://host/realms/invoice-service.");
     }
 
     private static string Required(string? value, string description, string keys)

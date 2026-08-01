@@ -28,8 +28,9 @@ public sealed class MonthlyInvoiceEmailContent
     [JsonPropertyName("invoiceTotal")]
     public string InvoiceTotal { get; init; } = default!;
 
+    // ISO 4217 code, never a symbol. email-hub renders the symbol per locale.
     [JsonPropertyName("currency")]
-    public string Currency { get; init; } = "€";
+    public string Currency { get; init; } = "EUR";
 
     [JsonPropertyName("invoiceRows")]
     public IReadOnlyList<MonthlyInvoiceEmailRowContent> InvoiceRows { get; init; } = [];

@@ -485,6 +485,89 @@ namespace DataAccess.Migrations
                     b.ToTable("MonthlyStatementLines", "invoice");
                 });
 
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.ProcessedInboxMessageEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("EnvelopeId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTime>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EnvelopeId")
+                        .IsUnique();
+
+                    b.HasIndex("ProcessedAt");
+
+                    b.ToTable("ProcessedInboxMessages", "invoice");
+                });
+
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.PublishedInvoiceEmailEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ConfirmedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EnvelopeId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("InvoiceIdentifier")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("MonthlyStatementId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Recipient")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EnvelopeId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId", "MonthlyStatementId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId", "Year", "Month");
+
+                    b.ToTable("PublishedInvoiceEmails", "invoice");
+                });
+
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.ServiceEntity", b =>
                 {
                     b.Property<Guid>("Id")

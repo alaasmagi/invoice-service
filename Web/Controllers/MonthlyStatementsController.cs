@@ -12,7 +12,8 @@ namespace Web.Controllers;
 public class MonthlyStatementsController(
     AppDbContext context,
     IGenerateMonthlyStatementService generateMonthlyStatementService,
-    ISendMonthlyStatementService sendMonthlyStatementService) : UserScopedControllerBase
+    ISendMonthlyStatementService sendMonthlyStatementService,
+    ISendPeriodInvoiceEmailsService sendPeriodInvoiceEmailsService) : UserScopedControllerBase
 {
     public async Task<IActionResult> Index()
     {
@@ -194,6 +195,20 @@ public class MonthlyStatementsController(
         return returnTo == nameof(Index)
             ? RedirectToAction(nameof(Index))
             : RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SendPeriod([Bind("Year,Month")] MonthlyStatementEntity input)
+    {
+        var userId = CurrentUserId();
+        var result = await sendPeriodInvoiceEmailsService.SendPeriodAsync(input.Year, input.Month, userId);
+
+        TempData["StatusMessage"] = result.Total == 0
+            ? $"No monthly statements were found for {input.Year:D4}-{input.Month:D2}."
+            : $"Period {input.Year:D4}-{input.Month:D2}: published {result.Published}, already sent {result.Skipped}, failed {result.Failed} of {result.Total}.";
+
+        return RedirectToAction(nameof(Index));
     }
 
     private async Task PopulateSelectLists(Guid userId)

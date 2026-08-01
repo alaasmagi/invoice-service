@@ -113,7 +113,7 @@ public static class InvoiceServiceApplication
         var appDbConnectionString = RequiredConfiguration.AppConnectionString();
         var keycloakOptions = RequiredConfiguration.KeycloakOptions();
         var rabbitMqOptions = RequiredConfiguration.RabbitMqOptions();
-        var invoiceMessagingOptions = RequiredConfiguration.InvoiceMessagingOptions(keycloakOptions);
+        var invoiceMessagingOptions = RequiredConfiguration.InvoiceMessagingOptions();
 
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(appDbConnectionString));
@@ -172,6 +172,9 @@ public static class InvoiceServiceApplication
         services.AddScoped<IAddressRepository, AddressRepository>();
         services.AddScoped<IAddressContactRepository, AddressContactRepository>();
         services.AddScoped<IAppUserRepository, AppUserRepository>();
+        services.AddScoped<IPublishedInvoiceEmailRepository, PublishedInvoiceEmailRepository>();
+        services.AddScoped<IProcessedInboxMessageRepository, ProcessedInboxMessageRepository>();
+        services.AddScoped<IIdentityUserProjection, IdentityUserProjection>();
         services.AddScoped<IContactRepository, ContactRepository>();
         services.AddScoped<IInvoiceRepository, InvoiceRepository>();
         services.AddScoped<IInvoiceAllocationRepository, InvoiceAllocationRepository>();
@@ -188,6 +191,7 @@ public static class InvoiceServiceApplication
         services.AddScoped<ICreateInvoiceService, CreateInvoiceService>();
         services.AddScoped<IGenerateMonthlyStatementService, GenerateMonthlyStatementService>();
         services.AddScoped<ISendMonthlyStatementService, SendMonthlyStatementService>();
+        services.AddScoped<ISendPeriodInvoiceEmailsService, SendPeriodInvoiceEmailsService>();
         services.AddScoped<IMonthlyStatementSenderPaymentDetailsProvider, AppUserMonthlyStatementSenderPaymentDetailsProvider>();
         services.AddScoped<IPdfInvoiceImportService, PdfInvoiceImportService>();
         services.AddScoped<IPdfInvoiceTextExtractor, PdfInvoiceTextExtractor>();

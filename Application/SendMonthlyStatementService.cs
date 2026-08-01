@@ -10,12 +10,17 @@ public class SendMonthlyStatementService(
     IMonthlyStatementLineRepository monthlyStatementLineRepository,
     IContactRepository contactRepository,
     IMonthlyStatementSenderPaymentDetailsProvider senderPaymentDetailsProvider,
+    IPublishedInvoiceEmailRepository publishedInvoiceEmailRepository,
     IMonthlyInvoiceEmailPublisher emailPublisher) : ISendMonthlyStatementService
 {
-    private static readonly CultureInfo EstonianCulture = CultureInfo.GetCultureInfo("et-EE");
-
-    public async Task SendAsync(Guid monthlyStatementId, Guid userId)
+    public async Task<EInvoiceSendOutcome> SendAsync(Guid monthlyStatementId, Guid userId, CancellationToken ct = default)
     {
+        // Idempotency: a statement already published and confirmed is never re-sent.
+        if (await publishedInvoiceEmailRepository.ExistsForStatementAsync(monthlyStatementId, userId, ct))
+        {
+            return EInvoiceSendOutcome.Skipped;
+        }
+
         var statementResponse = await monthlyStatementRepository.GetByIdAsync(monthlyStatementId, userId);
         if (!statementResponse.Successful || statementResponse.Value == null)
         {
@@ -32,20 +37,44 @@ public class SendMonthlyStatementService(
             throw new InvalidOperationException("Monthly statement has no invoice lines to send.");
         }
 
+        var invoiceIdentifier = InvoiceIdentifier(statement.Id);
+        var content = BuildEmailContent(statement, contact, senderPaymentDetails!, lines, invoiceIdentifier);
+
+        InvoiceEmailPublishResult result;
         try
         {
-            await emailPublisher.PublishAsync(BuildEmailContent(statement, contact, senderPaymentDetails!, lines));
-
-            statement.Status = EMonthlyStatementStatus.Sent;
-            statement.SentAt = DateTime.UtcNow;
+            result = await emailPublisher.PublishAsync(content, ct);
         }
-        catch
+        catch (Exception)
         {
-            statement.Status = EMonthlyStatementStatus.Failed;
-            statement.SentAt = null;
+            await monthlyStatementRepository.SetSendStatusAsync(statement.Id, userId, EMonthlyStatementStatus.Failed, null);
+            return EInvoiceSendOutcome.Failed;
         }
 
-        await monthlyStatementRepository.SetSendStatusAsync(statement.Id, userId, statement.Status, statement.SentAt);
+        if (!result.Confirmed)
+        {
+            await monthlyStatementRepository.SetSendStatusAsync(statement.Id, userId, EMonthlyStatementStatus.Failed, null);
+            return EInvoiceSendOutcome.Failed;
+        }
+
+        // Record only after the broker confirmed the publish. Should the app crash between confirm and
+        // this write, a re-run republishes the SAME deterministic envelope id and email-hub drops it.
+        await publishedInvoiceEmailRepository.AddAsync(
+            new PublishedInvoiceEmail
+            {
+                UserId = userId,
+                MonthlyStatementId = statement.Id,
+                Year = statement.Year,
+                Month = statement.Month,
+                InvoiceIdentifier = invoiceIdentifier,
+                Recipient = content.Email,
+                EnvelopeId = result.EnvelopeId,
+                ConfirmedAt = DateTime.UtcNow
+            },
+            ct);
+
+        await monthlyStatementRepository.SetSendStatusAsync(statement.Id, userId, EMonthlyStatementStatus.Sent, DateTime.UtcNow);
+        return EInvoiceSendOutcome.Published;
     }
 
     private async Task<Contact> GetContactAsync(Guid contactId, Guid userId)
@@ -73,24 +102,24 @@ public class SendMonthlyStatementService(
         MonthlyStatement statement,
         Contact contact,
         MonthlyStatementSenderPaymentDetails senderPaymentDetails,
-        IReadOnlyCollection<MonthlyStatementLine> lines)
+        IReadOnlyCollection<MonthlyStatementLine> lines,
+        string invoiceIdentifier)
     {
-        var invoiceIdentifier = InvoiceIdentifier(statement.Id);
         var invoiceDate = DateOnly.FromDateTime(DateTime.UtcNow);
         var dueDate = invoiceDate.AddDays(14);
-        var invoicePeriod = $"{statement.Month:D2}.{statement.Year:D4}";
 
+        // Machine-readable values only: email-hub owns all localisation and formats per recipient.
         return new MonthlyInvoiceEmailContent
         {
             Email = contact.Email,
             FullName = contact.FullName,
             Locale = senderPaymentDetails.Locale,
             InvoiceIdentifier = invoiceIdentifier,
-            InvoicePeriod = invoicePeriod,
-            InvoiceDate = FormatDate(invoiceDate),
+            InvoicePeriod = statement.Period,               // ISO year-month, e.g. 2026-06
+            InvoiceDate = FormatDate(invoiceDate),          // ISO date, e.g. 2026-06-06
             InvoiceDueDate = FormatDate(dueDate),
-            InvoiceTotal = FormatMoney(statement.TotalSum),
-            Currency = "€",
+            InvoiceTotal = FormatMoney(statement.TotalSum), // invariant decimal string, e.g. 97.87
+            Currency = "EUR",
             InvoiceRows = lines
                 .OrderBy(line => line.AddressName)
                 .ThenBy(line => line.InvoiceDate)
@@ -108,7 +137,9 @@ public class SendMonthlyStatementService(
                 .ToList(),
             PaymentFullName = senderPaymentDetails.FullName.Trim(),
             PaymentIban = senderPaymentDetails.BankIban.Trim(),
-            PaymentDescription = $"{invoiceIdentifier} {invoicePeriod}"
+            // Opaque reconciliation key — copied character for character by email-hub. NOT ISO:
+            // this is exactly what incoming-payment reconciliation matches against.
+            PaymentDescription = $"{invoiceIdentifier} {PaymentReferencePeriod(statement)}"
         };
     }
 
@@ -117,13 +148,20 @@ public class SendMonthlyStatementService(
         return statementId.ToString("N")[..7].ToUpperInvariant();
     }
 
+    private static string PaymentReferencePeriod(MonthlyStatement statement)
+    {
+        // Deliberately MM.yyyy (e.g. 06.2026), not ISO — it is part of the opaque payment reference.
+        return $"{statement.Month:D2}.{statement.Year:D4}";
+    }
+
     private static string FormatDate(DateOnly date)
     {
-        return date.ToString("dd.MM.yyyy", EstonianCulture);
+        return date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
     }
 
     private static string FormatMoney(decimal amount)
     {
-        return amount.ToString("N2", EstonianCulture);
+        // Invariant decimal string with two decimals; trailing zeroes preserved (e.g. 40.00).
+        return amount.ToString("0.00", CultureInfo.InvariantCulture);
     }
 }
