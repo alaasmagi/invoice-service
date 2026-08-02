@@ -108,8 +108,14 @@ jobs:
 
           PORT="${VPS_PORT:-22}"
 
+          # /opt is root-owned, so a non-root deploy user cannot chown the
+          # app dir directly. Create it (with sudo if needed) and make the
+          # ownership fix best-effort so an already-owned dir doesn't fail.
           ssh -i ~/.ssh/deploy_key -p "${PORT}" "${VPS_USER}@${VPS_HOST}" \
-            "mkdir -p '${REMOTE_APP_DIR}' && chown '${VPS_USER}:${VPS_USER}' '${REMOTE_APP_DIR}'"
+            "mkdir -p '${REMOTE_APP_DIR}' 2>/dev/null || sudo mkdir -p '${REMOTE_APP_DIR}'
+             chown '${VPS_USER}:${VPS_USER}' '${REMOTE_APP_DIR}' 2>/dev/null \
+               || sudo chown '${VPS_USER}:${VPS_USER}' '${REMOTE_APP_DIR}' 2>/dev/null \
+               || true"
 
           scp -i ~/.ssh/deploy_key -P "${PORT}" \
             image.tar.gz .env docker-compose.yml \
