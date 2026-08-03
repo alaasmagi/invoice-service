@@ -62,7 +62,7 @@ public sealed class RabbitMqMonthlyInvoiceEmailPublisherTests
         Assert.Equal(envelope.Id, result.EnvelopeId);
 
         // The shared routing-key builder yields the required key from the envelope.
-        Assert.Equal("invoice.invoice.invoice", BaseRoutingKey.For(envelope));
+        Assert.Equal("invoice-service.invoice-service.invoice", BaseRoutingKey.For(envelope));
         Assert.Equal('5', envelope.Id[14]); // UUID version 5
     }
 

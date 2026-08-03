@@ -9,9 +9,10 @@ namespace Contracts.Application;
 public static class MessagingContract
 {
     // Outbound "invoice" command published to email-hub.commands.
-    // An app publishing its own mail is both publisher and subject, so source == tenant == action.
-    public const string InvoiceSource = "invoice";
-    public const string InvoiceTenant = "invoice";
+    // Routing key follows source.tenant.action: the publishing app's slug is both source and tenant,
+    // with "invoice" as the action -> invoice-service.invoice-service.invoice.
+    public const string InvoiceSource = "invoice-service";
+    public const string InvoiceTenant = "invoice-service";
     public const string InvoiceAction = "invoice";
     public const string InvoiceContentVersion = "1.0";
 
