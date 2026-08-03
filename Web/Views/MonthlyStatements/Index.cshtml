@@ -11,7 +11,7 @@
     <a asp-action="Generate" class="btn btn-primary">Generate Person Statements</a>
     <a asp-action="Create" class="btn btn-outline-primary">Create New</a>
 </p>
-<form asp-action="SendPeriod" method="post" class="row row-cols-lg-auto g-2 align-items-end mb-3" style="width: fit-content;">
+<form asp-action="SendPeriod" method="post" class="row row-cols-auto g-2 align-items-end mb-3" style="width: fit-content;">
     <div class="col">
         <label class="form-label">Year</label>
         <input type="number" name="Year" value="@DateTime.UtcNow.Year" class="form-control" />
