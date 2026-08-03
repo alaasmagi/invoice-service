@@ -12,7 +12,7 @@ namespace Tests;
 public sealed class UserEventHandlerTests
 {
     private static BaseEventEnvelope<UserEventContent> Envelope(
-        string source = "identity",
+        string source = "identity-hub",
         string tenant = "realmName/appName",
         string action = "user-created",
         string contentVersion = "1.0",

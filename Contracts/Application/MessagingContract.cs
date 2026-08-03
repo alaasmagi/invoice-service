@@ -16,11 +16,9 @@ public static class MessagingContract
     public const string InvoiceContentVersion = "1.0";
 
     // Inbound identity events consumed from the invoice.users queue: the concrete publisher slug in
-    // the envelope 'source' (and first routing-key segment).
-    // NOTE: the live events use "identity" — this deliberately DIVERGES from the shared package's
-    // Base.Message.DefaultSources.IdentityHub ("identity-hub") and from event-contract.md §8.1, which
-    // are out of sync with the wire. Reconcile before prod (see below).
-    public const string IdentitySource = "identity";
+    // the envelope 'source' (and first routing-key segment). Matches the live wire, the shared
+    // package's Base.Message.DefaultSources.IdentityHub, and the exchange name identity-hub.events.
+    public const string IdentitySource = "identity-hub";
 
     // Consumers compare contentVersion on the MAJOR part only: a "1.0" consumer accepts "1.1".
     public const int SupportedContentMajor = 1;
