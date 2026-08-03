@@ -27,6 +27,7 @@ public class AddressContactsController(AppDbContext context) : UserScopedControl
         var userId = CurrentUserId();
         var entity = await context.AddressContacts.Include(e => e.Address).Include(e => e.Contact)
             .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
+        
         return entity == null ? NotFound() : View(entity);
     }
 
