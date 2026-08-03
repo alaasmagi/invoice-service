@@ -108,12 +108,17 @@ jobs:
 
           PORT="${VPS_PORT:-22}"
 
-          # ${REMOTE_APP_DIR} must already exist and be owned by ${VPS_USER}.
+          # ${REMOTE_APP_DIR} must exist and be writable by ${VPS_USER}.
           # One-time setup on the VPS as root:
-          #   sudo mkdir -p ${REMOTE_APP_DIR}
-          #   sudo chown ${VPS_USER}:${VPS_USER} ${REMOTE_APP_DIR}
+          #   sudo mkdir -p ${REMOTE_APP_DIR} && sudo chmod 777 ${REMOTE_APP_DIR}
+          # Remove any stale (possibly root-owned) files first: scp cannot
+          # overwrite an existing file it lacks write permission on, but the
+          # 777 dir lets us unlink them regardless of file ownership.
           ssh -i ~/.ssh/deploy_key -p "${PORT}" "${VPS_USER}@${VPS_HOST}" \
-            "mkdir -p '${REMOTE_APP_DIR}'"
+            "mkdir -p '${REMOTE_APP_DIR}' && rm -f \
+               '${REMOTE_APP_DIR}/image.tar.gz' \
+               '${REMOTE_APP_DIR}/.env' \
+               '${REMOTE_APP_DIR}/docker-compose.yml'"
 
           scp -i ~/.ssh/deploy_key -P "${PORT}" \
             image.tar.gz .env docker-compose.yml \
