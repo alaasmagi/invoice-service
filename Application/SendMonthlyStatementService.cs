@@ -13,13 +13,18 @@ public class SendMonthlyStatementService(
     IPublishedInvoiceEmailRepository publishedInvoiceEmailRepository,
     IMonthlyInvoiceEmailPublisher emailPublisher) : ISendMonthlyStatementService
 {
-    public async Task<EInvoiceSendOutcome> SendAsync(Guid monthlyStatementId, Guid userId, CancellationToken ct = default)
+    public async Task<EInvoiceSendOutcome> SendAsync(Guid monthlyStatementId, Guid userId, bool allowResend = false, CancellationToken ct = default)
     {
-        // Idempotency: a statement already published and confirmed is never re-sent.
-        if (await publishedInvoiceEmailRepository.ExistsForStatementAsync(monthlyStatementId, userId, ct))
+        // Prior confirmed sends for this statement. The count is also the highest attempt number, so the
+        // next attempt is count + 1. Without allowResend an already-sent statement is skipped (batch runs
+        // stay idempotent); with allowResend an explicit "send again" proceeds as a new attempt.
+        var previousAttempts = await publishedInvoiceEmailRepository.CountForStatementAsync(monthlyStatementId, userId, ct);
+        if (!allowResend && previousAttempts > 0)
         {
             return EInvoiceSendOutcome.Skipped;
         }
+
+        var attempt = previousAttempts + 1;
 
         var statementResponse = await monthlyStatementRepository.GetByIdAsync(monthlyStatementId, userId);
         if (!statementResponse.Successful || statementResponse.Value == null)
@@ -43,7 +48,7 @@ public class SendMonthlyStatementService(
         InvoiceEmailPublishResult result;
         try
         {
-            result = await emailPublisher.PublishAsync(content, ct);
+            result = await emailPublisher.PublishAsync(content, attempt, ct);
         }
         catch (Exception)
         {
@@ -66,6 +71,7 @@ public class SendMonthlyStatementService(
                 MonthlyStatementId = statement.Id,
                 Year = statement.Year,
                 Month = statement.Month,
+                Attempt = attempt,
                 InvoiceIdentifier = invoiceIdentifier,
                 Recipient = content.Email,
                 EnvelopeId = result.EnvelopeId,

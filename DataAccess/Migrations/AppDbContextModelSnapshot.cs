@@ -525,6 +525,9 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int>("Attempt")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("ConfirmedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -560,7 +563,7 @@ namespace DataAccess.Migrations
                     b.HasIndex("EnvelopeId")
                         .IsUnique();
 
-                    b.HasIndex("UserId", "MonthlyStatementId")
+                    b.HasIndex("UserId", "MonthlyStatementId", "Attempt")
                         .IsUnique();
 
                     b.HasIndex("UserId", "Year", "Month");

@@ -27,7 +27,8 @@ public class SendPeriodInvoiceEmailsService(
             ct.ThrowIfCancellationRequested();
             try
             {
-                switch (await sendMonthlyStatementService.SendAsync(statement.Id, userId, ct))
+                // Batch runs stay idempotent: never resend a statement already published this period.
+                switch (await sendMonthlyStatementService.SendAsync(statement.Id, userId, allowResend: false, ct))
                 {
                     case EInvoiceSendOutcome.Published:
                         published++;

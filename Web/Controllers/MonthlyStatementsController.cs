@@ -173,7 +173,9 @@ public class MonthlyStatementsController(
     {
         try
         {
-            await sendMonthlyStatementService.SendAsync(id, CurrentUserId());
+            // Explicit single-statement action is always a deliberate human click, so allow resend:
+            // clicking "Send again" on an already-sent statement publishes a fresh attempt.
+            await sendMonthlyStatementService.SendAsync(id, CurrentUserId(), allowResend: true);
             var userId = CurrentUserId();
             var status = await context.MonthlyStatements
                 .Where(e => e.Id == id && e.UserId == userId)

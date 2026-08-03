@@ -34,7 +34,8 @@ public class AppDbContext : DbContext
             entity.Property(e => e.EnvelopeId).HasMaxLength(64);
             // Second layer of dedup after the natural key: the deterministic envelope id is unique.
             entity.HasIndex(e => e.EnvelopeId).IsUnique();
-            entity.HasIndex(e => new { e.UserId, e.MonthlyStatementId }).IsUnique();
+            // One row per send attempt: the first send and each explicit resend get their own row.
+            entity.HasIndex(e => new { e.UserId, e.MonthlyStatementId, e.Attempt }).IsUnique();
             entity.HasIndex(e => new { e.UserId, e.Year, e.Month });
         });
 

@@ -8,6 +8,7 @@ public class PublishedInvoiceEmailEntity : BaseEntity
     public Guid MonthlyStatementId { get; set; }
     public int Year { get; set; }
     public int Month { get; set; }
+    public int Attempt { get; set; }
     public string InvoiceIdentifier { get; set; } = default!;
     public string Recipient { get; set; } = default!;
     public string EnvelopeId { get; set; } = default!;

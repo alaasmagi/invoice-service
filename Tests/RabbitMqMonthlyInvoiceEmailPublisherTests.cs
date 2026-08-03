@@ -48,7 +48,7 @@ public sealed class RabbitMqMonthlyInvoiceEmailPublisherTests
     public async Task PublishAsync_BuildsInvoiceEnvelope_WithNoExpiration_AndConfirms()
     {
         var basePublisher = new FakeBaseEventPublisher();
-        var result = await CreateSut(basePublisher).PublishAsync(SampleContent());
+        var result = await CreateSut(basePublisher).PublishAsync(SampleContent(), attempt: 1);
 
         Assert.True(result.Confirmed);
         Assert.Equal(1, basePublisher.Calls);
@@ -72,14 +72,30 @@ public sealed class RabbitMqMonthlyInvoiceEmailPublisherTests
         var basePublisher = new FakeBaseEventPublisher();
         var sut = CreateSut(basePublisher);
 
-        var first = await sut.PublishAsync(SampleContent("a@example.com"));
-        var rerun = await sut.PublishAsync(SampleContent("a@example.com"));
-        var other = await sut.PublishAsync(SampleContent("b@example.com"));
+        var first = await sut.PublishAsync(SampleContent("a@example.com"), attempt: 1);
+        var rerun = await sut.PublishAsync(SampleContent("a@example.com"), attempt: 1);
+        var other = await sut.PublishAsync(SampleContent("b@example.com"), attempt: 1);
 
-        // Re-running a batch reproduces the same id -> email-hub drops the repeat.
+        // Re-publishing the same attempt reproduces the same id -> email-hub drops the repeat.
         Assert.Equal(first.EnvelopeId, rerun.EnvelopeId);
         // A different recipient is a different message.
         Assert.NotEqual(first.EnvelopeId, other.EnvelopeId);
+    }
+
+    [Fact]
+    public async Task PublishAsync_ExplicitResend_UsesHigherAttempt_YieldsNewId()
+    {
+        var basePublisher = new FakeBaseEventPublisher();
+        var sut = CreateSut(basePublisher);
+
+        var first = await sut.PublishAsync(SampleContent("a@example.com"), attempt: 1);
+        var resend = await sut.PublishAsync(SampleContent("a@example.com"), attempt: 2);
+        var resendRerun = await sut.PublishAsync(SampleContent("a@example.com"), attempt: 2);
+
+        // A higher attempt is a new message email-hub will deliver...
+        Assert.NotEqual(first.EnvelopeId, resend.EnvelopeId);
+        // ...but that resend attempt is still deterministic, so a crash-recovery re-publish is dropped.
+        Assert.Equal(resend.EnvelopeId, resendRerun.EnvelopeId);
     }
 
     [Fact]
@@ -87,7 +103,7 @@ public sealed class RabbitMqMonthlyInvoiceEmailPublisherTests
     {
         var basePublisher = new FakeBaseEventPublisher { Result = PublishResult.Failed("Timed out waiting for broker confirmation.") };
 
-        var result = await CreateSut(basePublisher).PublishAsync(SampleContent());
+        var result = await CreateSut(basePublisher).PublishAsync(SampleContent(), attempt: 1);
 
         Assert.False(result.Confirmed);
         Assert.Contains("Timed out", result.FailureReason);

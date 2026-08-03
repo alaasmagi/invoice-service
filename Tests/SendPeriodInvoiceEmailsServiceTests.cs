@@ -86,19 +86,19 @@ public sealed class SendPeriodInvoiceEmailsServiceTests
     {
         public int Calls { get; private set; }
 
-        public Task<InvoiceEmailPublishResult> PublishAsync(MonthlyInvoiceEmailContent content, CancellationToken ct = default)
+        public Task<InvoiceEmailPublishResult> PublishAsync(MonthlyInvoiceEmailContent content, int attempt, CancellationToken ct = default)
         {
             Calls++;
-            return Task.FromResult(InvoiceEmailPublishResult.Ok($"id-{content.Email}"));
+            return Task.FromResult(InvoiceEmailPublishResult.Ok($"id-{content.Email}-{attempt}"));
         }
     }
 
     private sealed class InMemoryPublishedRepo : IPublishedInvoiceEmailRepository
     {
-        private readonly HashSet<(Guid Statement, Guid User)> _sent = [];
+        private readonly List<(Guid Statement, Guid User)> _sent = [];
 
-        public Task<bool> ExistsForStatementAsync(Guid monthlyStatementId, Guid userId, CancellationToken ct = default)
-            => Task.FromResult(_sent.Contains((monthlyStatementId, userId)));
+        public Task<int> CountForStatementAsync(Guid monthlyStatementId, Guid userId, CancellationToken ct = default)
+            => Task.FromResult(_sent.Count(e => e.Statement == monthlyStatementId && e.User == userId));
 
         public Task AddAsync(PublishedInvoiceEmail record, CancellationToken ct = default)
         {

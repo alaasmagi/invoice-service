@@ -8,11 +8,11 @@ namespace DataAccess;
 
 public class PublishedInvoiceEmailRepository(AppDbContext context) : IPublishedInvoiceEmailRepository
 {
-    public Task<bool> ExistsForStatementAsync(Guid monthlyStatementId, Guid userId, CancellationToken ct = default)
+    public Task<int> CountForStatementAsync(Guid monthlyStatementId, Guid userId, CancellationToken ct = default)
     {
         return context.PublishedInvoiceEmails
             .AsNoTracking()
-            .AnyAsync(e => e.MonthlyStatementId == monthlyStatementId && e.UserId == userId, ct);
+            .CountAsync(e => e.MonthlyStatementId == monthlyStatementId && e.UserId == userId, ct);
     }
 
     public async Task AddAsync(PublishedInvoiceEmail record, CancellationToken ct = default)
@@ -24,6 +24,7 @@ public class PublishedInvoiceEmailRepository(AppDbContext context) : IPublishedI
             MonthlyStatementId = record.MonthlyStatementId,
             Year = record.Year,
             Month = record.Month,
+            Attempt = record.Attempt,
             InvoiceIdentifier = record.InvoiceIdentifier,
             Recipient = record.Recipient,
             EnvelopeId = record.EnvelopeId,

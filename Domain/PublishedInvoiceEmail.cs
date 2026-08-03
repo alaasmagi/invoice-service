@@ -16,6 +16,9 @@ public class PublishedInvoiceEmail : BaseEntity
 
     public int Month { get; set; }
 
+    /// <summary>Send attempt this record represents; 1 for the first send, incremented on each resend.</summary>
+    public int Attempt { get; set; }
+
     public string InvoiceIdentifier { get; set; } = default!;
 
     public string Recipient { get; set; } = default!;
