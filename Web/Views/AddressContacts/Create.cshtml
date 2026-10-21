@@ -1,16 +1,44 @@
 @model DTO.DataAccess.DataAccess.DTO.AddressContactEntity
 @{
-    ViewData["Title"] = "Create Address Contacts";
+    ViewData["Title"] = "Create address contact";
 }
-<h1>Create Address Contacts</h1>
-<form asp-action="Create" method="post">
 
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="mb-3"><label asp-for="AddressId" class="form-label"></label><select asp-for="AddressId" class="form-select" asp-items="ViewBag.AddressId"></select></div>
-    <div class="mb-3"><label asp-for="ContactId" class="form-label"></label><select asp-for="ContactId" class="form-select" asp-items="ViewBag.ContactId"></select></div>
-    <div class="mb-3"><label asp-for="StartDate" class="form-label"></label><input asp-for="StartDate" class="form-control" type="date" /></div>
-    <div class="mb-3"><label asp-for="EndDate" class="form-label"></label><input asp-for="EndDate" class="form-control" type="date" /></div>
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Directory</p>
+        <h1>Create address contact</h1>
+    </div>
+</header>
+
+<form asp-action="Create" method="post" class="card form narrow">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div class="form-row">
+        <div class="field">
+            <label asp-for="AddressId" class="field__label"></label>
+            <div class="field__control"><select asp-for="AddressId" class="input" asp-items="ViewBag.AddressId"></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+            <span asp-validation-for="AddressId"></span>
+        </div>
+        <div class="field">
+            <label asp-for="ContactId" class="field__label"></label>
+            <div class="field__control"><select asp-for="ContactId" class="input" asp-items="ViewBag.ContactId"></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+            <span asp-validation-for="ContactId"></span>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="field">
+            <label asp-for="StartDate" class="field__label"></label>
+            <div class="field__control has-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg><input asp-for="StartDate" class="input" type="date" /></div>
+            <span asp-validation-for="StartDate"></span>
+        </div>
+        <div class="field">
+            <label asp-for="EndDate" class="field__label"></label>
+            <div class="field__control has-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg><input asp-for="EndDate" class="input" type="date" /></div>
+            <span asp-validation-for="EndDate"></span>
+        </div>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn--primary">Create address contact</button>
+        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+    </div>
 </form>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

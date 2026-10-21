@@ -1,47 +1,88 @@
 @model IEnumerable<DTO.DataAccess.DataAccess.DTO.MonthlyStatementEntity>
 @{
-    ViewData["Title"] = "Monthly Statements";
+    ViewData["Title"] = "Monthly statements";
+    var currentMonth = DateTime.UtcNow.Month;
 }
-<h1>Monthly Statements</h1>
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Billing</p>
+        <h1>Monthly statements</h1>
+    </div>
+    <div class="page-header__actions">
+        <a asp-action="Create" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Create statement</a>
+        <a asp-action="Generate" class="btn btn--primary">Generate statements</a>
+    </div>
+</header>
+
 @if (TempData["StatusMessage"] is string message)
 {
-    <div class="alert alert-info">@message</div>
+    <div class="alert alert--info" role="status">
+        <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+        <div class="alert__body">@message</div>
+    </div>
 }
-<p>
-    <a asp-action="Generate" class="btn btn-primary">Generate Person Statements</a>
-    <a asp-action="Create" class="btn btn-outline-primary">Create New</a>
-</p>
-<table class="table">
-    <thead><tr><th>Person</th><th>Period</th><th>Total</th><th>Status</th><th>Sent At</th><th></th></tr></thead>
-    <tbody>
-@foreach (var item in Model) {
-    var canSend = item.Status is Domain.EMonthlyStatementStatus.Draft
-        or Domain.EMonthlyStatementStatus.ReadyToSend
-        or Domain.EMonthlyStatementStatus.PartiallySent
-        or Domain.EMonthlyStatementStatus.Failed;
-    <tr>
-        <td>@item.Contact.FullName</td>
-        <td>@item.Period</td>
-        <td>@item.TotalSum</td>
-        <td>@item.Status</td>
-        <td>@item.SentAt</td>
-        <td>
-            <div class="d-flex gap-2 align-items-center">
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                <span>|</span>
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                <span>|</span>
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                @if (canSend)
+
+<form asp-action="SendPeriod" method="post" class="card period-bar">
+    <div class="period-bar__text">
+        <strong>Send all for period</strong>
+        <span>Sends all unsent statements for the selected month.</span>
+    </div>
+    <div class="field">
+        <label for="sendYear" class="field__label">Year</label>
+        <input id="sendYear" type="number" name="Year" value="@DateTime.UtcNow.Year" class="input" />
+    </div>
+    <div class="field field--month">
+        <label for="sendMonth" class="field__label">Month</label>
+        <div class="field__control">
+            <select id="sendMonth" name="Month" class="input">
+                @for (var m = 1; m <= 12; m++)
                 {
-                    <form asp-action="Send" asp-route-id="@item.Id" method="post" class="d-inline">
-                        <input type="hidden" name="returnTo" value="Index" />
-                        <button type="submit" class="btn btn-sm btn-primary">Send</button>
-                    </form>
+                    <option value="@m" selected="@(m == currentMonth)">@System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(m)</option>
                 }
-            </div>
-        </td>
-    </tr>
-}
-    </tbody>
-</table>
+            </select>
+            <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </div>
+    </div>
+    <button type="submit" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg>Send all for period</button>
+</form>
+
+<div class="card table-card">
+    <table class="data-table">
+        <thead><tr><th>Person</th><th>Period</th><th class="num">Total</th><th>Status</th><th>Sent at</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            var canSend = item.Status is Domain.EMonthlyStatementStatus.Draft
+                or Domain.EMonthlyStatementStatus.ReadyToSend
+                or Domain.EMonthlyStatementStatus.PartiallySent
+                or Domain.EMonthlyStatementStatus.Failed;
+            <tr>
+                <td>@item.Contact.FullName</td>
+                <td class="nowrap">@item.Period</td>
+                <td class="num">@item.TotalSum €</td>
+                <td><partial name="_StatementStatus" model="item.Status" /></td>
+                <td class="nowrap secondary">@(item.SentAt == null ? "—" : item.SentAt.ToString())</td>
+                <td class="actions-col">
+                    <div class="row-actions">
+                        @if (canSend)
+                        {
+                            <form asp-action="Send" asp-route-id="@item.Id" method="post">
+                                <input type="hidden" name="returnTo" value="Index" />
+                                <button type="submit" class="btn btn--secondary btn--sm">Send</button>
+                            </form>
+                        }
+                        <a asp-action="Details" asp-route-id="@item.Id" class="icon-btn" aria-label="Details" title="Details"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+                    </div>
+                </td>
+            </tr>
+        }
+        @if (!Model.Any())
+        {
+            <tr><td colspan="6" class="empty">No statements yet. Generate them for a month to get started.</td></tr>
+        }
+        </tbody>
+    </table>
+</div>

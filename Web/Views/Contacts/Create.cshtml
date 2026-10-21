@@ -1,14 +1,37 @@
 @model DTO.DataAccess.DataAccess.DTO.ContactEntity
 @{
-    ViewData["Title"] = "Create Contacts";
+    ViewData["Title"] = "Create contact";
 }
-<h1>Create Contacts</h1>
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="mb-3"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control" /><span asp-validation-for="FullName" class="text-danger"></span></div>
-    <div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /><span asp-validation-for="Email" class="text-danger"></span></div>
-    <div class="mb-3"><label asp-for="Phone" class="form-label"></label><input asp-for="Phone" class="form-control" /><span asp-validation-for="Phone" class="text-danger"></span></div>
-    <button type="submit" class="btn btn-primary">Create</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Directory</p>
+        <h1>Create contact</h1>
+    </div>
+</header>
+
+<form asp-action="Create" method="post" class="card form narrow">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div class="field">
+        <label asp-for="FullName" class="field__label"></label>
+        <input asp-for="FullName" class="input" placeholder="e.g. Andres Tamm" />
+        <span asp-validation-for="FullName"></span>
+    </div>
+    <div class="form-row">
+        <div class="field">
+            <label asp-for="Email" class="field__label"></label>
+            <input asp-for="Email" class="input" placeholder="e.g. andres.tamm@gmail.com" />
+            <span asp-validation-for="Email"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Phone" class="field__label"></label>
+            <input asp-for="Phone" class="input" placeholder="e.g. +372 5123 4567" />
+            <span asp-validation-for="Phone"></span>
+        </div>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn--primary">Create contact</button>
+        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+    </div>
 </form>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

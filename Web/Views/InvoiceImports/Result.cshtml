@@ -3,89 +3,103 @@
     ViewData["Title"] = "PDF import result";
 }
 
-<h1>PDF import result</h1>
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Billing</p>
+        <h1>PDF import result</h1>
+    </div>
+    <div class="page-header__actions">
+        <a asp-action="Upload" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>Import another PDF</a>
+    </div>
+</header>
 
 @if (Model.FatalErrors.Count > 0)
 {
-    <div class="alert alert-danger">
-        <strong>Import failed.</strong>
-        <ul class="mb-0">
-            @foreach (var error in Model.FatalErrors)
-            {
-                <li>@error</li>
-            }
-        </ul>
+    <div class="alert alert--danger" role="alert">
+        <svg class="icon" aria-hidden="true"><use href="#i-circle-x"></use></svg>
+        <div class="alert__body">
+            <span class="alert__title">Import failed.</span>
+            <ul>
+                @foreach (var error in Model.FatalErrors)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        </div>
     </div>
 }
 else
 {
-    <div class="alert alert-success">
-        Imported @Model.CreatedInvoices.Count invoice(s) from @Model.ProviderName.
+    <div class="alert alert--success" role="status">
+        <svg class="icon" aria-hidden="true"><use href="#i-circle-check"></use></svg>
+        <div class="alert__body">Imported @Model.CreatedInvoices.Count invoice(s) from @Model.ProviderName.</div>
     </div>
 }
 
 @if (Model.Warnings.Count > 0)
 {
-    <div class="alert alert-warning">
-        <strong>Warnings</strong>
-        <ul class="mb-0">
-            @foreach (var warning in Model.Warnings)
-            {
-                <li>@warning</li>
-            }
-        </ul>
+    <div class="alert alert--warning">
+        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+        <div class="alert__body">
+            <span class="alert__title">Warnings</span>
+            <ul>
+                @foreach (var warning in Model.Warnings)
+                {
+                    <li>@warning</li>
+                }
+            </ul>
+        </div>
     </div>
 }
 
 @if (Model.CreatedInvoices.Count > 0)
 {
-    <section class="mb-4">
-        <h2>Created invoices</h2>
-        <table class="table">
-            <thead>
-            <tr><th>Date</th><th>Address</th><th>Service</th><th>Period</th><th>Total</th><th></th></tr>
-            </thead>
-            <tbody>
-            @foreach (var invoice in Model.CreatedInvoices)
-            {
-                <tr>
-                    <td>@invoice.InvoiceDate</td>
-                    <td>@invoice.AddressName</td>
-                    <td>@invoice.ServiceName</td>
-                    <td>@invoice.PeriodStart - @invoice.PeriodEnd</td>
-                    <td>@invoice.TotalSum</td>
-                    <td><a asp-controller="Invoices" asp-action="Details" asp-route-id="@invoice.InvoiceId">Details</a></td>
-                </tr>
-            }
-            </tbody>
-        </table>
+    <section class="section">
+        <h2 class="section-title">Created invoices</h2>
+        <div class="card table-card">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Address</th><th>Service</th><th>Period</th><th class="num">Total</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+                <tbody>
+                @foreach (var invoice in Model.CreatedInvoices)
+                {
+                    <tr>
+                        <td class="nowrap">@invoice.InvoiceDate</td>
+                        <td>@invoice.AddressName</td>
+                        <td>@invoice.ServiceName</td>
+                        <td class="nowrap">@invoice.PeriodStart – @invoice.PeriodEnd</td>
+                        <td class="num">@invoice.TotalSum €</td>
+                        <td class="actions-col"><a asp-controller="Invoices" asp-action="Details" asp-route-id="@invoice.InvoiceId" class="btn btn--ghost btn--sm">Details</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
     </section>
 }
 
 @if (Model.SkippedRows.Count > 0)
 {
-    <section class="mb-4">
-        <h2>Skipped rows</h2>
-        <table class="table">
-            <thead>
-            <tr><th>Address text</th><th>Amount</th><th>Reason</th><th>Source</th></tr>
-            </thead>
-            <tbody>
-            @foreach (var row in Model.SkippedRows)
-            {
-                <tr>
-                    <td>@row.AddressText</td>
-                    <td>@row.Amount</td>
-                    <td>@row.Reason</td>
-                    <td>@row.SourceText</td>
-                </tr>
-            }
-            </tbody>
-        </table>
+    <section class="section">
+        <h2 class="section-title">Skipped rows</h2>
+        <div class="card table-card">
+            <table class="data-table">
+                <thead><tr><th>Address text</th><th class="num">Amount</th><th>Reason</th><th>Source</th></tr></thead>
+                <tbody>
+                @foreach (var row in Model.SkippedRows)
+                {
+                    <tr>
+                        <td>@row.AddressText</td>
+                        <td class="num">@row.Amount €</td>
+                        <td>@row.Reason</td>
+                        <td class="mono secondary">@row.SourceText</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
     </section>
 }
 
-<p>
-    <a asp-action="Upload" class="btn btn-primary">Import another PDF</a>
-    <a asp-controller="Invoices" asp-action="Index" class="btn btn-outline-secondary">Back to invoices</a>
-</p>
+<div class="actions">
+    <a asp-controller="Invoices" asp-action="Index" class="btn btn--ghost">Back to invoices</a>
+</div>

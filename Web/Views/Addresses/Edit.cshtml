@@ -1,14 +1,31 @@
 @model DTO.DataAccess.DataAccess.DTO.AddressEntity
 @{
-    ViewData["Title"] = "Edit Addresses";
+    ViewData["Title"] = "Edit address";
 }
-<h1>Edit Addresses</h1>
-<form asp-action="Edit" method="post">
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Directory</p>
+        <h1>Edit address</h1>
+    </div>
+</header>
+
+<form asp-action="Edit" method="post" class="card form narrow">
     <input type="hidden" asp-for="Id" />
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="mb-3"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger"></span></div>
-    <div class="mb-3"><label asp-for="FullAddress" class="form-label"></label><input asp-for="FullAddress" class="form-control" /><span asp-validation-for="FullAddress" class="text-danger"></span></div>
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
+    <div asp-validation-summary="ModelOnly"></div>
+    <div class="field">
+        <label asp-for="Name" class="field__label"></label>
+        <input asp-for="Name" class="input" placeholder="e.g. City centre flat" />
+        <span asp-validation-for="Name"></span>
+    </div>
+    <div class="field">
+        <label asp-for="FullAddress" class="field__label"></label>
+        <input asp-for="FullAddress" class="input" placeholder="e.g. Narva mnt 7-21, Tallinn" />
+        <span asp-validation-for="FullAddress"></span>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn--primary">Save</button>
+        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+    </div>
 </form>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

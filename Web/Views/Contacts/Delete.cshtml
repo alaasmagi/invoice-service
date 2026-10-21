@@ -1,16 +1,28 @@
 @model DTO.DataAccess.DataAccess.DTO.ContactEntity
 @{
-    ViewData["Title"] = "Delete Contacts";
+    ViewData["Title"] = "Delete contact";
 }
-<h1>Delete Contacts</h1>
-<p>Are you sure you want to delete this record?</p>
-<dl class="row">
-    <dt class="col-sm-2">Name</dt><dd class="col-sm-10">@Model.FullName</dd>
-    <dt class="col-sm-2">Email</dt><dd class="col-sm-10">@Model.Email</dd>
-    <dt class="col-sm-2">Phone</dt><dd class="col-sm-10">@Model.Phone</dd>
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Directory</p>
+        <h1>Delete contact</h1>
+    </div>
+</header>
+
+<div class="section medium">
+    <div class="alert alert--danger" role="alert">
+        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+        <div class="alert__body"><span class="alert__title">Delete this contact?</span><span>This action cannot be undone.</span></div>
+    </div>
+    <dl class="card details">
+    <div class="details__row"><dt>Name</dt><dd>@Model.FullName</dd></div>
+    <div class="details__row"><dt>Email</dt><dd>@Model.Email</dd></div>
+    <div class="details__row"><dt>Phone</dt><dd>@Model.Phone</dd></div>
 </dl>
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
-</form>
+    <form asp-action="Delete" method="post" class="form-actions">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn--danger">Delete contact</button>
+        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+    </form>
+</div>

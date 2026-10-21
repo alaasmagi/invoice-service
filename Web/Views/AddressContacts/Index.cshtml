@@ -1,14 +1,40 @@
 @model IEnumerable<DTO.DataAccess.DataAccess.DTO.AddressContactEntity>
 @{
-    ViewData["Title"] = "Address Contacts";
+    ViewData["Title"] = "Address contacts";
 }
-<h1>Address Contacts</h1>
-<p><a asp-action="Create" class="btn btn-primary">Create New</a></p>
-<table class="table">
-    <thead><tr><th>Address</th><th>Contact</th><th>Start</th><th>End</th><th></th></tr></thead>
-    <tbody>
-@foreach (var item in Model) {
-    <tr><td>@item.Address.Name</td><td>@item.Contact.FullName</td><td>@item.StartDate</td><td>@item.EndDate</td><td><a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | <a asp-action="Details" asp-route-id="@item.Id">Details</a> | <a asp-action="Delete" asp-route-id="@item.Id">Delete</a></td></tr>
-}
-    </tbody>
-</table>
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Directory</p>
+        <h1>Address contacts</h1>
+    </div>
+    <div class="page-header__actions">
+        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Create address contact</a>
+    </div>
+</header>
+
+<div class="card table-card">
+    <table class="data-table">
+        <thead><tr><th>Address</th><th>Contact</th><th>Start</th><th>End</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><div class="stack-cell"><span>@item.Address.Name</span><span>@item.Address.FullAddress</span></div></td>
+                <td>@item.Contact.FullName</td>
+                <td class="nowrap">@item.StartDate</td>
+                <td>@if (item.EndDate == null) { <span class="badge badge--success">Current</span> } else { <span class="nowrap">@item.EndDate</span> }</td>
+                <td class="actions-col"><div class="row-actions">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="icon-btn" aria-label="Details" title="Details"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+                </div></td>
+            </tr>
+        }
+        @if (!Model.Any())
+        {
+            <tr><td colspan="5" class="empty">No address contacts yet.</td></tr>
+        }
+        </tbody>
+    </table>
+</div>

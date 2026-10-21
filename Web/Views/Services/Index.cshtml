@@ -2,13 +2,36 @@
 @{
     ViewData["Title"] = "Services";
 }
-<h1>Services</h1>
-<p><a asp-action="Create" class="btn btn-primary">Create New</a></p>
-<table class="table">
-    <thead><tr><th>Name</th><th></th></tr></thead>
-    <tbody>
-@foreach (var item in Model) {
-    <tr><td>@item.Name</td><td><a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | <a asp-action="Details" asp-route-id="@item.Id">Details</a> | <a asp-action="Delete" asp-route-id="@item.Id">Delete</a></td></tr>
-}
-    </tbody>
-</table>
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Directory</p>
+        <h1>Services</h1>
+    </div>
+    <div class="page-header__actions">
+        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Create service</a>
+    </div>
+</header>
+
+<div class="card table-card">
+    <table class="data-table">
+        <thead><tr><th>Name</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td class="actions-col"><div class="row-actions">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="icon-btn" aria-label="Details" title="Details"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+                </div></td>
+            </tr>
+        }
+        @if (!Model.Any())
+        {
+            <tr><td colspan="2" class="empty">No services yet.</td></tr>
+        }
+        </tbody>
+    </table>
+</div>
