@@ -1,11 +1,23 @@
 @model DTO.DataAccess.DataAccess.DTO.InvoiceAllocationEntity
 @{
-    ViewData["Title"] = "Details Invoice Allocations";
+    ViewData["Title"] = "Allocation details";
 }
-<h1>Details Invoice Allocations</h1>
-<dl class="row">
-    <dt class="col-sm-2">Invoice</dt><dd class="col-sm-10">@Model.Invoice.InvoiceDate - @Model.Invoice.Address.Name</dd>
-    <dt class="col-sm-2">Contact</dt><dd class="col-sm-10">@Model.Contact.FullName</dd>
-    <dt class="col-sm-2">Amount</dt><dd class="col-sm-10">@Model.AllocatedSum</dd>
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Billing</p>
+        <h1>Allocation details</h1>
+    </div>
+    <div class="page-header__actions">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>Edit</a>
+    </div>
+</header>
+
+<div class="section medium">
+    <dl class="card details">
+    <div class="details__row"><dt>Invoice</dt><dd><div class="stack-cell"><span>@Model.Invoice.InvoiceDate</span><span>@Model.Invoice.Address.Name</span></div></dd></div>
+    <div class="details__row"><dt>Contact</dt><dd>@Model.Contact.FullName</dd></div>
+    <div class="details__row"><dt>Amount</dt><dd>@Model.AllocatedSum €</dd></div>
 </dl>
-<p><a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> | <a asp-action="Index">Back</a></p>
+    <div><a asp-action="Index" class="btn btn--ghost">Back to allocations</a></div>
+</div>

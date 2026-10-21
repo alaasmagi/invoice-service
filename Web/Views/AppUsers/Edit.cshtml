@@ -3,50 +3,62 @@
     ViewData["Title"] = "User information";
 }
 
-<h1>User information</h1>
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Account</p>
+        <h1>User information</h1>
+    </div>
+</header>
 
 @if (TempData["StatusMessage"] is string message)
 {
-    <div class="alert alert-success">@message</div>
+    <div class="alert alert--success narrow" role="status">
+        <svg class="icon" aria-hidden="true"><use href="#i-circle-check"></use></svg>
+        <div class="alert__body">@message</div>
+    </div>
 }
 
-<form asp-action="Edit" method="post">
+<form asp-action="Edit" method="post" class="card form narrow">
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="Email" />
     <input type="hidden" asp-for="Username" />
 
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div asp-validation-summary="ModelOnly"></div>
 
-    <div class="mb-3">
-        <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control" disabled />
+    <div class="form-row">
+        <div class="field">
+            <label asp-for="Email" class="field__label"></label>
+            <input asp-for="Email" class="input" disabled />
+        </div>
+        <div class="field">
+            <label asp-for="Username" class="field__label"></label>
+            <input asp-for="Username" class="input" disabled />
+        </div>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="Username" class="form-label"></label>
-        <input asp-for="Username" class="form-control" disabled />
+    <div class="field">
+        <label asp-for="FullName" class="field__label"></label>
+        <input asp-for="FullName" class="input" autocomplete="name" />
+        <span asp-validation-for="FullName"></span>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="FullName" class="form-label"></label>
-        <input asp-for="FullName" class="form-control" autocomplete="name" />
-        <span asp-validation-for="FullName" class="text-danger"></span>
+    <div class="form-row">
+        <div class="field">
+            <label asp-for="Locale" class="field__label"></label>
+            <input asp-for="Locale" class="input" autocomplete="language" placeholder="e.g. et-EE" />
+            <span asp-validation-for="Locale"></span>
+        </div>
+        <div class="field">
+            <label asp-for="BankIban" class="field__label"></label>
+            <input asp-for="BankIban" class="input mono" autocomplete="off" placeholder="e.g. EE38 2200 2210 2014 5685" />
+            <span asp-validation-for="BankIban"></span>
+        </div>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="Locale" class="form-label"></label>
-        <input asp-for="Locale" class="form-control" autocomplete="language" />
-        <span asp-validation-for="Locale" class="text-danger"></span>
+    <div class="form-actions">
+        <button type="submit" class="btn btn--primary">Save</button>
+        <a asp-controller="Home" asp-action="Index" class="btn btn--ghost">Back</a>
     </div>
-
-    <div class="mb-3">
-        <label asp-for="BankIban" class="form-label"></label>
-        <input asp-for="BankIban" class="form-control" autocomplete="off" />
-        <span asp-validation-for="BankIban" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back</a>
 </form>
 
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

@@ -2,22 +2,20 @@
     var appUserEmail = ViewData["CurrentAppUserEmail"] as string ?? User.Identity?.Name ?? "Account";
 }
 
-<ul class="navbar-nav">
-    @if (User.Identity?.IsAuthenticated == true)
-    {
-        <li class="nav-item">
-            <a class="nav-link app-user-button" asp-area="" asp-controller="AppUsers" asp-action="Edit">@appUserEmail</a>
-        </li>
-        <li class="nav-item">
-            <form class="form-inline" asp-area="" asp-controller="Auth" asp-action="Logout" method="post">
-                <button type="submit" class="nav-link btn btn-link">Logout</button>
-            </form>
-        </li>
-    }
-    else
-    {
-        <li class="nav-item">
-            <a class="nav-link" asp-area="" asp-controller="Auth" asp-action="Login">Login</a>
-        </li>
-    }
-</ul>
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <div class="user-row">
+        <a class="user-row__email" asp-area="" asp-controller="AppUsers" asp-action="Edit" title="@appUserEmail">@appUserEmail</a>
+        <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post">
+            <button type="submit" class="icon-btn" aria-label="Logout" title="Logout">
+                <svg class="icon" aria-hidden="true"><use href="#i-log-out"></use></svg>
+            </button>
+        </form>
+    </div>
+}
+else
+{
+    <a class="btn btn--secondary" asp-area="" asp-controller="Auth" asp-action="Login">
+        <svg class="icon" aria-hidden="true"><use href="#i-log-in"></use></svg>Login
+    </a>
+}

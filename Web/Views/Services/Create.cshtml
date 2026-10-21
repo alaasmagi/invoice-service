@@ -1,12 +1,25 @@
 @model DTO.DataAccess.DataAccess.DTO.ServiceEntity
 @{
-    ViewData["Title"] = "Create Services";
+    ViewData["Title"] = "Create service";
 }
-<h1>Create Services</h1>
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="mb-3"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger"></span></div>
-    <button type="submit" class="btn btn-primary">Create</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Directory</p>
+        <h1>Create service</h1>
+    </div>
+</header>
+
+<form asp-action="Create" method="post" class="card form narrow">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div class="field">
+        <label asp-for="Name" class="field__label"></label>
+        <input asp-for="Name" class="input" placeholder="e.g. Enefit electricity" />
+        <span asp-validation-for="Name"></span>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn--primary">Create service</button>
+        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+    </div>
 </form>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

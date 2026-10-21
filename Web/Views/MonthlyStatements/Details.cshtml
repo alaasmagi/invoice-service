@@ -1,46 +1,64 @@
 @model Web.Models.MonthlyStatementDetailViewModel
 @{
-    ViewData["Title"] = "Monthly Statement Details";
+    ViewData["Title"] = "Monthly statement details";
 }
-<h1>Monthly Statement Details</h1>
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Monthly statement</p>
+        <h1>@Model.Statement.Contact.FullName — @Model.Statement.Period</h1>
+    </div>
+    <div class="page-header__actions">
+        <a asp-action="Edit" asp-route-id="@Model.Statement.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>Edit</a>
+        @if (Model.CanSend)
+        {
+            <form asp-action="Send" asp-route-id="@Model.Statement.Id" method="post">
+                <button type="submit" class="btn btn--primary">
+                    <svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg>@(Model.Statement.Status == Domain.EMonthlyStatementStatus.Sent ? "Send again" : "Send")
+                </button>
+            </form>
+        }
+    </div>
+</header>
+
 @if (TempData["StatusMessage"] is string message)
 {
-    <div class="alert alert-info">@message</div>
+    <div class="alert alert--info" role="status">
+        <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+        <div class="alert__body">@message</div>
+    </div>
 }
-<section class="mb-4">
-    <h2>@Model.Statement.Contact.FullName - @Model.Statement.Period</h2>
-    <dl class="row">
-        <dt class="col-sm-2">Addresses</dt><dd class="col-sm-10">@string.Join(", ", Model.AddressNames)</dd>
-        <dt class="col-sm-2">Total</dt><dd class="col-sm-10">@Model.Statement.TotalSum</dd>
-        <dt class="col-sm-2">Status</dt><dd class="col-sm-10">@Model.Statement.Status</dd>
-        <dt class="col-sm-2">Sent At</dt><dd class="col-sm-10">@Model.Statement.SentAt</dd>
-    </dl>
-    @if (Model.CanSend)
-    {
-        <form asp-action="Send" asp-route-id="@Model.Statement.Id" method="post">
-            <button type="submit" class="btn btn-primary">
-                @(Model.Statement.Status == Domain.EMonthlyStatementStatus.Sent ? "Send again" : "Send")
-            </button>
-        </form>
-    }
+
+<dl class="card details medium">
+    <div class="details__row"><dt>Addresses</dt><dd>@string.Join(", ", Model.AddressNames)</dd></div>
+    <div class="details__row"><dt>Total</dt><dd>@Model.Statement.TotalSum €</dd></div>
+    <div class="details__row"><dt>Status</dt><dd><partial name="_StatementStatus" model="Model.Statement.Status" /></dd></div>
+    <div class="details__row"><dt>Sent at</dt><dd>@(Model.Statement.SentAt == null ? "Not sent yet" : Model.Statement.SentAt.ToString())</dd></div>
+</dl>
+
+<section class="section">
+    <h2 class="section-title">Invoice shares</h2>
+    <div class="card table-card">
+        <table class="data-table">
+            <thead><tr><th>Address</th><th>Service</th><th>Invoice date</th><th>Period</th><th class="num">Invoice total</th><th class="num">Split</th><th class="num">Person share</th></tr></thead>
+            <tbody>
+            @foreach (var line in Model.Lines)
+            {
+                <tr>
+                    <td>@line.AddressName</td>
+                    <td>@line.ServiceName</td>
+                    <td class="nowrap">@line.InvoiceDate</td>
+                    <td class="nowrap">@line.PeriodStart – @line.PeriodEnd</td>
+                    <td class="num">@line.InvoiceTotal €</td>
+                    <td class="num">÷ @line.ResidentCount</td>
+                    <td class="num"><strong>@line.AllocatedAmount €</strong></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 </section>
-<section class="mb-4">
-    <h3>Invoice Shares</h3>
-    <table class="table">
-        <thead><tr><th>Address</th><th>Service</th><th>Invoice Date</th><th>Period</th><th>Invoice Total</th><th>Split</th><th>Person Share</th></tr></thead>
-        <tbody>
-@foreach (var line in Model.Lines) {
-            <tr>
-                <td>@line.AddressName</td>
-                <td>@line.ServiceName</td>
-                <td>@line.InvoiceDate</td>
-                <td>@line.PeriodStart - @line.PeriodEnd</td>
-                <td>@line.InvoiceTotal</td>
-                <td>@line.ResidentCount</td>
-                <td>@line.AllocatedAmount</td>
-            </tr>
-}
-        </tbody>
-    </table>
-</section>
-<p><a asp-action="Edit" asp-route-id="@Model.Statement.Id">Edit</a> | <a asp-action="Index">Back</a></p>
+
+<div class="actions">
+    <a asp-action="Index" class="btn btn--ghost">Back to statements</a>
+</div>

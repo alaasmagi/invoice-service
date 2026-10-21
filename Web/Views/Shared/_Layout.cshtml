@@ -1,3 +1,7 @@
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    string? Current(params string[] controllers) => controllers.Contains(currentController) ? "page" : null;
+}
 <!DOCTYPE html>
 <html lang="en" data-theme="dark" data-bs-theme="dark">
 <head>
@@ -22,83 +26,110 @@
             document.documentElement.setAttribute("data-bs-theme", theme);
         })();
     </script>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@@400;500;600;700&family=JetBrains+Mono:wght@@400&display=swap"/>
+    <partial name="_DesignSystem"/>
     <link rel="stylesheet" href="~/Web.styles.css" asp-append-version="true"/>
 </head>
-<body class="app-shell">
-<header class="app-header">
-    <nav class="navbar navbar-expand-lg app-navbar">
-        <div class="container-fluid app-nav-container">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Invoice Service</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div id="mainNavigation" class="navbar-collapse collapse">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Addresses" asp-action="Index">Addresses</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="AddressContacts" asp-action="Index">AddressContacts</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Contacts" asp-action="Index">Contacts</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Services" asp-action="Index">Services</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Invoices" asp-action="Index">Invoices</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="MonthlyStatements" asp-action="Index">Statements</a>
-                    </li>
-                </ul>
-                <div class="app-nav-actions">
-                    <button id="themeToggle" class="app-theme-toggle" type="button" role="switch" aria-checked="true">
-                        <span class="theme-switch-track" aria-hidden="true">
-                            <span class="theme-switch-thumb"></span>
-                        </span>
-                        <span data-theme-toggle-label>Dark</span>
-                    </button>
-                    <partial name="_LoginPartial"/>
-                </div>
-            </div>
-        </div>
-    </nav>
-</header>
+<body>
+<partial name="_Icons"/>
 
-<div class="container app-page-container">
-    <main role="main" class="app-main">
-        @RenderBody()
-    </main>
+<div class="shell">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar__top">
+            <a class="brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <span class="brand__mark" aria-hidden="true">IS</span>
+                <span>Invoice Service</span>
+            </a>
+            <button class="icon-btn menu-button" type="button" aria-controls="mainNavigation" aria-expanded="false" aria-label="Toggle navigation" data-menu-toggle>
+                <svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg>
+            </button>
+        </div>
+
+        <nav class="nav" id="mainNavigation" aria-label="Main">
+            <a class="nav-item" asp-area="" asp-controller="Home" asp-action="Index" aria-current="@Current("Home")">
+                <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>Home
+            </a>
+
+            <div class="nav__group">Billing</div>
+            <a class="nav-item" asp-area="" asp-controller="Invoices" asp-action="Index" aria-current="@Current("Invoices", "InvoiceImports")">
+                <svg class="icon" aria-hidden="true"><use href="#i-file-text"></use></svg>Invoices
+            </a>
+            <a class="nav-item" asp-area="" asp-controller="MonthlyStatements" asp-action="Index" aria-current="@Current("MonthlyStatements")">
+                <svg class="icon" aria-hidden="true"><use href="#i-receipt"></use></svg>Statements
+            </a>
+            <a class="nav-item" asp-area="" asp-controller="InvoiceAllocations" asp-action="Index" aria-current="@Current("InvoiceAllocations")">
+                <svg class="icon" aria-hidden="true"><use href="#i-split"></use></svg>Allocations
+            </a>
+
+            <div class="nav__group">Directory</div>
+            <a class="nav-item" asp-area="" asp-controller="Addresses" asp-action="Index" aria-current="@Current("Addresses")">
+                <svg class="icon" aria-hidden="true"><use href="#i-map-pin"></use></svg>Addresses
+            </a>
+            <a class="nav-item" asp-area="" asp-controller="Contacts" asp-action="Index" aria-current="@Current("Contacts")">
+                <svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg>Contacts
+            </a>
+            <a class="nav-item" asp-area="" asp-controller="AddressContacts" asp-action="Index" aria-current="@Current("AddressContacts")">
+                <svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg>Address contacts
+            </a>
+            <a class="nav-item" asp-area="" asp-controller="Services" asp-action="Index" aria-current="@Current("Services")">
+                <svg class="icon" aria-hidden="true"><use href="#i-zap"></use></svg>Services
+            </a>
+        </nav>
+
+        <div class="sidebar__spacer"></div>
+
+        <div class="sidebar__footer">
+            <button id="dsThemeToggle" class="switch" type="button" role="switch" aria-checked="true">
+                <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
+                <span>Dark mode</span>
+            </button>
+            <partial name="_LoginPartial"/>
+        </div>
+    </aside>
+
+    <div class="main">
+        <main role="main" class="content">
+            @RenderBody()
+        </main>
+
+        <footer class="app-footer">
+            <span>&copy; Aleksander Laasmägi @DateTime.Now.Year</span>
+            <span aria-hidden="true">/</span>
+            <a href="https://alaasmagi.dev" target="_blank" rel="noopener noreferrer">Portfolio</a>
+            <span aria-hidden="true">/</span>
+            <a href="https://github.com/alaasmagi/invoice-service" target="_blank" rel="noopener noreferrer">Source</a>
+            <span aria-hidden="true">/</span>
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </footer>
+    </div>
 </div>
 
-<footer class="app-footer">
-    <div class="container app-page-container">
-        <span>&copy; Aleksander Laasmägi @DateTime.Now.Year</span>
-        <span aria-hidden="true">/</span>
-        <a href="https://alaasmagi.dev" target="_blank" rel="noopener noreferrer">
-            Portfolio
-        </a>
-        <span aria-hidden="true">/</span>
-        <a href="https://github.com/alaasmagi/invoice-service"
-           target="_blank" rel="noopener noreferrer">
-            Source
-        </a>
-        <span aria-hidden="true">/</span>
-        <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-    </div>
-</footer>
+<script>
+    (() => {
+        const storageKey = "invoice-service-theme";
+        const root = document.documentElement;
+        const toggle = document.getElementById("dsThemeToggle");
+        const sync = () => toggle.setAttribute("aria-checked", String(root.getAttribute("data-theme") === "dark"));
+        toggle.addEventListener("click", () => {
+            const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+            root.setAttribute("data-theme", next);
+            root.setAttribute("data-bs-theme", next);
+            try { localStorage.setItem(storageKey, next); } catch { /* storage unavailable */ }
+            sync();
+        });
+        sync();
+
+        const sidebar = document.getElementById("sidebar");
+        const menu = document.querySelector("[data-menu-toggle]");
+        menu.addEventListener("click", () => {
+            const open = sidebar.classList.toggle("is-open");
+            menu.setAttribute("aria-expanded", String(open));
+        });
+    })();
+</script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,9 +1,21 @@
 @model DTO.DataAccess.DataAccess.DTO.ServiceEntity
 @{
-    ViewData["Title"] = "Services Details";
+    ViewData["Title"] = "Service details";
 }
-<h1>Services Details</h1>
-<dl class="row">
-    <dt class="col-sm-2">Name</dt><dd class="col-sm-10">@Model.Name</dd>
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Directory</p>
+        <h1>Service details</h1>
+    </div>
+    <div class="page-header__actions">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>Edit</a>
+    </div>
+</header>
+
+<div class="section medium">
+    <dl class="card details">
+    <div class="details__row"><dt>Name</dt><dd>@Model.Name</dd></div>
 </dl>
-<p><a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> | <a asp-action="Index">Back</a></p>
+    <div><a asp-action="Index" class="btn btn--ghost">Back to services</a></div>
+</div>

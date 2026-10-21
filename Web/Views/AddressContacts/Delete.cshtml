@@ -1,16 +1,29 @@
 @model DTO.DataAccess.DataAccess.DTO.AddressContactEntity
 @{
-    ViewData["Title"] = "Delete Address Contacts";
+    ViewData["Title"] = "Delete address contact";
 }
-<h1>Delete Address Contacts</h1>
-<dl class="row">
-    <dt class="col-sm-2">Address</dt><dd class="col-sm-10">@Model.Address.Name</dd>
-    <dt class="col-sm-2">Contact</dt><dd class="col-sm-10">@Model.Contact.FullName</dd>
-    <dt class="col-sm-2">Start</dt><dd class="col-sm-10">@Model.StartDate</dd>
-    <dt class="col-sm-2">End</dt><dd class="col-sm-10">@Model.EndDate</dd>
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Directory</p>
+        <h1>Delete address contact</h1>
+    </div>
+</header>
+
+<div class="section medium">
+    <div class="alert alert--danger" role="alert">
+        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+        <div class="alert__body"><span class="alert__title">Delete this address contact?</span><span>This action cannot be undone.</span></div>
+    </div>
+    <dl class="card details">
+    <div class="details__row"><dt>Address</dt><dd><div class="stack-cell"><span>@Model.Address.Name</span><span>@Model.Address.FullAddress</span></div></dd></div>
+    <div class="details__row"><dt>Contact</dt><dd>@Model.Contact.FullName</dd></div>
+    <div class="details__row"><dt>Start</dt><dd>@Model.StartDate</dd></div>
+    <div class="details__row"><dt>End</dt><dd>@if (Model.EndDate == null) { <span class="badge badge--success">Current</span> } else { <text>@Model.EndDate</text> }</dd></div>
 </dl>
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
-</form>
+    <form asp-action="Delete" method="post" class="form-actions">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn--danger">Delete address contact</button>
+        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+    </form>
+</div>
