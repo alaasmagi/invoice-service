@@ -13,7 +13,8 @@ public class AppUserMonthlyStatementSenderPaymentDetailsProvider(IAppUserReposit
             : new MonthlyStatementSenderPaymentDetails
             {
                 FullName = user.FullName,
-                Locale = user.Locale,
+                // The app-level language choice wins over the Keycloak locale.
+                Locale = string.IsNullOrWhiteSpace(user.Language) ? user.Locale : user.Language,
                 BankIban = user.BankIban ?? string.Empty,
                 Currency = string.IsNullOrWhiteSpace(user.Currency) ? "EUR" : user.Currency
             };

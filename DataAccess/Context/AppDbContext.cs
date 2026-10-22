@@ -57,6 +57,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.FullName).HasMaxLength(256);
             entity.Property(e => e.Locale).HasMaxLength(16);
             entity.Property(e => e.BankIban).HasMaxLength(64);
+            entity.Property(e => e.Language).HasMaxLength(8);
             entity.Property(e => e.FormatCulture).HasMaxLength(16);
             entity.Property(e => e.Currency).HasMaxLength(3).HasDefaultValue("EUR");
             entity.Property(e => e.TimeZone).HasMaxLength(64).HasDefaultValue("Europe/Tallinn");

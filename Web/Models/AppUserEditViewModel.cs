@@ -12,14 +12,17 @@ public class AppUserEditViewModel
     [Display(Name = "Username")]
     public string Username { get; set; } = string.Empty;
 
-    [Required]
-    [StringLength(256)]
+    /// <summary>Managed in Keycloak, like email and username; shown read-only.</summary>
     [Display(Name = "Full name")]
     public string FullName { get; set; } = string.Empty;
 
-    /// <summary>Managed in Keycloak; shown read-only.</summary>
-    [Display(Name = "Language")]
+    /// <summary>The Keycloak-managed locale, used when <see cref="Language"/> is empty.</summary>
     public string Locale { get; set; } = "et";
+
+    /// <summary>Empty means "same as my account".</summary>
+    [StringLength(8)]
+    [Display(Name = "Language")]
+    public string? Language { get; set; }
 
     [StringLength(64)]
     [Display(Name = "Bank IBAN")]

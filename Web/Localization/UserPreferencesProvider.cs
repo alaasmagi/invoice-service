@@ -7,7 +7,7 @@ namespace Web.Localization;
 
 /// <summary>
 /// Loads a signed-in user's display preferences, cached briefly so every request doesn't hit the database.
-/// The language comes from the Keycloak-managed locale; format, currency and time zone are set in the app.
+/// The language defaults to the Keycloak-managed locale and can be overridden in the app, like format, currency and time zone.
 /// </summary>
 public class UserPreferencesProvider(IMemoryCache cache, IServiceScopeFactory scopeFactory)
 {
@@ -28,11 +28,11 @@ public class UserPreferencesProvider(IMemoryCache cache, IServiceScopeFactory sc
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var row = await context.AppUsers.AsNoTracking()
                 .Where(e => e.Id == userId)
-                .Select(e => new { e.Locale, e.FormatCulture, e.Currency, e.TimeZone })
+                .Select(e => new { e.Locale, e.Language, e.FormatCulture, e.Currency, e.TimeZone })
                 .FirstOrDefaultAsync();
 
-            // Not projected from Keycloak yet: fall back to the locale claim.
-            var language = LocalizationSettings.LanguageFor(row?.Locale ?? user.FindFirstValue("locale"));
+            // The app-level choice wins; otherwise the Keycloak locale (or its claim, before the user is projected).
+            var language = LocalizationSettings.LanguageFor(row?.Language ?? row?.Locale ?? user.FindFirstValue("locale"));
             return new UserPreferences(
                 language,
                 LocalizationSettings.FormatCultureFor(row?.FormatCulture, language),

@@ -10,6 +10,9 @@ public class AppUserEntity : BaseEntityWithMetaConcurrency
     public string Locale { get; set; } = "et";
     public string? BankIban { get; set; }
 
+    /// <summary>UI language chosen in the app ("en", "et"); null follows the Keycloak-managed Locale.</summary>
+    public string? Language { get; set; }
+
     /// <summary>Culture for dates and numbers (e.g. "et-EE"); null follows the language.</summary>
     public string? FormatCulture { get; set; }
 

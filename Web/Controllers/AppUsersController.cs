@@ -41,6 +41,9 @@ public class AppUsersController(AppDbContext context, UserPreferencesProvider pr
         ModelState.Remove(nameof(model.Email));
         ModelState.Remove(nameof(model.Username));
         ModelState.Remove(nameof(model.Locale));
+        ModelState.Remove(nameof(model.FullName));
+        if (!string.IsNullOrEmpty(model.Language) && !LocalizationSettings.Languages.Contains(model.Language))
+            ModelState.AddModelError(nameof(model.Language), T["Choose a language from the list."]);
         if (!string.IsNullOrEmpty(model.FormatCulture) && !LocalizationSettings.FormatCultures.Contains(model.FormatCulture))
             ModelState.AddModelError(nameof(model.FormatCulture), T["Choose a format from the list."]);
         if (!LocalizationSettings.Currencies.Contains(model.Currency))
@@ -50,8 +53,10 @@ public class AppUsersController(AppDbContext context, UserPreferencesProvider pr
 
         if (!ModelState.IsValid)
         {
-            model.Locale = (await context.AppUsers.AsNoTracking().Where(user => user.Id == userId)
-                .Select(user => user.Locale).FirstOrDefaultAsync(HttpContext.RequestAborted)) ?? model.Locale;
+            var current = await context.AppUsers.AsNoTracking().Where(user => user.Id == userId)
+                .Select(user => new { user.Locale, user.FullName }).FirstOrDefaultAsync(HttpContext.RequestAborted);
+            model.Locale = current?.Locale ?? model.Locale;
+            model.FullName = string.IsNullOrWhiteSpace(current?.FullName) ? IdentityFullName() : current.FullName;
             return View(model);
         }
 
@@ -64,7 +69,8 @@ public class AppUsersController(AppDbContext context, UserPreferencesProvider pr
             {
                 Id = userId,
                 Email = model.Email,
-                Username = model.Username
+                Username = model.Username,
+                FullName = IdentityFullName()
             };
             StampNew(entity, userId);
             context.AppUsers.Add(entity);
@@ -74,8 +80,8 @@ public class AppUsersController(AppDbContext context, UserPreferencesProvider pr
             StampExisting(entity, userId);
         }
 
-        entity.FullName = model.FullName.Trim();
-        // The language (Locale) is owned by Keycloak and synced from identity events, so it isn't written here.
+        // Name, email, username and Locale are owned by Keycloak (synced from identity events); Language is the app-level override.
+        entity.Language = string.IsNullOrEmpty(model.Language) ? null : model.Language;
         entity.BankIban = string.IsNullOrWhiteSpace(model.BankIban) ? null : model.BankIban.Trim();
         entity.FormatCulture = string.IsNullOrEmpty(model.FormatCulture) ? null : model.FormatCulture;
         entity.Currency = model.Currency;
@@ -98,6 +104,7 @@ public class AppUsersController(AppDbContext context, UserPreferencesProvider pr
             FullName = string.IsNullOrWhiteSpace(entity?.FullName) ? IdentityFullName() : entity.FullName,
             Locale = string.IsNullOrWhiteSpace(entity?.Locale) ? "et" : entity.Locale,
             BankIban = entity?.BankIban,
+            Language = entity?.Language,
             FormatCulture = entity?.FormatCulture,
             Currency = LocalizationSettings.CurrencyFor(entity?.Currency),
             TimeZone = LocalizationSettings.TimeZoneFor(entity?.TimeZone).Id

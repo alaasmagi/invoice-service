@@ -3,8 +3,9 @@
 @{
     ViewData["Title"] = T["Settings"];
     var accountUrl = ViewData["AccountUrl"] as string;
-    var language = LocalizationSettings.LanguageFor(Model.Locale);
-    var languageName = Formatter.Capitalize(CultureInfo.GetCultureInfo(language).NativeName);
+    var accountLanguage = LocalizationSettings.LanguageFor(Model.Locale);
+    var language = LocalizationSettings.LanguageFor(Model.Language ?? Model.Locale);
+    string LanguageName(string code) => Formatter.Capitalize(CultureInfo.GetCultureInfo(code).NativeName);
     var sampleDate = new DateTime(2026, 10, 22, 14, 30, 0);
     const decimal sampleAmount = 1234.56m;
     string Sample(string cultureName)
@@ -37,6 +38,10 @@
     <h2 class="section-title">@T["Profile"]</h2>
     <div class="form-row">
         <div class="field">
+            <label asp-for="FullName" class="field__label"></label>
+            <input asp-for="FullName" class="input" disabled />
+        </div>
+        <div class="field">
             <label asp-for="Email" class="field__label"></label>
             <input asp-for="Email" class="input" disabled />
         </div>
@@ -45,17 +50,20 @@
             <input asp-for="Username" class="input" disabled />
         </div>
     </div>
+    <p class="field__help">
+        @T["Your name, username and email are managed in your account."]
+        @if (accountUrl != null)
+        {
+            <a href="@accountUrl" target="_blank" rel="noopener noreferrer" class="link">@T["Change them in your account settings"]</a>
+        }
+    </p>
 
+    <h2 class="section-title">@T["Payment details"]</h2>
     <div class="form-row">
-        <div class="field">
-            <label asp-for="FullName" class="field__label"></label>
-            <input asp-for="FullName" class="input" autocomplete="name" />
-            <span class="field__help">@T["Shown as the payee on statements."]</span>
-            <span asp-validation-for="FullName"></span>
-        </div>
         <div class="field">
             <label asp-for="BankIban" class="field__label"></label>
             <input asp-for="BankIban" class="input mono" autocomplete="off" placeholder="@T["e.g. {0}", "EE38 2200 2210 2014 5685"]" />
+            <span class="field__help">@T["Shown on statements together with your name, so recipients know where to pay."]</span>
             <span asp-validation-for="BankIban"></span>
         </div>
     </div>
@@ -63,15 +71,21 @@
     <h2 class="section-title">@T["Language and formats"]</h2>
     <div class="form-row">
         <div class="field">
-            <label asp-for="Locale" class="field__label"></label>
-            <input id="Locale" class="input" value="@languageName" disabled />
+            <label asp-for="Language" class="field__label"></label>
+            <div class="field__control">
+                <select asp-for="Language" class="input">
+                    <option value="">@T["Same as account ({0})", LanguageName(accountLanguage)]</option>
+                    @foreach (var code in LocalizationSettings.Languages)
+                    {
+                        <option value="@code" selected="@(Model.Language == code)">@LanguageName(code)</option>
+                    }
+                </select>
+                <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+            </div>
             <span class="field__help">
-                @T["Comes from your account. It also sets the language of statement emails."]
-                @if (accountUrl != null)
-                {
-                    <a href="@accountUrl" target="_blank" rel="noopener noreferrer" class="link">@T["Change it in your account"]</a>
-                }
+                @T["Also sets the language of statement emails. \"Same as account\" follows the language in your account settings."]
             </span>
+            <span asp-validation-for="Language"></span>
         </div>
         <div class="field">
             <label asp-for="FormatCulture" class="field__label"></label>

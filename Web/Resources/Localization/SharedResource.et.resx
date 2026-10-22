@@ -75,7 +75,6 @@
   <data name="By person" xml:space="preserve"><value>Inimeste kaupa</value></data>
   <data name="By service" xml:space="preserve"><value>Teenuste kaupa</value></data>
   <data name="Cancel" xml:space="preserve"><value>Tühista</value></data>
-  <data name="Change it in your account" xml:space="preserve"><value>Muuda seda oma kontol</value></data>
   <data name="Check the amounts below. When every invoice for the month is in, generate the statements so they can be sent." xml:space="preserve"><value>Kontrolli allolevaid summasid. Kui kõik kuu arved on sees, genereeri aruanded, et neid saaks saata.</value></data>
   <data name="Check the recipients' email addresses and send them again." xml:space="preserve"><value>Kontrolli saajate e-posti aadresse ja saada uuesti.</value></data>
   <data name="Check the {0} invoice that may still be missing first." xml:space="preserve"><value>Kontrolli enne üle {0} arve, mis võib veel puududa.</value></data>
@@ -88,7 +87,6 @@
   <data name="Choose month" xml:space="preserve"><value>Vali kuu</value></data>
   <data name="Clear filters" xml:space="preserve"><value>Tühjenda filtrid</value></data>
   <data name="Close" xml:space="preserve"><value>Sulge</value></data>
-  <data name="Comes from your account. It also sets the language of statement emails." xml:space="preserve"><value>Tuleb sinu kontolt. See määrab ka aruannete e-kirjade keele.</value></data>
   <data name="Confirm" xml:space="preserve"><value>Kinnita</value></data>
   <data name="Contact" xml:space="preserve"><value>Kontakt</value></data>
   <data name="contact" xml:space="preserve"><value>kontakt</value></data>
@@ -376,7 +374,6 @@
   <data name="Show as table" xml:space="preserve"><value>Näita tabelina</value></data>
   <data name="Show {0} past resident" xml:space="preserve"><value>Näita {0} endist elanikku</value></data>
   <data name="Show {0} past residents" xml:space="preserve"><value>Näita {0} endist elanikku</value></data>
-  <data name="Shown as the payee on statements." xml:space="preserve"><value>Kuvatakse aruannetel makse saajana.</value></data>
   <data name="Skipped rows" xml:space="preserve"><value>Vahele jäetud read</value></data>
   <data name="so invoices can be split." xml:space="preserve"><value>, et arveid saaks jagada.</value></data>
   <data name="Some setup is missing" xml:space="preserve"><value>Osa seadistusest on puudu</value></data>
@@ -511,4 +508,11 @@
   <data name="{1} has {0} monthly statements. Delete them first, or keep the contact for history." xml:space="preserve"><value>Isikul {1} on {0} igakuist aruannet. Kustuta need enne või jäta kontakt ajaloo jaoks alles.</value></data>
   <data name="{1}: sent {0} statement." xml:space="preserve"><value>{1}: saadeti {0} aruanne.</value></data>
   <data name="{1}: sent {0} statements." xml:space="preserve"><value>{1}: saadeti {0} aruannet.</value></data>
+  <data name="Choose a language from the list." xml:space="preserve"><value>Vali keel nimekirjast.</value></data>
+  <data name="Same as account ({0})" xml:space="preserve"><value>Sama mis kontol ({0})</value></data>
+  <data name="Also sets the language of statement emails. &quot;Same as account&quot; follows the language in your account settings." xml:space="preserve"><value>Määrab ka aruannete e-kirjade keele. "Sama mis kontol" järgib sinu konto seadetes valitud keelt.</value></data>
+  <data name="Your name, username and email are managed in your account." xml:space="preserve"><value>Sinu nime, kasutajanime ja e-posti hallatakse sinu kontol.</value></data>
+  <data name="Change them in your account settings" xml:space="preserve"><value>Muuda neid oma konto seadetes</value></data>
+  <data name="Payment details" xml:space="preserve"><value>Makseandmed</value></data>
+  <data name="Shown on statements together with your name, so recipients know where to pay." xml:space="preserve"><value>Kuvatakse aruannetel koos sinu nimega, et saajad teaksid, kuhu maksta.</value></data>
 </root>

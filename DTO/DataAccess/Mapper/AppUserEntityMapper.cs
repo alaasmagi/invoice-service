@@ -16,6 +16,7 @@ public class AppUserEntityMapper : IMapper<AppUser, AppUserEntity>
             FullName = entity.FullName,
             Locale = entity.Locale,
             BankIban = entity.BankIban,
+            Language = entity.Language,
             FormatCulture = entity.FormatCulture,
             Currency = entity.Currency,
             TimeZone = entity.TimeZone
@@ -37,6 +38,7 @@ public class AppUserEntityMapper : IMapper<AppUser, AppUserEntity>
             FullName = entity.FullName,
             Locale = entity.Locale,
             BankIban = entity.BankIban,
+            Language = entity.Language,
             FormatCulture = entity.FormatCulture,
             Currency = entity.Currency,
             TimeZone = entity.TimeZone
