@@ -3,7 +3,7 @@ using Contracts.Application;
 
 namespace Application;
 
-public sealed partial class EnefitPdfInvoiceParser : PdfInvoiceParserBase
+public partial class EnefitPdfInvoiceParser : PdfInvoiceParserBase
 {
     public override EPdfInvoiceProvider Provider => EPdfInvoiceProvider.Enefit;
     protected override string ServiceName => "Enefit";

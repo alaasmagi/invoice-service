@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Tests;
 
-public sealed class SendPeriodInvoiceEmailsServiceTests
+public class SendPeriodInvoiceEmailsServiceTests
 {
     [Fact]
     public async Task SendPeriod_RunTwiceForSamePeriod_PublishesEachRecipientOnce()
@@ -82,7 +82,7 @@ public sealed class SendPeriodInvoiceEmailsServiceTests
         Assert.Equal(new SendPeriodResult(1, 0, 1, 0), second);
     }
 
-    private sealed class CountingPublisher : IMonthlyInvoiceEmailPublisher
+    private class CountingPublisher : IMonthlyInvoiceEmailPublisher
     {
         public int Calls { get; private set; }
 
@@ -93,7 +93,7 @@ public sealed class SendPeriodInvoiceEmailsServiceTests
         }
     }
 
-    private sealed class InMemoryPublishedRepo : IPublishedInvoiceEmailRepository
+    private class InMemoryPublishedRepo : IPublishedInvoiceEmailRepository
     {
         private readonly List<(Guid Statement, Guid User)> _sent = [];
 

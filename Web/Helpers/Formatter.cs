@@ -10,7 +10,7 @@ namespace Web.Helpers;
 /// Formats amounts, dates and times for the current user: numbers and dates follow their format culture,
 /// amounts carry their currency, timestamps are shown in their time zone. Injected into views as <c>Fmt</c>.
 /// </summary>
-public sealed class Formatter(IHttpContextAccessor httpContextAccessor, IStringLocalizer<SharedResource> t)
+public class Formatter(IHttpContextAccessor httpContextAccessor, IStringLocalizer<SharedResource> t)
 {
     private NumberFormatInfo? _moneyFormat;
 

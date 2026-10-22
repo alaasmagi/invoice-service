@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Localization;
 namespace Web.Localization;
 
 /// <summary>Sets the request culture (formats) and UI culture (language) from the signed-in user's preferences.</summary>
-public sealed class UserPreferencesCultureProvider : RequestCultureProvider
+public class UserPreferencesCultureProvider : RequestCultureProvider
 {
     public const string ItemKey = "UserPreferences";
 

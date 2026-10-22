@@ -8,7 +8,7 @@ using Web.Models;
 
 namespace Web.Controllers;
 
-public sealed class AppUsersController(AppDbContext context, UserPreferencesProvider preferencesProvider) : UserScopedControllerBase
+public class AppUsersController(AppDbContext context, UserPreferencesProvider preferencesProvider) : UserScopedControllerBase
 {
     public async Task<IActionResult> Edit()
     {

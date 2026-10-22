@@ -3,7 +3,7 @@ using System.Globalization;
 namespace Web.Localization;
 
 /// <summary>Resolved display preferences for the current request.</summary>
-public sealed record UserPreferences(string Language, string FormatCulture, string Currency, string TimeZoneId)
+public record UserPreferences(string Language, string FormatCulture, string Currency, string TimeZoneId)
 {
     public static readonly UserPreferences Default = new(
         LocalizationSettings.DefaultLanguage,

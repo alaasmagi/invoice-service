@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Tests;
 
-public sealed class RabbitMqMonthlyInvoiceEmailPublisherTests
+public class RabbitMqMonthlyInvoiceEmailPublisherTests
 {
     private static MonthlyInvoiceEmailContent SampleContent(string email = "user@example.com") => new()
     {
@@ -158,7 +158,7 @@ public sealed class RabbitMqMonthlyInvoiceEmailPublisherTests
         Assert.False(content.TryGetProperty("Email", out _));
     }
 
-    private sealed class FakeBaseEventPublisher : IBaseEventPublisher
+    private class FakeBaseEventPublisher : IBaseEventPublisher
     {
         public int Calls { get; private set; }
         public string? LastExpiration { get; private set; }

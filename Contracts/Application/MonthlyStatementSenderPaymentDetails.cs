@@ -1,6 +1,6 @@
 namespace Contracts.Application;
 
-public sealed class MonthlyStatementSenderPaymentDetails
+public class MonthlyStatementSenderPaymentDetails
 {
     public string FullName { get; init; } = default!;
     public string Locale { get; init; } = "et";

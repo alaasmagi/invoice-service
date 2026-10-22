@@ -2,7 +2,7 @@ using Contracts.Application;
 
 namespace Application;
 
-public sealed class PdfInvoiceProviderDetector : IPdfInvoiceProviderDetector
+public class PdfInvoiceProviderDetector : IPdfInvoiceProviderDetector
 {
     public PdfInvoiceProviderDetectionResult Detect(string text)
     {

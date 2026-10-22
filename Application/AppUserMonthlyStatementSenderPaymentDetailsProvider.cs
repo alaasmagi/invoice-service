@@ -3,7 +3,7 @@ using Contracts.DataAccess;
 
 namespace Application;
 
-public sealed class AppUserMonthlyStatementSenderPaymentDetailsProvider(IAppUserRepository appUserRepository) : IMonthlyStatementSenderPaymentDetailsProvider
+public class AppUserMonthlyStatementSenderPaymentDetailsProvider(IAppUserRepository appUserRepository) : IMonthlyStatementSenderPaymentDetailsProvider
 {
     public async Task<MonthlyStatementSenderPaymentDetails?> GetAsync(Guid userId)
     {

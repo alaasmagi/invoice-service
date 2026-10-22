@@ -7,7 +7,7 @@ namespace Web.Localization;
 /// Gives validation attributes without an explicit message (including MVC's implicit [Required] on
 /// non-nullable values) a message key, so data-annotations localization can translate it.
 /// </summary>
-public sealed class RequiredMessageMetadataProvider : IValidationMetadataProvider
+public class RequiredMessageMetadataProvider : IValidationMetadataProvider
 {
     public void CreateValidationMetadata(ValidationMetadataProviderContext context)
     {

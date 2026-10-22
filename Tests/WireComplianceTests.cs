@@ -16,7 +16,7 @@ namespace Tests;
 /// tenant "realmName/appName", nanosecond timestamps). Deserialization mirrors the shared consumer
 /// (default options; envelope/content property names come from their JsonPropertyName attributes).
 /// </summary>
-public sealed class WireComplianceTests
+public class WireComplianceTests
 {
     private const string UserCreated = """
     {"id":"2b9dc316-98d7-488f-8614-6d275497d0b9","source":"identity-hub","tenant":"realmName/appName","action":"user-created","timestamp":"2026-07-08T12:44:37.408804148Z","contentVersion":"1.0","content":{"userId":"1b9dc316-98d7-488f-8614-6d275497d0b9","email":"user@example.com","username":"testUser","fullName":"testFullName","locale":"et"}}

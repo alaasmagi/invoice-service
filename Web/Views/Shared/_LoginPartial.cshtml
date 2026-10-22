@@ -1,11 +1,14 @@
 @{
     var appUserEmail = ViewData["CurrentAppUserEmail"] as string ?? User.Identity?.Name ?? T["Account"].Value;
+    var appUserFullName = ViewData["CurrentAppUserFullName"] as string;
+    var appUserFirstName = ViewData["CurrentAppUserFirstName"] as string ?? appUserEmail;
+    var appUserTooltip = string.IsNullOrWhiteSpace(appUserFullName) ? appUserEmail : $"{appUserFullName} · {appUserEmail}";
 }
 
 @if (User.Identity?.IsAuthenticated == true)
 {
     <div class="user-row">
-        <a class="user-row__email" asp-area="" asp-controller="AppUsers" asp-action="Edit" title="@T["Settings"] · @appUserEmail">@appUserEmail</a>
+        <a class="user-row__email" asp-area="" asp-controller="AppUsers" asp-action="Edit" title="@appUserTooltip">@appUserFirstName</a>
         <a class="icon-btn" asp-area="" asp-controller="AppUsers" asp-action="Edit" aria-label="@T["Settings"]" title="@T["Settings"]"><svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg></a>
         <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post">
             <button type="submit" class="icon-btn" aria-label="@T["Logout"]" title="@T["Logout"]">

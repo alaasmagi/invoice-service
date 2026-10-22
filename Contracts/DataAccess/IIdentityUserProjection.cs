@@ -10,7 +10,7 @@ public interface IIdentityUserProjection
     Task<bool> TryProjectAsync(IdentityUserProjectionInput input, CancellationToken ct = default);
 }
 
-public sealed record IdentityUserProjectionInput(
+public record IdentityUserProjectionInput(
     string EnvelopeId,
     string Source,
     string Action,

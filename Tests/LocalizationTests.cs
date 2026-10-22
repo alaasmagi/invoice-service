@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Tests;
 
-public sealed class LocalizationTests
+public class LocalizationTests
 {
     private static IStringLocalizer<SharedResource> Localizer()
     {

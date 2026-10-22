@@ -9,14 +9,14 @@ public enum EPdfInvoiceProvider
     Enefit = 2
 }
 
-public sealed class PdfInvoiceImportRequest
+public class PdfInvoiceImportRequest
 {
     public Stream PdfStream { get; init; } = default!;
     public string FileName { get; init; } = default!;
     public long Length { get; init; }
 }
 
-public sealed class PdfInvoiceImportResult
+public class PdfInvoiceImportResult
 {
     public EPdfInvoiceProvider Provider { get; set; } = EPdfInvoiceProvider.Unknown;
     public string? ProviderName { get; set; }
@@ -27,7 +27,7 @@ public sealed class PdfInvoiceImportResult
     public List<string> FatalErrors { get; } = [];
 }
 
-public sealed class PdfInvoiceParsedDocument
+public class PdfInvoiceParsedDocument
 {
     public EPdfInvoiceProvider Provider { get; init; }
     public string ServiceName { get; init; } = default!;
@@ -38,7 +38,7 @@ public sealed class PdfInvoiceParsedDocument
     public List<string> Warnings { get; } = [];
 }
 
-public sealed class PdfInvoiceParsedRow
+public class PdfInvoiceParsedRow
 {
     public string AddressText { get; init; } = default!;
     public decimal? Amount { get; init; }
@@ -48,7 +48,7 @@ public sealed class PdfInvoiceParsedRow
     public string? SourceText { get; init; }
 }
 
-public sealed class PdfInvoiceCreatedInvoice
+public class PdfInvoiceCreatedInvoice
 {
     public Guid InvoiceId { get; init; }
     public Guid AddressId { get; init; }
@@ -61,7 +61,7 @@ public sealed class PdfInvoiceCreatedInvoice
     public decimal TotalSum { get; init; }
 }
 
-public sealed class PdfInvoiceSkippedRow
+public class PdfInvoiceSkippedRow
 {
     public string AddressText { get; init; } = default!;
     public string Reason { get; init; } = default!;
@@ -69,7 +69,7 @@ public sealed class PdfInvoiceSkippedRow
     public string? SourceText { get; init; }
 }
 
-public sealed class PdfInvoiceProviderDetectionResult
+public class PdfInvoiceProviderDetectionResult
 {
     public EPdfInvoiceProvider Provider { get; init; }
     public bool IsAmbiguous { get; init; }

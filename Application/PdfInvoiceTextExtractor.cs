@@ -3,7 +3,7 @@ using UglyToad.PdfPig;
 
 namespace Application;
 
-public sealed class PdfInvoiceTextExtractor : IPdfInvoiceTextExtractor
+public class PdfInvoiceTextExtractor : IPdfInvoiceTextExtractor
 {
     public Task<string> ExtractTextAsync(Stream pdfStream)
     {

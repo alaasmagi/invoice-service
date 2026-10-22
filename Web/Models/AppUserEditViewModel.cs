@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Web.Models;
 
-public sealed class AppUserEditViewModel
+public class AppUserEditViewModel
 {
     public Guid Id { get; set; }
 

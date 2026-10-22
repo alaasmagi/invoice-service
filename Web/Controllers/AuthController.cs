@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Web.Controllers;
 
 [Route("[controller]")]
-public sealed class AuthController : Controller
+public class AuthController : Controller
 {
     [HttpGet("Login")]
     [AllowAnonymous]

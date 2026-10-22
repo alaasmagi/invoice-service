@@ -11,7 +11,7 @@ namespace Infrastructure.Messaging;
 /// bounded prefetch and never declares or binds topology. On a handler exception it nacks WITHOUT
 /// requeue, so validation/permanent failures dead-letter for a human to see.
 /// </summary>
-public sealed class UserEventConsumer : RabbitMqConsumerBase<UserEventContent>
+public class UserEventConsumer : RabbitMqConsumerBase<UserEventContent>
 {
     public UserEventConsumer(
         RabbitMqConnectionManager connectionManager,

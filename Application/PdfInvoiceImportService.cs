@@ -4,7 +4,7 @@ using Domain;
 
 namespace Application;
 
-public sealed class PdfInvoiceImportService(
+public class PdfInvoiceImportService(
     IPdfInvoiceTextExtractor textExtractor,
     IPdfInvoiceProviderDetector providerDetector,
     IEnumerable<IPdfInvoiceParser> parsers,
@@ -270,5 +270,5 @@ public sealed class PdfInvoiceImportService(
             .Any(token => parsedTokens.Contains(token));
     }
 
-    private sealed record AddressMatch(Address? Address, bool IsAmbiguous);
+    private record AddressMatch(Address? Address, bool IsAmbiguous);
 }

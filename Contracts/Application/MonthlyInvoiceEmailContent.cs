@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Contracts.Application;
 
-public sealed class MonthlyInvoiceEmailContent
+public class MonthlyInvoiceEmailContent
 {
     [JsonPropertyName("email")]
     public string Email { get; init; } = default!;
@@ -45,7 +45,7 @@ public sealed class MonthlyInvoiceEmailContent
     public string PaymentDescription { get; init; } = default!;
 }
 
-public sealed class MonthlyInvoiceEmailRowContent
+public class MonthlyInvoiceEmailRowContent
 {
     [JsonPropertyName("address")]
     public string Address { get; init; } = default!;

@@ -11,4 +11,4 @@ public interface ISendPeriodInvoiceEmailsService
 }
 
 /// <summary>Summary of a period batch run.</summary>
-public sealed record SendPeriodResult(int Total, int Published, int Skipped, int Failed);
+public record SendPeriodResult(int Total, int Published, int Skipped, int Failed);

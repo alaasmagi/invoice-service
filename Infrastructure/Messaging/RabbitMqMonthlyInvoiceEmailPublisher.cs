@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Infrastructure.Messaging;
 
-public sealed class RabbitMqMonthlyInvoiceEmailPublisher(
+public class RabbitMqMonthlyInvoiceEmailPublisher(
     IBaseEventPublisher publisher,
     ILogger<RabbitMqMonthlyInvoiceEmailPublisher> logger) : IMonthlyInvoiceEmailPublisher
 {

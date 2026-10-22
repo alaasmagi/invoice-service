@@ -5,7 +5,7 @@ namespace Contracts.Application;
 /// broker confirmed the publish (publisher confirms + mandatory return). A publish that is not
 /// confirmed must be treated as failed and must NOT be recorded as sent.
 /// </summary>
-public sealed record InvoiceEmailPublishResult(bool Confirmed, string EnvelopeId, string? FailureReason)
+public record InvoiceEmailPublishResult(bool Confirmed, string EnvelopeId, string? FailureReason)
 {
     public static InvoiceEmailPublishResult Ok(string envelopeId) => new(true, envelopeId, null);
 

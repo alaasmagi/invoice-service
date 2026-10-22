@@ -8,7 +8,7 @@ namespace Web.Localization;
 /// &lt;input type="date"&gt; in an invariant format ("84.12", "2026-10-22") whatever the page's language,
 /// so parsing them with e.g. et-EE (decimal comma) would reject valid input.
 /// </summary>
-public sealed class InvariantFormValueProviderFactory : IValueProviderFactory
+public class InvariantFormValueProviderFactory : IValueProviderFactory
 {
     public async Task CreateValueProviderAsync(ValueProviderFactoryContext context)
     {

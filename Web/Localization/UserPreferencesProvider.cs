@@ -9,7 +9,7 @@ namespace Web.Localization;
 /// Loads a signed-in user's display preferences, cached briefly so every request doesn't hit the database.
 /// The language comes from the Keycloak-managed locale; format, currency and time zone are set in the app.
 /// </summary>
-public sealed class UserPreferencesProvider(IMemoryCache cache, IServiceScopeFactory scopeFactory)
+public class UserPreferencesProvider(IMemoryCache cache, IServiceScopeFactory scopeFactory)
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
 

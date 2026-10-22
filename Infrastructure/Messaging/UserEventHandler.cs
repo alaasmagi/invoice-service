@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Messaging;
 
-public sealed class UserEventHandler(
+public class UserEventHandler(
     IServiceScopeFactory scopeFactory,
     ILogger<UserEventHandler> logger) : IBaseEventHandler<UserEventContent>
 {

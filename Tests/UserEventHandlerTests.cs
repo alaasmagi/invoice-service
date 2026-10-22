@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Tests;
 
-public sealed class UserEventHandlerTests
+public class UserEventHandlerTests
 {
     private static BaseEventEnvelope<UserEventContent> Envelope(
         string source = "identity-hub",

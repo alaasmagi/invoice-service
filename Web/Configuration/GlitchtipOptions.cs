@@ -1,3 +1,3 @@
 namespace Web.Configuration;
 
-public sealed record GlitchtipOptions(string? Dsn, string Release);
+public record GlitchtipOptions(string? Dsn, string Release);
