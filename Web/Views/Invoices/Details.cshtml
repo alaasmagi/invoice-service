@@ -1,41 +1,41 @@
 @model InvoiceDetailsViewModel
 @{
-    ViewData["Title"] = "Invoice details";
+    ViewData["Title"] = T["Invoice details"];
     var invoice = Model.Invoice;
     var period = BillingPeriod.From(invoice.InvoiceDate);
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Invoice</p>
+        <p class="kicker">@T["Invoice"]</p>
         <h1>@invoice.Service.Name · @invoice.Address.Name</h1>
-        <p class="page-header__lede">@Fmt.Money(invoice.TotalSum) · dated @Fmt.Date(invoice.InvoiceDate)</p>
+        <p class="page-header__lede">@T["{0} · dated {1}", Fmt.Money(invoice.TotalSum), Fmt.Date(invoice.InvoiceDate)]</p>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Edit" asp-route-id="@invoice.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>Edit</a>
-        <a asp-action="Delete" asp-route-id="@invoice.Id" class="btn btn--ghost"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>Delete</a>
+        <a asp-action="Edit" asp-route-id="@invoice.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>@T["Edit"]</a>
+        <a asp-action="Delete" asp-route-id="@invoice.Id" class="btn btn--ghost"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>@T["Delete"]</a>
     </div>
 </header>
 
 <dl class="card details medium">
-    <div class="details__row"><dt>Address</dt><dd><div class="stack-cell"><a asp-controller="Addresses" asp-action="Details" asp-route-id="@invoice.AddressId" class="link">@invoice.Address.Name</a><span>@invoice.Address.FullAddress</span></div></dd></div>
-    <div class="details__row"><dt>Service</dt><dd>@invoice.Service.Name</dd></div>
-    <div class="details__row"><dt>Invoice date</dt><dd>@Fmt.Date(invoice.InvoiceDate)</dd></div>
-    <div class="details__row"><dt>Billed period</dt><dd>@Fmt.Range(invoice.PeriodStart, invoice.PeriodEnd)</dd></div>
-    <div class="details__row"><dt>Total</dt><dd><strong>@Fmt.Money(invoice.TotalSum)</strong></dd></div>
+    <div class="details__row"><dt>@T["Address"]</dt><dd><div class="stack-cell"><a asp-controller="Addresses" asp-action="Details" asp-route-id="@invoice.AddressId" class="link">@invoice.Address.Name</a><span>@invoice.Address.FullAddress</span></div></dd></div>
+    <div class="details__row"><dt>@T["Service"]</dt><dd>@invoice.Service.Name</dd></div>
+    <div class="details__row"><dt>@T["Invoice date"]</dt><dd>@Fmt.Date(invoice.InvoiceDate)</dd></div>
+    <div class="details__row"><dt>@T["Billed period"]</dt><dd>@Fmt.Range(invoice.PeriodStart, invoice.PeriodEnd)</dd></div>
+    <div class="details__row"><dt>@T["Total"]</dt><dd><strong>@Fmt.Money(invoice.TotalSum)</strong></dd></div>
 </dl>
 
 <section class="section medium">
     <div class="section-head">
-        <h2 class="section-title">Who pays</h2>
-        <a asp-controller="AddressContacts" asp-action="Create" asp-route-addressId="@invoice.AddressId" asp-route-returnUrl="@(Context.Request.Path)" class="btn btn--ghost btn--sm"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add resident</a>
+        <h2 class="section-title">@T["Who pays"]</h2>
+        <a asp-controller="AddressContacts" asp-action="Create" asp-route-addressId="@invoice.AddressId" asp-route-returnUrl="@(Context.Request.Path)" class="btn btn--ghost btn--sm"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add resident"]</a>
     </div>
     @if (Model.Split.Any())
     {
-        <p class="secondary">Split equally between the residents living at @invoice.Address.Name on @Fmt.Date(invoice.InvoiceDate). Statement generation uses this split.</p>
+        <p class="secondary">@T["Split equally between the residents living at {0} on {1}. Statement generation uses this split.", invoice.Address.Name, Fmt.Date(invoice.InvoiceDate)]</p>
         <div class="card table-card">
             <table class="data-table">
-                <thead><tr><th>Resident</th><th class="num">Share</th></tr></thead>
+                <thead><tr><th>@T["Resident"]</th><th class="num">@T["Share"]</th></tr></thead>
                 <tbody>
                 @foreach (var share in Model.Split)
                 {
@@ -53,8 +53,8 @@
         <div class="alert alert--warning">
             <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
             <div class="alert__body">
-                <span class="alert__title">Nobody to bill</span>
-                <span>No residents lived at @invoice.Address.Name on @Fmt.Date(invoice.InvoiceDate), so statement generation will skip this invoice. Add a resident whose move-in date is on or before the invoice date.</span>
+                <span class="alert__title">@T["Nobody to bill"]</span>
+                <span>@T["No residents lived at {0} on {1}, so statement generation will skip this invoice. Add a resident whose move-in date is on or before the invoice date.", invoice.Address.Name, Fmt.Date(invoice.InvoiceDate)]</span>
             </div>
         </div>
     }
@@ -62,14 +62,14 @@
 
 <section class="section medium">
     <div class="section-head">
-        <h2 class="section-title">Statements</h2>
-        <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="btn btn--ghost btn--sm">@period.Label statements <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a>
+        <h2 class="section-title">@T["Statements"]</h2>
+        <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="btn btn--ghost btn--sm">@T["{0} statements", period.Label] <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a>
     </div>
     @if (Model.StatementLines.Any())
     {
         <div class="card table-card">
             <table class="data-table">
-                <thead><tr><th>Person</th><th>Month</th><th>Status</th><th class="num">Share</th></tr></thead>
+                <thead><tr><th>@T["Person"]</th><th>@T["Month"]</th><th>@T["Status"]</th><th class="num">@T["Share"]</th></tr></thead>
                 <tbody>
                 @foreach (var line in Model.StatementLines)
                 {
@@ -86,10 +86,10 @@
     }
     else
     {
-        <p class="secondary">Not included in any statement yet. Generate statements for @period.Label to bill it.</p>
+        <p class="secondary">@T["Not included in any statement yet. Generate statements for {0} to bill it.", period.Label]</p>
     }
 </section>
 
 <div class="actions">
-    <a asp-action="Index" class="btn btn--ghost">Back to invoices</a>
+    <a asp-action="Index" class="btn btn--ghost">@T["Back to invoices"]</a>
 </div>

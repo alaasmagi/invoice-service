@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Web.Helpers;
+using Web.Localization;
 using Web.Mapping;
 using Web.Models;
 using Web.Services;
@@ -96,10 +97,10 @@ public class MonthlyStatementsController(
         var userId = CurrentUserId();
         ClearServerManagedModelState(dto);
         ClearNavigationModelState(nameof(dto.Contact), nameof(dto.Lines));
-        if (!await context.Contacts.AnyAsync(e => e.Id == dto.ContactId && e.UserId == userId)) ModelState.AddModelError(nameof(dto.ContactId), "Selected person was not found.");
+        if (!await context.Contacts.AnyAsync(e => e.Id == dto.ContactId && e.UserId == userId)) ModelState.AddModelError(nameof(dto.ContactId), T["Selected person was not found."]);
         if (await context.MonthlyStatements.AnyAsync(e => e.UserId == userId && e.ContactId == dto.ContactId && e.Year == dto.Year && e.Month == dto.Month))
         {
-            ModelState.AddModelError(string.Empty, "This person already has a statement for that month. Edit the existing one instead.");
+            ModelState.AddModelError(string.Empty, T["This person already has a statement for that month. Edit the existing one instead."]);
         }
         if (!ModelState.IsValid)
         {
@@ -111,7 +112,7 @@ public class MonthlyStatementsController(
         entity.CreatedAt = DateTime.UtcNow;
         context.Add(entity);
         await context.SaveChangesAsync();
-        Flash("Statement created.");
+        Flash(T["Statement created."]);
         return RedirectToAction(nameof(Details), new { id = entity.Id });
     }
 
@@ -133,7 +134,7 @@ public class MonthlyStatementsController(
         var userId = CurrentUserId();
         ClearServerManagedModelState(dto);
         ClearNavigationModelState(nameof(dto.Contact), nameof(dto.Lines));
-        if (!await context.Contacts.AnyAsync(e => e.Id == dto.ContactId && e.UserId == userId)) ModelState.AddModelError(nameof(dto.ContactId), "Selected person was not found.");
+        if (!await context.Contacts.AnyAsync(e => e.Id == dto.ContactId && e.UserId == userId)) ModelState.AddModelError(nameof(dto.ContactId), T["Selected person was not found."]);
         if (!ModelState.IsValid)
         {
             await PopulateSelectLists(userId);
@@ -146,7 +147,7 @@ public class MonthlyStatementsController(
         entity.CreatedAt = existing.CreatedAt;
         context.Update(entity);
         await context.SaveChangesAsync();
-        Flash("Statement updated.");
+        Flash(T["Statement updated."]);
         return RedirectToAction(nameof(Details), new { id });
     }
 
@@ -159,8 +160,8 @@ public class MonthlyStatementsController(
 
         var consequences = new List<string>();
         var lineCount = await context.MonthlyStatementLines.CountAsync(e => e.UserId == userId && e.MonthlyStatementId == entity.Id);
-        if (lineCount > 0) consequences.Add($"Its {lineCount} invoice share line(s) will be removed. The invoices themselves stay.");
-        if (entity.Status == EMonthlyStatementStatus.Sent) consequences.Add($"It was already emailed to {entity.Contact.FullName}. Deleting it here doesn't recall that email.");
+        if (lineCount > 0) consequences.Add(T.Plural(lineCount, "Its {0} invoice share line will be removed. The invoice itself stays.", "Its {0} invoice share lines will be removed. The invoices themselves stay."));
+        if (entity.Status == EMonthlyStatementStatus.Sent) consequences.Add(T["It was already emailed to {0}. Deleting it here doesn't recall that email.", entity.Contact.FullName]);
 
         return View(new DeleteViewModel<MonthlyStatementDto> { Item = mapper.ToDto(entity), Consequences = consequences });
     }
@@ -176,7 +177,7 @@ public class MonthlyStatementsController(
         var period = new BillingPeriod(entity.Year, entity.Month);
         context.MonthlyStatements.Remove(entity);
         await context.SaveChangesAsync();
-        Flash("Statement deleted.");
+        Flash(T["Statement deleted."]);
         return RedirectToAction(nameof(Index), new { period = period.Key });
     }
 
@@ -190,7 +191,7 @@ public class MonthlyStatementsController(
     {
         if (month is < 1 or > 12 || year is < 2000 or > 2100)
         {
-            Flash("Choose a valid month to generate statements for.", "danger");
+            Flash(T["Choose a valid month to generate statements for."], "danger");
             return RedirectToAction(nameof(Index));
         }
 
@@ -200,18 +201,18 @@ public class MonthlyStatementsController(
         var overview = await periodOverviewService.GetAsync(period, userId);
         var skipped = overview.InvoicesWithoutResidents.Count;
         var skippedNote = skipped > 0
-            ? $" {skipped} invoice(s) were skipped because nobody lived at the address on the invoice date."
+            ? " " + T.Plural(skipped, "{0} invoice was skipped because nobody lived at the address on the invoice date.", "{0} invoices were skipped because nobody lived at the address on the invoice date.")
             : "";
 
         if (statements.Count == 0)
         {
             Flash(overview.Invoices.Count > 0
-                ? $"No statements were generated for {period.Label}.{skippedNote}"
-                : $"No invoices found for {period.Label}. Add or import invoices first.", "warning");
+                ? T["No statements were generated for {0}.", period.Label] + skippedNote
+                : T["No invoices found for {0}. Add or import invoices first.", period.Label], "warning");
         }
         else
         {
-            Flash($"Generated {statements.Count} statement(s) for {period.Label}, ready to send.{skippedNote}", skipped > 0 ? "warning" : "success");
+            Flash(T.Plural(statements.Count, "Generated {0} statement for {1}, ready to send.", "Generated {0} statements for {1}, ready to send.", period.Label) + skippedNote, skipped > 0 ? "warning" : "success");
         }
 
         return RedirectToAction(nameof(Index), new { period = period.Key });
@@ -235,19 +236,19 @@ public class MonthlyStatementsController(
             switch (statement?.Status)
             {
                 case EMonthlyStatementStatus.Sent:
-                    Flash($"Statement emailed to {statement.FullName}.");
+                    Flash(T["Statement emailed to {0}.", statement.FullName]);
                     break;
                 case EMonthlyStatementStatus.Failed:
-                    Flash($"The statement for {statement.FullName} couldn't be sent. Check the messaging (RabbitMQ) configuration and try again.", "danger");
+                    Flash(T["The statement for {0} couldn't be sent. Check the messaging (RabbitMQ) configuration and try again.", statement.FullName], "danger");
                     break;
                 default:
-                    Flash("Send action completed.", "info");
+                    Flash(T["Send action completed."], "info");
                     break;
             }
         }
         catch (Exception ex)
         {
-            Flash($"The statement couldn't be sent: {ex.Message}", "danger");
+            Flash(T["The statement couldn't be sent: {0}", ex.Message], "danger");
         }
 
         if (returnTo == nameof(Index))
@@ -270,15 +271,17 @@ public class MonthlyStatementsController(
 
         if (result.Total == 0)
         {
-            Flash($"There are no statements for {period.Label} to send.", "warning");
+            Flash(T["There are no statements for {0} to send.", period.Label], "warning");
         }
         else if (result.Failed > 0)
         {
-            Flash($"{period.Label}: sent {result.Published}, {result.Failed} failed, {result.Skipped} were already sent. Retry the failed ones from the list.", "danger");
+            Flash(T["{0}: sent {1}, {2} failed, {3} were already sent. Retry the failed ones from the list.", period.Label, result.Published, result.Failed, result.Skipped], "danger");
         }
         else
         {
-            Flash($"{period.Label}: sent {result.Published} statement(s)" + (result.Skipped > 0 ? $", {result.Skipped} were already sent." : "."));
+            Flash(result.Skipped > 0
+                ? T["{0}: sent {1}, {2} were already sent.", period.Label, result.Published, result.Skipped]
+                : T.Plural(result.Published, "{1}: sent {0} statement.", "{1}: sent {0} statements.", period.Label));
         }
 
         return RedirectToAction(nameof(Index), new { period = period.Key });

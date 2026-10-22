@@ -2,6 +2,7 @@ using DataAccess.Context;
 using DTO.DataAccess.Web.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Web.Localization;
 using Web.Mapping;
 using Web.Models;
 
@@ -64,7 +65,7 @@ public class AddressesController(AppDbContext context, WebDtoMapper mapper) : Us
         StampNew(entity, CurrentUserId());
         context.Add(entity);
         await context.SaveChangesAsync();
-        Flash($"Address \"{entity.Name}\" added. Next, add the people who live there.");
+        Flash(T["Address \"{0}\" added. Next, add the people who live there.", entity.Name]);
         return RedirectToLocalOr(returnUrl, nameof(Details), new { id = entity.Id });
     }
 
@@ -91,7 +92,7 @@ public class AddressesController(AppDbContext context, WebDtoMapper mapper) : Us
         StampExisting(entity, userId, existing);
         context.Update(entity);
         await context.SaveChangesAsync();
-        Flash("Address updated.");
+        Flash(T["Address updated."]);
         return RedirectToAction(nameof(Details), new { id });
     }
 
@@ -114,12 +115,12 @@ public class AddressesController(AppDbContext context, WebDtoMapper mapper) : Us
         {
             if (await context.MonthlyStatementLines.AnyAsync(e => e.UserId == userId && e.AddressId == id))
             {
-                Flash("This address appears on monthly statements and can't be deleted.", "danger");
+                Flash(T["This address appears on monthly statements and can't be deleted."], "danger");
                 return RedirectToAction(nameof(Delete), new { id });
             }
             context.Addresses.Remove(entity);
             await context.SaveChangesAsync();
-            Flash($"Address \"{entity.Name}\" deleted.");
+            Flash(T["Address \"{0}\" deleted.", entity.Name]);
         }
         return RedirectToAction(nameof(Index));
     }
@@ -133,14 +134,14 @@ public class AddressesController(AppDbContext context, WebDtoMapper mapper) : Us
         var residentCount = await context.AddressContacts.CountAsync(e => e.UserId == userId && e.AddressId == addressId);
 
         var consequences = new List<string>();
-        if (invoiceCount > 0) consequences.Add($"{invoiceCount} invoice(s) for this address will also be deleted.");
-        if (residentCount > 0) consequences.Add($"{residentCount} resident record(s) will also be deleted. The contacts themselves stay.");
+        if (invoiceCount > 0) consequences.Add(T.Plural(invoiceCount, "{0} invoice for this address will also be deleted.", "{0} invoices for this address will also be deleted."));
+        if (residentCount > 0) consequences.Add(T.Plural(residentCount, "{0} resident record will also be deleted. The contact itself stays.", "{0} resident records will also be deleted. The contacts themselves stay."));
 
         return new DeleteViewModel<AddressDto>
         {
             Item = dto,
             Blockers = statementCount > 0
-                ? [$"Invoices for this address are included in {statementCount} monthly statement(s). Delete those statements first, or keep the address for history."]
+                ? [T.Plural(statementCount, "Invoices for this address are included in {0} monthly statement. Delete that statement first, or keep the address for history.", "Invoices for this address are included in {0} monthly statements. Delete those statements first, or keep the address for history.")]
                 : [],
             Consequences = consequences
         };

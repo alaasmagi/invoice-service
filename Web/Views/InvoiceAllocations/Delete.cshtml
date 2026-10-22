@@ -1,28 +1,28 @@
 @model InvoiceAllocationDto
 @{
-    ViewData["Title"] = "Delete allocation";
+    ViewData["Title"] = T["Delete allocation"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Billing</p>
-        <h1>Delete allocation</h1>
+        <p class="kicker">@T["Billing"]</p>
+        <h1>@T["Delete allocation"]</h1>
     </div>
 </header>
 
 <div class="section medium">
     <div class="alert alert--danger" role="alert">
         <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
-        <div class="alert__body"><span class="alert__title">Delete this allocation?</span><span>This action cannot be undone.</span></div>
+        <div class="alert__body"><span class="alert__title">@T["Delete this allocation?"]</span><span>@T["This action cannot be undone."]</span></div>
     </div>
     <dl class="card details">
-    <div class="details__row"><dt>Invoice</dt><dd><div class="stack-cell"><a asp-controller="Invoices" asp-action="Details" asp-route-id="@Model.InvoiceId" class="link">@Fmt.Date(Model.Invoice.InvoiceDate)</a><span>@Model.Invoice.Address.Name</span></div></dd></div>
-    <div class="details__row"><dt>Contact</dt><dd>@Model.Contact.FullName</dd></div>
-    <div class="details__row"><dt>Amount</dt><dd>@Fmt.Money(Model.AllocatedSum)</dd></div>
+    <div class="details__row"><dt>@T["Invoice"]</dt><dd><div class="stack-cell"><a asp-controller="Invoices" asp-action="Details" asp-route-id="@Model.InvoiceId" class="link">@Fmt.Date(Model.Invoice.InvoiceDate)</a><span>@Model.Invoice.Address.Name</span></div></dd></div>
+    <div class="details__row"><dt>@T["Contact"]</dt><dd>@Model.Contact.FullName</dd></div>
+    <div class="details__row"><dt>@T["Amount"]</dt><dd>@Fmt.Money(Model.AllocatedSum)</dd></div>
 </dl>
     <form asp-action="Delete" method="post" class="form-actions">
         <input type="hidden" name="Id" value="@Model.Id" />
-        <button type="submit" class="btn btn--danger">Delete allocation</button>
-        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+        <button type="submit" class="btn btn--danger">@T["Delete allocation"]</button>
+        <a asp-action="Index" class="btn btn--ghost">@T["Cancel"]</a>
     </form>
 </div>

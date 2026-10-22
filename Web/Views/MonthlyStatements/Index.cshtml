@@ -1,6 +1,6 @@
 @model StatementsIndexViewModel
 @{
-    ViewData["Title"] = "Monthly statements";
+    ViewData["Title"] = T["Monthly statements"];
     var overview = Model.Overview;
     var statuses = Enum.GetValues<Domain.EMonthlyStatementStatus>();
     var groups = Model.Statements
@@ -11,21 +11,21 @@
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Billing</p>
-        <h1>Monthly statements</h1>
-        <p class="page-header__lede">Each person gets one statement per month with their share of every invoice at the addresses they live at.</p>
+        <p class="kicker">@T["Billing"]</p>
+        <h1>@T["Monthly statements"]</h1>
+        <p class="page-header__lede">@T["Each person gets one statement per month with their share of every invoice at the addresses they live at."]</p>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Create" class="btn btn--ghost"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Manual statement</a>
+        <a asp-action="Create" class="btn btn--ghost"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Manual statement"]</a>
     </div>
 </header>
 
-<form method="get" asp-action="Index" class="card filter-bar" role="search" aria-label="Filter statements">
+<form method="get" asp-action="Index" class="card filter-bar" role="search" aria-label="@T["Filter statements"]">
     <div class="field">
-        <label for="filterPeriod" class="field__label">Month</label>
+        <label for="filterPeriod" class="field__label">@T["Month"]</label>
         <div class="field__control">
             <select id="filterPeriod" name="period" class="input" data-autosubmit>
-                <option value="all" selected="@(Model.Period == null)">All months</option>
+                <option value="all" selected="@(Model.Period == null)">@T["All months"]</option>
                 @foreach (var option in Model.PeriodOptions)
                 {
                     <option value="@option.Key" selected="@(option == Model.Period)">@option.Label</option>
@@ -35,10 +35,10 @@
         </div>
     </div>
     <div class="field">
-        <label for="filterStatus" class="field__label">Status</label>
+        <label for="filterStatus" class="field__label">@T["Status"]</label>
         <div class="field__control">
             <select id="filterStatus" name="status" class="input" data-autosubmit>
-                <option value="">Any status</option>
+                <option value="">@T["Any status"]</option>
                 @foreach (var s in statuses)
                 {
                     <option value="@s" selected="@(s.ToString() == Model.Status)">@Fmt.StatusLabel(s)</option>
@@ -47,31 +47,31 @@
             <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
         </div>
     </div>
-    <noscript><button type="submit" class="btn btn--secondary">Apply</button></noscript>
+    <noscript><button type="submit" class="btn btn--secondary">@T["Apply"]</button></noscript>
 </form>
 
 @if (overview != null)
 {
     var period = overview.Period;
-    var generateLabel = overview.Statements.Any() ? "Regenerate" : "Generate statements";
+    var generateLabel = overview.Statements.Any() ? T["Regenerate"] : T["Generate statements"];
     var generateConfirm = overview.SentCount > 0
-        ? $"{overview.SentCount} statement(s) for {period.Label} were already sent. Regenerating recalculates every statement for the month and marks them all \"Ready to send\" again, so they would be emailed again on the next \"Send all\"."
-        : $"This recalculates the statements for {period.Label} from {overview.Invoices.Count} invoice(s) and the residents on each invoice date.";
+        ? T.Plural(overview.SentCount, "{0} statement for {1} was already sent. Regenerating recalculates every statement for the month and marks them all \"Ready to send\" again, so it would be emailed again on the next \"Send all\".", "{0} statements for {1} were already sent. Regenerating recalculates every statement for the month and marks them all \"Ready to send\" again, so they would be emailed again on the next \"Send all\".", period.Label)
+        : T.Plural(overview.Invoices.Count, "This recalculates the statements for {1} from {0} invoice and the residents on each invoice date.", "This recalculates the statements for {1} from {0} invoices and the residents on each invoice date.", period.Label);
 
-    <section class="card period-summary" aria-label="@period.Label summary">
+    <section class="card period-summary" aria-label="@T["{0} summary", period.Label]">
         <div class="period-summary__facts">
-            <div class="fact"><span class="fact__label">Invoices</span><span class="fact__value">@overview.Invoices.Count <small>@Fmt.Money(overview.InvoiceTotal)</small></span></div>
-            <div class="fact"><span class="fact__label">Statements</span><span class="fact__value">@overview.Statements.Count <small>@Fmt.Money(overview.StatementTotal)</small></span></div>
-            <div class="fact"><span class="fact__label">Sent</span><span class="fact__value">@overview.SentCount / @overview.Statements.Count</span></div>
+            <div class="fact"><span class="fact__label">@T["Invoices"]</span><span class="fact__value">@overview.Invoices.Count <small>@Fmt.Money(overview.InvoiceTotal)</small></span></div>
+            <div class="fact"><span class="fact__label">@T["Statements"]</span><span class="fact__value">@overview.Statements.Count <small>@Fmt.Money(overview.StatementTotal)</small></span></div>
+            <div class="fact"><span class="fact__label">@T["Sent"]</span><span class="fact__value">@overview.SentCount / @overview.Statements.Count</span></div>
             @if (overview.FailedCount > 0)
             {
-                <div class="fact"><span class="fact__label">Failed</span><span class="fact__value fact__value--danger">@overview.FailedCount</span></div>
+                <div class="fact"><span class="fact__label">@T["Failed"]</span><span class="fact__value fact__value--danger">@overview.FailedCount</span></div>
             }
         </div>
         <div class="actions">
             @if (overview.Invoices.Any())
             {
-                <form asp-action="Generate" method="post" data-confirm="@(overview.Statements.Any() ? generateConfirm : null)" data-confirm-title="Regenerate @period.Label?" data-confirm-action="Regenerate" data-confirm-tone="@(overview.SentCount > 0 ? "danger" : null)">
+                <form asp-action="Generate" method="post" data-confirm="@(overview.Statements.Any() ? generateConfirm.Value : null)" data-confirm-title="@T["Regenerate {0}?", period.Label]" data-confirm-action="@T["Regenerate"]" data-confirm-tone="@(overview.SentCount > 0 ? "danger" : null)">
                     <input type="hidden" name="year" value="@period.Year" />
                     <input type="hidden" name="month" value="@period.Month" />
                     <button type="submit" class="btn @(overview.NeedsGeneration ? "btn--primary" : "btn--secondary")"><svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>@generateLabel</button>
@@ -80,11 +80,11 @@
             @if (overview.UnsentCount > 0)
             {
                 <form asp-action="SendPeriod" method="post"
-                      data-confirm="@($"{overview.UnsentCount} statement(s) totalling {Fmt.Money(overview.UnsentTotal)} will be emailed to the recipients. Already sent statements are skipped.")"
-                      data-confirm-title="Send @period.Label statements?" data-confirm-action="Send @overview.UnsentCount">
+                      data-confirm="@T.Plural(overview.UnsentCount, "{0} statement totalling {1} will be emailed to the recipient. Already sent statements are skipped.", "{0} statements totalling {1} will be emailed to the recipients. Already sent statements are skipped.", Fmt.Money(overview.UnsentTotal))"
+                      data-confirm-title="@T["Send {0} statements?", period.Label]" data-confirm-action="@T["Send {0}", overview.UnsentCount]">
                     <input type="hidden" name="year" value="@period.Year" />
                     <input type="hidden" name="month" value="@period.Month" />
-                    <button type="submit" class="btn @(overview.NeedsGeneration ? "btn--secondary" : "btn--primary")"><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg>Send @overview.UnsentCount unsent</button>
+                    <button type="submit" class="btn @(overview.NeedsGeneration ? "btn--secondary" : "btn--primary")"><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg>@T["Send {0} unsent", overview.UnsentCount]</button>
                 </form>
             }
         </div>
@@ -95,8 +95,8 @@
         <div class="alert alert--warning">
             <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
             <div class="alert__body">
-                <span class="alert__title">Statements are out of date</span>
-                <span>@overview.PendingInvoiceCount invoice(s) were added or changed after these statements were generated. Regenerate before sending.</span>
+                <span class="alert__title">@T["Statements are out of date"]</span>
+                <span>@T.Plural(overview.PendingInvoiceCount, "{0} invoice was added or changed after these statements were generated. Regenerate before sending.", "{0} invoices were added or changed after these statements were generated. Regenerate before sending.")</span>
             </div>
         </div>
     }
@@ -105,11 +105,11 @@
         <div class="alert alert--warning">
             <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
             <div class="alert__body">
-                <span class="alert__title">@overview.InvoicesWithoutResidents.Count invoice(s) have nobody to bill</span>
+                <span class="alert__title">@T.Plural(overview.InvoicesWithoutResidents.Count, "{0} invoice has nobody to bill", "{0} invoices have nobody to bill")</span>
                 <ul>
                     @foreach (var invoice in overview.InvoicesWithoutResidents)
                     {
-                        <li><a asp-controller="Invoices" asp-action="Details" asp-route-id="@invoice.Id" class="link">@invoice.Service.Name · @invoice.Address.Name (@Fmt.Date(invoice.InvoiceDate))</a>: no resident lived there on the invoice date.</li>
+                        <li><a asp-controller="Invoices" asp-action="Details" asp-route-id="@invoice.Id" class="link">@invoice.Service.Name · @invoice.Address.Name (@Fmt.Date(invoice.InvoiceDate))</a>@T[": no resident lived there on the invoice date."]</li>
                     }
                 </ul>
             </div>
@@ -119,13 +119,13 @@
 
 <div class="card table-card">
     <table class="data-table">
-        <thead><tr><th>Person</th><th>Month</th><th class="num">Total</th><th>Status</th><th>Sent at</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <thead><tr><th>@T["Person"]</th><th>@T["Month"]</th><th class="num">@T["Total"]</th><th>@T["Status"]</th><th>@T["Sent at"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
         <tbody>
         @foreach (var group in groups)
         {
             if (Model.Period == null)
             {
-                <tr class="group-row"><td colspan="2">@group.Key.Label · @group.Count(e => e.Status == Domain.EMonthlyStatementStatus.Sent) of @group.Count() sent</td><td class="num">@Fmt.Money(group.Sum(e => e.TotalSum))</td><td colspan="3"></td></tr>
+                <tr class="group-row"><td colspan="2">@group.Key.Label · @T["{0} of {1} sent", group.Count(e => e.Status == Domain.EMonthlyStatementStatus.Sent), group.Count()]</td><td class="num">@Fmt.Money(group.Sum(e => e.TotalSum))</td><td colspan="3"></td></tr>
             }
             foreach (var item in group)
             {
@@ -139,13 +139,13 @@
                     <td class="actions-col">
                         <div class="row-actions">
                             <form asp-action="Send" asp-route-id="@item.Id" method="post"
-                                  data-confirm="@($"Email the {group.Key.Label} statement ({Fmt.Money(item.TotalSum)}) to {item.Contact.FullName} <{item.Contact.Email}>?" + (isSent ? " It was already sent once." : ""))"
-                                  data-confirm-title="@(isSent ? "Send again?" : "Send statement?")" data-confirm-action="@(isSent ? "Send again" : "Send")">
+                                  data-confirm="@(T["Email the {0} statement ({1}) to {2} <{3}>?", group.Key.Label, Fmt.Money(item.TotalSum), item.Contact.FullName, item.Contact.Email] + (isSent ? " " + T["It was already sent once."] : ""))"
+                                  data-confirm-title="@(isSent ? T["Send again?"] : T["Send statement?"])" data-confirm-action="@(isSent ? T["Send again"] : T["Send"])">
                                 <input type="hidden" name="returnTo" value="Index" />
-                                <button type="submit" class="btn @(isSent ? "btn--ghost" : "btn--secondary") btn--sm">@(isSent ? "Resend" : "Send")</button>
+                                <button type="submit" class="btn @(isSent ? "btn--ghost" : "btn--secondary") btn--sm">@(isSent ? T["Resend"] : T["Send"])</button>
                             </form>
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
-                            <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="@T["Edit"]" title="@T["Edit"]"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="@T["Delete"]" title="@T["Delete"]"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
                         </div>
                     </td>
                 </tr>
@@ -156,19 +156,19 @@
             <tr><td colspan="6" class="empty">
                 @if (Model.Status != null)
                 {
-                    <span>No statements with this status. <a asp-action="Index" asp-route-period="@(Model.Period?.Key ?? "all")" class="link">Show all statuses</a></span>
+                    <span>@T["No statements with this status."] <a asp-action="Index" asp-route-period="@(Model.Period?.Key ?? "all")" class="link">@T["Show all statuses"]</a></span>
                 }
                 else if (overview != null && overview.Invoices.Any())
                 {
-                    <span>No statements for @overview.Period.Label yet. Use <strong>Generate statements</strong> above.</span>
+                    <span>@T["No statements for {0} yet. Use Generate statements above.", overview.Period.Label]</span>
                 }
                 else if (overview != null)
                 {
-                    <span>No invoices for @overview.Period.Label yet. <a asp-controller="Invoices" asp-action="Create" class="link">Add an invoice</a> or <a asp-controller="InvoiceImports" asp-action="Upload" class="link">import a PDF</a> first.</span>
+                    <span>@T["No invoices for {0} yet.", overview.Period.Label] <a asp-controller="Invoices" asp-action="Create" class="link">@T["Add an invoice"]</a> @T["or"] <a asp-controller="InvoiceImports" asp-action="Upload" class="link">@T["import a PDF"]</a> @T["first."]</span>
                 }
                 else
                 {
-                    <span>No statements yet.</span>
+                    <span>@T["No statements yet."]</span>
                 }
             </td></tr>
         }

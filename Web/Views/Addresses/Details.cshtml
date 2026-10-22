@@ -8,25 +8,25 @@
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Address</p>
+        <p class="kicker">@T["Address"]</p>
         <h1>@address.Name</h1>
         <p class="page-header__lede">@address.FullAddress</p>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Edit" asp-route-id="@address.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>Edit</a>
-        <a asp-action="Delete" asp-route-id="@address.Id" class="btn btn--ghost"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>Delete</a>
+        <a asp-action="Edit" asp-route-id="@address.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>@T["Edit"]</a>
+        <a asp-action="Delete" asp-route-id="@address.Id" class="btn btn--ghost"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>@T["Delete"]</a>
     </div>
 </header>
 
 <section class="section medium">
     <div class="section-head">
-        <h2 class="section-title">Residents</h2>
-        <a asp-controller="AddressContacts" asp-action="Create" asp-route-addressId="@address.Id" asp-route-returnUrl="@here" class="btn btn--secondary btn--sm"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add resident</a>
+        <h2 class="section-title">@T["Residents"]</h2>
+        <a asp-controller="AddressContacts" asp-action="Create" asp-route-addressId="@address.Id" asp-route-returnUrl="@here" class="btn btn--secondary btn--sm"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add resident"]</a>
     </div>
-    <p class="secondary">Invoices for this address are split equally between the people living here on the invoice date.</p>
+    <p class="secondary">@T["Invoices for this address are split equally between the people living here on the invoice date."]</p>
     <div class="card table-card">
         <table class="data-table">
-            <thead><tr><th>Person</th><th>Moved in</th><th>Moved out</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+            <thead><tr><th>@T["Person"]</th><th>@T["Moved in"]</th><th>@T["Moved out"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
             <tbody>
             @foreach (var resident in Model.Residents)
             {
@@ -34,15 +34,15 @@
                 <tr>
                     <td><div class="stack-cell"><a asp-controller="Contacts" asp-action="Details" asp-route-id="@resident.ContactId" class="link">@resident.Contact.FullName</a><span>@resident.Contact.Email</span></div></td>
                     <td class="nowrap">@Fmt.Date(resident.StartDate)</td>
-                    <td class="nowrap">@if (resident.EndDate == null) { <span class="badge badge--success">Lives here</span> } else { <span class="@(current ? null : "secondary")">@Fmt.Date(resident.EndDate)</span> }</td>
+                    <td class="nowrap">@if (resident.EndDate == null) { <span class="badge badge--success">@T["Lives here"]</span> } else { <span class="@(current ? null : "secondary")">@Fmt.Date(resident.EndDate)</span> }</td>
                     <td class="actions-col"><div class="row-actions">
-                        <a asp-controller="AddressContacts" asp-action="Edit" asp-route-id="@resident.Id" asp-route-returnUrl="@here" class="btn btn--ghost btn--sm">@(resident.EndDate == null ? "Set move-out" : "Edit")</a>
+                        <a asp-controller="AddressContacts" asp-action="Edit" asp-route-id="@resident.Id" asp-route-returnUrl="@here" class="btn btn--ghost btn--sm">@(resident.EndDate == null ? T["Set move-out"] : T["Edit"])</a>
                     </div></td>
                 </tr>
             }
             @if (!Model.Residents.Any())
             {
-                <tr><td colspan="4" class="empty">Nobody lives here yet, so invoices for this address can't be billed. <a asp-controller="AddressContacts" asp-action="Create" asp-route-addressId="@address.Id" asp-route-returnUrl="@here" class="link">Add a resident</a>.</td></tr>
+                <tr><td colspan="4" class="empty">@T["Nobody lives here yet, so invoices for this address can't be billed."] <a asp-controller="AddressContacts" asp-action="Create" asp-route-addressId="@address.Id" asp-route-returnUrl="@here" class="link">@T["Add a resident"]</a>.</td></tr>
             }
             </tbody>
         </table>
@@ -51,18 +51,18 @@
 
 <section class="section medium">
     <div class="section-head">
-        <h2 class="section-title">Recent invoices</h2>
+        <h2 class="section-title">@T["Recent invoices"]</h2>
         <div class="actions">
             @if (Model.InvoiceCount > Model.RecentInvoices.Count)
             {
-                <a asp-controller="Invoices" asp-action="Index" asp-route-addressId="@address.Id" class="btn btn--ghost btn--sm">All @Model.InvoiceCount invoices</a>
+                <a asp-controller="Invoices" asp-action="Index" asp-route-addressId="@address.Id" class="btn btn--ghost btn--sm">@T["All {0} invoices", Model.InvoiceCount]</a>
             }
-            <a asp-controller="Invoices" asp-action="Create" asp-route-addressId="@address.Id" class="btn btn--secondary btn--sm"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add invoice</a>
+            <a asp-controller="Invoices" asp-action="Create" asp-route-addressId="@address.Id" class="btn btn--secondary btn--sm"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add invoice"]</a>
         </div>
     </div>
     <div class="card table-card">
         <table class="data-table">
-            <thead><tr><th>Date</th><th>Service</th><th>Billed period</th><th class="num">Total</th></tr></thead>
+            <thead><tr><th>@T["Date"]</th><th>@T["Service"]</th><th>@T["Billed period"]</th><th class="num">@T["Total"]</th></tr></thead>
             <tbody>
             @foreach (var invoice in Model.RecentInvoices)
             {
@@ -75,7 +75,7 @@
             }
             @if (!Model.RecentInvoices.Any())
             {
-                <tr><td colspan="4" class="empty">No invoices for this address yet.</td></tr>
+                <tr><td colspan="4" class="empty">@T["No invoices for this address yet."]</td></tr>
             }
             </tbody>
         </table>
@@ -83,5 +83,5 @@
 </section>
 
 <div class="actions">
-    <a asp-action="Index" class="btn btn--ghost">Back to addresses</a>
+    <a asp-action="Index" class="btn btn--ghost">@T["Back to addresses"]</a>
 </div>

@@ -6,18 +6,18 @@
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Service</p>
+        <p class="kicker">@T["Service"]</p>
         <h1>@Model.Name</h1>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>Edit</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>@T["Edit"]</a>
     </div>
 </header>
 
 <div class="section medium">
     <dl class="card details">
-        <div class="details__row"><dt>Name</dt><dd>@Model.Name</dd></div>
-        <div class="details__row"><dt>Invoices</dt><dd><a asp-controller="Invoices" asp-action="Index" asp-route-serviceId="@Model.Id" class="link">@invoiceCount invoice(s)</a></dd></div>
+        <div class="details__row"><dt>@T["Name"]</dt><dd>@Model.Name</dd></div>
+        <div class="details__row"><dt>@T["Invoices"]</dt><dd><a asp-controller="Invoices" asp-action="Index" asp-route-serviceId="@Model.Id" class="link">@T.Plural(invoiceCount, "{0} invoice", "{0} invoices")</a></dd></div>
     </dl>
-    <div><a asp-action="Index" class="btn btn--ghost">Back to services</a></div>
+    <div><a asp-action="Index" class="btn btn--ghost">@T["Back to services"]</a></div>
 </div>

@@ -1,13 +1,13 @@
 @model MonthlyStatementDto
 @{
-    ViewData["Title"] = "Manual statement";
+    ViewData["Title"] = T["Manual statement"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Billing</p>
-        <h1>Manual statement</h1>
-        <p class="page-header__lede">Usually statements are generated from invoices on the <a asp-action="Index" class="link">statements page</a>. Create one by hand only for special cases. It won't have invoice lines.</p>
+        <p class="kicker">@T["Billing"]</p>
+        <h1>@T["Manual statement"]</h1>
+        <p class="page-header__lede">@T["Usually statements are generated from invoices on the"] <a asp-action="Index" class="link">@T["statements page"]</a>@T[". Create one by hand only for special cases. It won't have invoice lines."]</p>
     </div>
 </header>
 
@@ -15,25 +15,25 @@
     <div asp-validation-summary="ModelOnly"></div>
     <div class="field">
         <label asp-for="ContactId" class="field__label"></label>
-        <div class="field__control"><select asp-for="ContactId" class="input" asp-items="ViewBag.ContactId"><option value="">Select person…</option></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+        <div class="field__control"><select asp-for="ContactId" class="input" asp-items="ViewBag.ContactId"><option value="">@T["Select person…"]</option></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
         <span asp-validation-for="ContactId"></span>
     </div>
     <div class="form-row">
         <div class="field">
             <label asp-for="Year" class="field__label"></label>
-            <input asp-for="Year" class="input" type="number" min="2000" max="2100" placeholder="e.g. 2026" />
+            <input asp-for="Year" class="input" type="number" min="2000" max="2100" placeholder="@T["e.g. 2026"]" />
             <span asp-validation-for="Year"></span>
         </div>
         <div class="field">
             <label asp-for="Month" class="field__label"></label>
-            <div class="field__control"><select asp-for="Month" class="input" asp-items="Enumerable.Range(1, 12).Select(m => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(Fmt.MonthName(m), m.ToString()))"></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+            <div class="field__control"><select asp-for="Month" class="input" asp-items="Fmt.MonthOptions()"></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
             <span asp-validation-for="Month"></span>
         </div>
     </div>
     <div class="form-row">
         <div class="field">
             <label asp-for="TotalSum" class="field__label"></label>
-            <input asp-for="TotalSum" class="input" type="number" step="0.01" placeholder="e.g. 76.08" />
+            <input asp-for="TotalSum" class="input" type="number" step="0.01" value="@Formatter.InputNumber(Model.TotalSum)" placeholder="@T["e.g. 76.08"]" />
             <span asp-validation-for="TotalSum"></span>
         </div>
         <div class="field">
@@ -43,8 +43,8 @@
         </div>
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn--primary">Create statement</button>
-        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+        <button type="submit" class="btn btn--primary">@T["Create statement"]</button>
+        <a asp-action="Index" class="btn btn--ghost">@T["Cancel"]</a>
     </div>
 </form>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

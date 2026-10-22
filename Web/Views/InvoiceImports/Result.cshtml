@@ -1,16 +1,16 @@
 @model Contracts.Application.PdfInvoiceImportResult
 @{
-    ViewData["Title"] = "PDF import result";
+    ViewData["Title"] = T["PDF import result"];
     var periods = Model.CreatedInvoices.Select(e => BillingPeriod.From(e.InvoiceDate)).Distinct().OrderDescending().ToList();
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Billing</p>
-        <h1>PDF import result</h1>
+        <p class="kicker">@T["Billing"]</p>
+        <h1>@T["PDF import result"]</h1>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Upload" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>Import another PDF</a>
+        <a asp-action="Upload" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>@T["Import another PDF"]</a>
     </div>
 </header>
 
@@ -19,7 +19,7 @@
     <div class="alert alert--danger" role="alert">
         <svg class="icon" aria-hidden="true"><use href="#i-circle-x"></use></svg>
         <div class="alert__body">
-            <span class="alert__title">Import failed.</span>
+            <span class="alert__title">@T["Import failed."]</span>
             <ul>
                 @foreach (var error in Model.FatalErrors)
                 {
@@ -33,21 +33,21 @@ else
 {
     <div class="alert alert--success" role="status">
         <svg class="icon" aria-hidden="true"><use href="#i-circle-check"></use></svg>
-        <div class="alert__body">Imported @Model.CreatedInvoices.Count invoice(s) from @Model.ProviderName, @Fmt.Money(Model.CreatedInvoices.Sum(e => e.TotalSum)) in total.</div>
+        <div class="alert__body">@T.Plural(Model.CreatedInvoices.Count, "Imported {0} invoice from {1}, {2} in total.", "Imported {0} invoices from {1}, {2} in total.", Model.ProviderName ?? "", Fmt.Money(Model.CreatedInvoices.Sum(e => e.TotalSum)))</div>
     </div>
 
     @if (periods.Any())
     {
         <section class="card next-step">
             <div class="next-step__copy">
-                <span class="kicker">Next step</span>
-                <h2 class="next-step__title">Review the invoices, then generate statements</h2>
-                <p>Check the amounts below. When every invoice for the month is in, generate the statements so they can be sent.</p>
+                <span class="kicker">@T["Next step"]</span>
+                <h2 class="next-step__title">@T["Review the invoices, then generate statements"]</h2>
+                <p>@T["Check the amounts below. When every invoice for the month is in, generate the statements so they can be sent."]</p>
             </div>
             <div class="actions">
                 @foreach (var period in periods)
                 {
-                    <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="btn btn--primary">@period.Label statements <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a>
+                    <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="btn btn--primary">@T["{0} statements", period.Label] <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a>
                 }
             </div>
         </section>
@@ -59,7 +59,7 @@ else
     <div class="alert alert--warning">
         <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
         <div class="alert__body">
-            <span class="alert__title">Warnings</span>
+            <span class="alert__title">@T["Warnings"]</span>
             <ul>
                 @foreach (var warning in Model.Warnings)
                 {
@@ -73,10 +73,10 @@ else
 @if (Model.CreatedInvoices.Count > 0)
 {
     <section class="section">
-        <h2 class="section-title">Created invoices</h2>
+        <h2 class="section-title">@T["Created invoices"]</h2>
         <div class="card table-card">
             <table class="data-table">
-                <thead><tr><th>Date</th><th>Address</th><th>Service</th><th>Period</th><th class="num">Total</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+                <thead><tr><th>@T["Date"]</th><th>@T["Address"]</th><th>@T["Service"]</th><th>@T["Period"]</th><th class="num">@T["Total"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
                 <tbody>
                 @foreach (var invoice in Model.CreatedInvoices)
                 {
@@ -86,7 +86,7 @@ else
                         <td>@invoice.ServiceName</td>
                         <td class="nowrap secondary">@Fmt.Range(invoice.PeriodStart, invoice.PeriodEnd)</td>
                         <td class="num">@Fmt.Money(invoice.TotalSum)</td>
-                        <td class="actions-col"><a asp-controller="Invoices" asp-action="Details" asp-route-id="@invoice.InvoiceId" class="btn btn--ghost btn--sm">Details</a></td>
+                        <td class="actions-col"><a asp-controller="Invoices" asp-action="Details" asp-route-id="@invoice.InvoiceId" class="btn btn--ghost btn--sm">@T["Details"]</a></td>
                     </tr>
                 }
                 </tbody>
@@ -98,10 +98,10 @@ else
 @if (Model.SkippedRows.Count > 0)
 {
     <section class="section">
-        <h2 class="section-title">Skipped rows</h2>
+        <h2 class="section-title">@T["Skipped rows"]</h2>
         <div class="card table-card">
             <table class="data-table">
-                <thead><tr><th>Address text</th><th class="num">Amount</th><th>Reason</th><th>Source</th></tr></thead>
+                <thead><tr><th>@T["Address text"]</th><th class="num">@T["Amount"]</th><th>@T["Reason"]</th><th>@T["Source"]</th></tr></thead>
                 <tbody>
                 @foreach (var row in Model.SkippedRows)
                 {
@@ -119,5 +119,5 @@ else
 }
 
 <div class="actions">
-    <a asp-controller="Invoices" asp-action="Index" class="btn btn--ghost">Back to invoices</a>
+    <a asp-controller="Invoices" asp-action="Index" class="btn btn--ghost">@T["Back to invoices"]</a>
 </div>

@@ -2,12 +2,24 @@ using System.Security.Claims;
 using Base.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using Web.Helpers;
+using Web.Localization;
 
 namespace Web.Controllers;
 
 [Authorize]
 public abstract class UserScopedControllerBase : Controller
 {
+    private IStringLocalizer<SharedResource>? _t;
+    private Formatter? _fmt;
+
+    /// <summary>Translations for messages shown to the user (keys are the English texts).</summary>
+    protected IStringLocalizer<SharedResource> T => _t ??= HttpContext.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
+
+    /// <summary>The current user's number, date and currency formatting.</summary>
+    protected Formatter Fmt => _fmt ??= HttpContext.RequestServices.GetRequiredService<Formatter>();
+
     protected Guid CurrentUserId()
     {
         var rawUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);

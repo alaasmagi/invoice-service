@@ -15,7 +15,10 @@ public class AppUserEntityMapper : IMapper<AppUser, AppUserEntity>
             Username = entity.Username,
             FullName = entity.FullName,
             Locale = entity.Locale,
-            BankIban = entity.BankIban
+            BankIban = entity.BankIban,
+            FormatCulture = entity.FormatCulture,
+            Currency = entity.Currency,
+            TimeZone = entity.TimeZone
         };
     }
 
@@ -33,7 +36,10 @@ public class AppUserEntityMapper : IMapper<AppUser, AppUserEntity>
             Username = entity.Username,
             FullName = entity.FullName,
             Locale = entity.Locale,
-            BankIban = entity.BankIban
+            BankIban = entity.BankIban,
+            FormatCulture = entity.FormatCulture,
+            Currency = entity.Currency,
+            TimeZone = entity.TimeZone
         };
     }
 

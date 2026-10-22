@@ -1,23 +1,23 @@
 @model InvoiceAllocationDto
 @{
-    ViewData["Title"] = "Allocation details";
+    ViewData["Title"] = T["Allocation details"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Billing</p>
-        <h1>Allocation details</h1>
+        <p class="kicker">@T["Billing"]</p>
+        <h1>@T["Allocation details"]</h1>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>Edit</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>@T["Edit"]</a>
     </div>
 </header>
 
 <div class="section medium">
     <dl class="card details">
-    <div class="details__row"><dt>Invoice</dt><dd><div class="stack-cell"><a asp-controller="Invoices" asp-action="Details" asp-route-id="@Model.InvoiceId" class="link">@Fmt.Date(Model.Invoice.InvoiceDate)</a><span>@Model.Invoice.Address.Name</span></div></dd></div>
-    <div class="details__row"><dt>Contact</dt><dd>@Model.Contact.FullName</dd></div>
-    <div class="details__row"><dt>Amount</dt><dd>@Fmt.Money(Model.AllocatedSum)</dd></div>
+    <div class="details__row"><dt>@T["Invoice"]</dt><dd><div class="stack-cell"><a asp-controller="Invoices" asp-action="Details" asp-route-id="@Model.InvoiceId" class="link">@Fmt.Date(Model.Invoice.InvoiceDate)</a><span>@Model.Invoice.Address.Name</span></div></dd></div>
+    <div class="details__row"><dt>@T["Contact"]</dt><dd>@Model.Contact.FullName</dd></div>
+    <div class="details__row"><dt>@T["Amount"]</dt><dd>@Fmt.Money(Model.AllocatedSum)</dd></div>
 </dl>
-    <div><a asp-action="Index" class="btn btn--ghost">Back to allocations</a></div>
+    <div><a asp-action="Index" class="btn btn--ghost">@T["Back to allocations"]</a></div>
 </div>

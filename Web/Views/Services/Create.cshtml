@@ -1,12 +1,12 @@
 @model ServiceDto
 @{
-    ViewData["Title"] = "Add service";
+    ViewData["Title"] = T["Add service"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Directory</p>
-        <h1>Add service</h1>
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Add service"]</h1>
     </div>
 </header>
 
@@ -15,12 +15,12 @@
     <div asp-validation-summary="ModelOnly"></div>
     <div class="field">
         <label asp-for="Name" class="field__label"></label>
-        <input asp-for="Name" class="input" placeholder="e.g. Enefit electricity" />
+        <input asp-for="Name" class="input" placeholder="@T["e.g. Enefit electricity"]" />
         <span asp-validation-for="Name"></span>
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn--primary">Save service</button>
-        <a href="@Url.LocalOr(ViewData["ReturnUrl"] as string, Url.Action("Index"))" class="btn btn--ghost">Cancel</a>
+        <button type="submit" class="btn btn--primary">@T["Save service"]</button>
+        <a href="@Url.LocalOr(ViewData["ReturnUrl"] as string, Url.Action("Index"))" class="btn btn--ghost">@T["Cancel"]</a>
     </div>
 </form>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

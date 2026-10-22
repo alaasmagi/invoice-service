@@ -1,27 +1,27 @@
 @model DeleteViewModel<AddressDto>
 @{
-    ViewData["Title"] = "Delete address";
+    ViewData["Title"] = T["Delete address"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Directory</p>
-        <h1>Delete address</h1>
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Delete address"]</h1>
     </div>
 </header>
 
 <div class="section medium">
-    <partial name="_DeleteNotice" model='Model.Notice("address")' />
+    <partial name="_DeleteNotice" model='Model.Notice(T["address"])' />
     <dl class="card details">
-        <div class="details__row"><dt>Name</dt><dd>@Model.Item.Name</dd></div>
-        <div class="details__row"><dt>Full address</dt><dd>@Model.Item.FullAddress</dd></div>
+        <div class="details__row"><dt>@T["Name"]</dt><dd>@Model.Item.Name</dd></div>
+        <div class="details__row"><dt>@T["Full address"]</dt><dd>@Model.Item.FullAddress</dd></div>
     </dl>
     <form asp-action="Delete" method="post" class="form-actions">
         <input type="hidden" name="Id" value="@Model.Item.Id" />
         @if (!Model.Blockers.Any())
         {
-            <button type="submit" class="btn btn--danger">Delete address</button>
+            <button type="submit" class="btn btn--danger">@T["Delete address"]</button>
         }
-        <a asp-action="Details" asp-route-id="@Model.Item.Id" class="btn btn--ghost">Cancel</a>
+        <a asp-action="Details" asp-route-id="@Model.Item.Id" class="btn btn--ghost">@T["Cancel"]</a>
     </form>
 </div>

@@ -3,12 +3,12 @@
     string? Current(params string[] controllers) => controllers.Contains(currentController) ? "page" : null;
 }
 <!DOCTYPE html>
-<html lang="en" data-theme="dark" data-bs-theme="dark">
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" data-theme="dark" data-bs-theme="dark">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="color-scheme" content="dark light"/>
-    <title>@ViewData["Title"] - Invoice Service</title>
+    <title>@ViewData["Title"] - @T["Invoice Service"]</title>
     <script>
         (() => {
             const storageKey = "invoice-service-theme";
@@ -40,44 +40,44 @@
         <div class="sidebar__top">
             <a class="brand" asp-area="" asp-controller="Home" asp-action="Index">
                 <span class="brand__mark" aria-hidden="true">IS</span>
-                <span>Invoice Service</span>
+                <span>@T["Invoice Service"]</span>
             </a>
-            <button class="icon-btn menu-button" type="button" aria-controls="mainNavigation" aria-expanded="false" aria-label="Toggle navigation" data-menu-toggle>
+            <button class="icon-btn menu-button" type="button" aria-controls="mainNavigation" aria-expanded="false" aria-label="@T["Toggle navigation"]" data-menu-toggle>
                 <svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg>
             </button>
         </div>
 
-        <nav class="nav" id="mainNavigation" aria-label="Main">
+        <nav class="nav" id="mainNavigation" aria-label="@T["Main"]">
             <a class="nav-item" asp-area="" asp-controller="Home" asp-action="Index" aria-current="@Current("Home")">
-                <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>Overview
+                <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>@T["Overview"]
             </a>
 
-            <div class="nav__group">Billing</div>
+            <div class="nav__group">@T["Billing"]</div>
             <a class="nav-item" asp-area="" asp-controller="Invoices" asp-action="Index" aria-current="@Current("Invoices", "InvoiceImports")">
-                <svg class="icon" aria-hidden="true"><use href="#i-file-text"></use></svg>Invoices
+                <svg class="icon" aria-hidden="true"><use href="#i-file-text"></use></svg>@T["Invoices"]
             </a>
             <a class="nav-item" asp-area="" asp-controller="MonthlyStatements" asp-action="Index" aria-current="@Current("MonthlyStatements")">
-                <svg class="icon" aria-hidden="true"><use href="#i-receipt"></use></svg>Statements
+                <svg class="icon" aria-hidden="true"><use href="#i-receipt"></use></svg>@T["Statements"]
             </a>
             <a class="nav-item" asp-area="" asp-controller="Statistics" asp-action="Index" aria-current="@Current("Statistics")">
-                <svg class="icon" aria-hidden="true"><use href="#i-chart"></use></svg>Statistics
+                <svg class="icon" aria-hidden="true"><use href="#i-chart"></use></svg>@T["Statistics"]
             </a>
             <a class="nav-item" asp-area="" asp-controller="InvoiceAllocations" asp-action="Index" aria-current="@Current("InvoiceAllocations")">
-                <svg class="icon" aria-hidden="true"><use href="#i-split"></use></svg>Allocations
+                <svg class="icon" aria-hidden="true"><use href="#i-split"></use></svg>@T["Allocations"]
             </a>
 
-            <div class="nav__group">Directory</div>
+            <div class="nav__group">@T["Directory"]</div>
             <a class="nav-item" asp-area="" asp-controller="Addresses" asp-action="Index" aria-current="@Current("Addresses")">
-                <svg class="icon" aria-hidden="true"><use href="#i-map-pin"></use></svg>Addresses
+                <svg class="icon" aria-hidden="true"><use href="#i-map-pin"></use></svg>@T["Addresses"]
             </a>
             <a class="nav-item" asp-area="" asp-controller="Contacts" asp-action="Index" aria-current="@Current("Contacts")">
-                <svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg>Contacts
+                <svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg>@T["Contacts"]
             </a>
             <a class="nav-item" asp-area="" asp-controller="AddressContacts" asp-action="Index" aria-current="@Current("AddressContacts")">
-                <svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg>Residents
+                <svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg>@T["Residents"]
             </a>
             <a class="nav-item" asp-area="" asp-controller="Services" asp-action="Index" aria-current="@Current("Services")">
-                <svg class="icon" aria-hidden="true"><use href="#i-zap"></use></svg>Services
+                <svg class="icon" aria-hidden="true"><use href="#i-zap"></use></svg>@T["Services"]
             </a>
         </nav>
 
@@ -86,7 +86,7 @@
         <div class="sidebar__footer">
             <button id="dsThemeToggle" class="switch" type="button" role="switch" aria-checked="true">
                 <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
-                <span>Dark mode</span>
+                <span>@T["Dark mode"]</span>
             </button>
             <partial name="_LoginPartial"/>
         </div>
@@ -105,7 +105,7 @@
                 <div class="alert alert--@statusKind toast" role="@(statusKind is "danger" or "warning" ? "alert" : "status")" data-toast="@statusKind">
                     <svg class="icon" aria-hidden="true"><use href="#@statusIcon"></use></svg>
                     <div class="alert__body">@statusMessage</div>
-                    <button type="button" class="icon-btn toast__close" aria-label="Dismiss" data-toast-close><svg class="icon icon--sm" aria-hidden="true"><use href="#i-x"></use></svg></button>
+                    <button type="button" class="icon-btn toast__close" aria-label="@T["Dismiss"]" data-toast-close><svg class="icon icon--sm" aria-hidden="true"><use href="#i-x"></use></svg></button>
                 </div>
             </div>
         }
@@ -113,11 +113,11 @@
         <footer class="app-footer">
             <span>&copy; Aleksander Laasmägi @DateTime.Now.Year</span>
             <span aria-hidden="true">/</span>
-            <a href="https://alaasmagi.dev" target="_blank" rel="noopener noreferrer">Portfolio</a>
+            <a href="https://alaasmagi.dev" target="_blank" rel="noopener noreferrer">@T["Portfolio"]</a>
             <span aria-hidden="true">/</span>
-            <a href="https://github.com/alaasmagi/invoice-service" target="_blank" rel="noopener noreferrer">Source</a>
+            <a href="https://github.com/alaasmagi/invoice-service" target="_blank" rel="noopener noreferrer">@T["Source"]</a>
             <span aria-hidden="true">/</span>
-            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">@T["Privacy"]</a>
         </footer>
     </div>
 </div>
@@ -145,16 +145,16 @@
         });
     })();
 </script>
-<dialog id="confirmDialog" class="dialog" aria-labelledby="confirmDialogTitle">
+<dialog id="confirmDialog" class="dialog" aria-labelledby="confirmDialogTitle" data-default-title="@T["Are you sure?"]" data-default-action="@T["Confirm"]">
     <form method="dialog" class="dialog__body">
         <div class="dialog__header">
-            <h2 id="confirmDialogTitle" class="dialog__title" data-confirm-title>Are you sure?</h2>
-            <button type="submit" value="cancel" class="icon-btn" aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg></button>
+            <h2 id="confirmDialogTitle" class="dialog__title" data-confirm-title>@T["Are you sure?"]</h2>
+            <button type="submit" value="cancel" class="icon-btn" aria-label="@T["Close"]"><svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg></button>
         </div>
         <p class="dialog__message" data-confirm-message></p>
         <div class="dialog__actions">
-            <button type="submit" value="cancel" class="btn btn--ghost" autofocus>Cancel</button>
-            <button type="submit" value="ok" class="btn btn--primary" data-confirm-ok>Confirm</button>
+            <button type="submit" value="cancel" class="btn btn--ghost" autofocus>@T["Cancel"]</button>
+            <button type="submit" value="ok" class="btn btn--primary" data-confirm-ok>@T["Confirm"]</button>
         </div>
     </form>
 </dialog>

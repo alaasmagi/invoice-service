@@ -2,18 +2,18 @@
 @{
     var o = Model.Overview;
     var period = o.Period;
-    ViewData["Title"] = "Overview";
+    ViewData["Title"] = T["Overview"];
     var attention = o.FailedCount + o.InvoicesWithoutResidents.Count + o.MissingInvoices.Count;
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Overview</p>
+        <p class="kicker">@T["Overview"]</p>
         <h1>@period.Label</h1>
     </div>
-    <form method="get" asp-action="Index" class="page-header__actions" aria-label="Choose month">
+    <form method="get" asp-action="Index" class="page-header__actions" aria-label="@T["Choose month"]">
         <div class="field">
-            <label for="overviewPeriod" class="visually-hidden">Month</label>
+            <label for="overviewPeriod" class="visually-hidden">@T["Month"]</label>
             <div class="field__control">
                 <select id="overviewPeriod" name="period" class="input" data-autosubmit>
                     @foreach (var option in Model.PeriodOptions)
@@ -24,7 +24,7 @@
                 <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
             </div>
         </div>
-        <noscript><button type="submit" class="btn btn--secondary">Show</button></noscript>
+        <noscript><button type="submit" class="btn btn--secondary">@T["Show"]</button></noscript>
     </form>
 </header>
 
@@ -33,9 +33,9 @@
 {
     <section class="card next-step">
         <div class="next-step__copy">
-            <span class="kicker">Next step</span>
-            <h2 class="next-step__title">Finish setting up</h2>
-            <p>Statements are built from invoices, split between the residents of each address. Add these once and you're ready for monthly billing.</p>
+            <span class="kicker">@T["Next step"]</span>
+            <h2 class="next-step__title">@T["Finish setting up"]</h2>
+            <p>@T["Statements are built from invoices, split between the residents of each address. Add these once and you're ready for monthly billing."]</p>
         </div>
     </section>
 }
@@ -43,13 +43,13 @@ else if (!o.Invoices.Any())
 {
     <section class="card next-step">
         <div class="next-step__copy">
-            <span class="kicker">Next step</span>
-            <h2 class="next-step__title">Add invoices for @period.Label</h2>
-            <p>Enter invoices manually or import Telia and Enefit PDFs.@(o.MissingInvoices.Any() ? $" Last month you had {o.MissingInvoices.Count} recurring invoice(s)." : "")</p>
+            <span class="kicker">@T["Next step"]</span>
+            <h2 class="next-step__title">@T["Add invoices for {0}", period.Label]</h2>
+            <p>@T["Enter invoices manually or import Telia and Enefit PDFs."]@(o.MissingInvoices.Any() ? " " + T.Plural(o.MissingInvoices.Count, "Last month you had {0} recurring invoice.", "Last month you had {0} recurring invoices.") : "")</p>
         </div>
         <div class="actions">
-            <a asp-controller="InvoiceImports" asp-action="Upload" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>Import PDF</a>
-            <a asp-controller="Invoices" asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add invoice</a>
+            <a asp-controller="InvoiceImports" asp-action="Upload" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>@T["Import PDF"]</a>
+            <a asp-controller="Invoices" asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add invoice"]</a>
         </div>
     </section>
 }
@@ -58,19 +58,19 @@ else if (o.NeedsGeneration)
     var regenerate = o.Statements.Any();
     <section class="card next-step">
         <div class="next-step__copy">
-            <span class="kicker">Next step</span>
-            <h2 class="next-step__title">@(regenerate ? "Update" : "Generate") statements for @period.Label</h2>
+            <span class="kicker">@T["Next step"]</span>
+            <h2 class="next-step__title">@(regenerate ? T["Update statements for {0}", period.Label] : T["Generate statements for {0}", period.Label])</h2>
             <p>@(regenerate
-                   ? $"{o.PendingInvoiceCount} invoice(s) changed since the statements were generated."
-                   : $"{o.AllocatableInvoiceCount} invoice(s) totalling {Fmt.Money(o.InvoiceTotal)} are ready to be split between residents.")
-               @(o.MissingInvoices.Any() ? $" Check the {o.MissingInvoices.Count} invoice(s) that may still be missing first." : "")</p>
+                   ? T.Plural(o.PendingInvoiceCount, "{0} invoice changed since the statements were generated.", "{0} invoices changed since the statements were generated.")
+                   : T.Plural(o.AllocatableInvoiceCount, "{0} invoice totalling {1} is ready to be split between residents.", "{0} invoices totalling {1} are ready to be split between residents.", Fmt.Money(o.InvoiceTotal)))
+               @(o.MissingInvoices.Any() ? T.Plural(o.MissingInvoices.Count, "Check the {0} invoice that may still be missing first.", "Check the {0} invoices that may still be missing first.") : "")</p>
         </div>
         <form asp-controller="MonthlyStatements" asp-action="Generate" method="post"
-              data-confirm="@(o.SentCount > 0 ? $"{o.SentCount} statement(s) for {period.Label} were already sent. Regenerating marks every statement for the month as \"Ready to send\" again." : null)"
-              data-confirm-title="Regenerate @period.Label?" data-confirm-action="Regenerate" data-confirm-tone="danger">
+              data-confirm="@(o.SentCount > 0 ? T.Plural(o.SentCount, "{0} statement for {1} was already sent. Regenerating marks every statement for the month as \"Ready to send\" again.", "{0} statements for {1} were already sent. Regenerating marks every statement for the month as \"Ready to send\" again.", period.Label).Value : null)"
+              data-confirm-title="@T["Regenerate {0}?", period.Label]" data-confirm-action="@T["Regenerate"]" data-confirm-tone="danger">
             <input type="hidden" name="year" value="@period.Year" />
             <input type="hidden" name="month" value="@period.Month" />
-            <button type="submit" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>@(regenerate ? "Regenerate" : "Generate statements")</button>
+            <button type="submit" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>@(regenerate ? T["Regenerate"] : T["Generate statements"])</button>
         </form>
     </section>
 }
@@ -78,27 +78,27 @@ else if (o.FailedCount > 0)
 {
     <section class="card next-step">
         <div class="next-step__copy">
-            <span class="kicker">Next step</span>
-            <h2 class="next-step__title">@o.FailedCount statement(s) failed to send</h2>
-            <p>Check the recipients' email addresses and send them again.</p>
+            <span class="kicker">@T["Next step"]</span>
+            <h2 class="next-step__title">@T.Plural(o.FailedCount, "{0} statement failed to send", "{0} statements failed to send")</h2>
+            <p>@T["Check the recipients' email addresses and send them again."]</p>
         </div>
-        <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" asp-route-status="Failed" class="btn btn--primary">Review failed</a>
+        <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" asp-route-status="Failed" class="btn btn--primary">@T["Review failed"]</a>
     </section>
 }
 else if (o.UnsentCount > 0)
 {
     <section class="card next-step">
         <div class="next-step__copy">
-            <span class="kicker">Next step</span>
-            <h2 class="next-step__title">Send @o.UnsentCount statement(s)</h2>
-            <p>@Fmt.Money(o.UnsentTotal) in total for @period.Label. <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="link">Review them first</a></p>
+            <span class="kicker">@T["Next step"]</span>
+            <h2 class="next-step__title">@T.Plural(o.UnsentCount, "Send {0} statement", "Send {0} statements")</h2>
+            <p>@T["{0} in total for {1}.", Fmt.Money(o.UnsentTotal), period.Label] <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="link">@T["Review them first"]</a></p>
         </div>
         <form asp-controller="MonthlyStatements" asp-action="SendPeriod" method="post"
-              data-confirm="@($"{o.UnsentCount} statement(s) totalling {Fmt.Money(o.UnsentTotal)} will be emailed to the recipients. Already sent statements are skipped.")"
-              data-confirm-title="Send @period.Label statements?" data-confirm-action="Send @o.UnsentCount">
+              data-confirm="@T.Plural(o.UnsentCount, "{0} statement totalling {1} will be emailed to the recipient. Already sent statements are skipped.", "{0} statements totalling {1} will be emailed to the recipients. Already sent statements are skipped.", Fmt.Money(o.UnsentTotal))"
+              data-confirm-title="@T["Send {0} statements?", period.Label]" data-confirm-action="@T["Send {0}", o.UnsentCount]">
             <input type="hidden" name="year" value="@period.Year" />
             <input type="hidden" name="month" value="@period.Month" />
-            <button type="submit" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg>Send all</button>
+            <button type="submit" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg>@T["Send all"]</button>
         </form>
     </section>
 }
@@ -106,57 +106,57 @@ else if (o.AllSent)
 {
     <section class="card next-step next-step--done">
         <div class="next-step__copy">
-            <span class="kicker">All done</span>
-            <h2 class="next-step__title">Every @period.Label statement has been sent</h2>
-            <p>@o.SentCount statement(s), @Fmt.Money(o.StatementTotal) in total.</p>
+            <span class="kicker">@T["All done"]</span>
+            <h2 class="next-step__title">@T["Every {0} statement has been sent", period.Label]</h2>
+            <p>@T.Plural(o.SentCount, "{0} statement, {1} in total.", "{0} statements, {1} in total.", Fmt.Money(o.StatementTotal))</p>
         </div>
-        <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="btn btn--secondary">View statements</a>
+        <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="btn btn--secondary">@T["View statements"]</a>
     </section>
 }
 else
 {
     <section class="card next-step">
         <div class="next-step__copy">
-            <span class="kicker">Next step</span>
-            <h2 class="next-step__title">Add residents to bill</h2>
-            <p>None of this month's invoices can be split yet, because nobody lived at their addresses on the invoice dates.</p>
+            <span class="kicker">@T["Next step"]</span>
+            <h2 class="next-step__title">@T["Add residents to bill"]</h2>
+            <p>@T["None of this month's invoices can be split yet, because nobody lived at their addresses on the invoice dates."]</p>
         </div>
-        <a asp-controller="AddressContacts" asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add resident</a>
+        <a asp-controller="AddressContacts" asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add resident"]</a>
     </section>
 }
 
 <section class="stat-grid" aria-label="@period.Label at a glance">
     <a asp-controller="Invoices" asp-action="Index" asp-route-period="@period.Key" class="card stat">
-        <span class="stat__label">Invoices</span>
+        <span class="stat__label">@T["Invoices"]</span>
         <span class="stat__value">@o.Invoices.Count</span>
         <span class="stat__hint">@Fmt.Money(o.InvoiceTotal)</span>
     </a>
     <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="card stat">
-        <span class="stat__label">Statements</span>
+        <span class="stat__label">@T["Statements"]</span>
         <span class="stat__value">@o.Statements.Count</span>
         <span class="stat__hint">@Fmt.Money(o.StatementTotal)</span>
     </a>
     <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="card stat">
-        <span class="stat__label">Sent</span>
+        <span class="stat__label">@T["Sent"]</span>
         <span class="stat__value">@o.SentCount<span class="secondary"> / @o.Statements.Count</span></span>
-        <span class="stat__hint">@(o.UnsentCount > 0 ? $"{o.UnsentCount} waiting" : o.Statements.Any() ? "Nothing waiting" : "No statements yet")</span>
+        <span class="stat__hint">@(o.UnsentCount > 0 ? T["{0} waiting", o.UnsentCount] : o.Statements.Any() ? T["Nothing waiting"] : T["No statements yet"])</span>
     </a>
     <div class="card stat">
-        <span class="stat__label">Needs attention</span>
+        <span class="stat__label">@T["Needs attention"]</span>
         <span class="stat__value">@attention</span>
-        <span class="stat__hint">@(attention == 0 ? "All clear" : "See checklist below")</span>
+        <span class="stat__hint">@(attention == 0 ? T["All clear"] : T["See checklist below"])</span>
     </div>
 </section>
 
 <div class="overview-grid">
     <section class="section">
         <div class="section-head">
-            <h2 class="section-title">Invoices in @period.Label</h2>
-            <a asp-controller="Invoices" asp-action="Create" class="btn btn--ghost btn--sm"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add invoice</a>
+            <h2 class="section-title">@T["Invoices in {0}", period.Label]</h2>
+            <a asp-controller="Invoices" asp-action="Create" class="btn btn--ghost btn--sm"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add invoice"]</a>
         </div>
         <div class="card table-card">
             <table class="data-table">
-                <thead><tr><th>Date</th><th>Address</th><th>Service</th><th class="num">Total</th></tr></thead>
+                <thead><tr><th>@T["Date"]</th><th>@T["Address"]</th><th>@T["Service"]</th><th class="num">@T["Total"]</th></tr></thead>
                 <tbody>
                 @foreach (var invoice in o.Invoices.Take(8))
                 {
@@ -169,42 +169,42 @@ else
                 }
                 @if (!o.Invoices.Any())
                 {
-                    <tr><td colspan="4" class="empty">No invoices for @period.Label yet.</td></tr>
+                    <tr><td colspan="4" class="empty">@T["No invoices for {0} yet.", period.Label]</td></tr>
                 }
                 </tbody>
             </table>
         </div>
         @if (o.Invoices.Count > 8)
         {
-            <a asp-controller="Invoices" asp-action="Index" asp-route-period="@period.Key" class="link">View all @o.Invoices.Count invoices</a>
+            <a asp-controller="Invoices" asp-action="Index" asp-route-period="@period.Key" class="link">@T["View all {0} invoices", o.Invoices.Count]</a>
         }
     </section>
 
     <section class="section">
-        <h2 class="section-title">Checklist</h2>
+        <h2 class="section-title">@T["Checklist"]</h2>
         <ul class="card checklist">
             @if (!Model.SetupComplete)
             {
-                <li class="@(Model.HasAddresses ? "is-done" : null)"><svg class="icon" aria-hidden="true"><use href="#@(Model.HasAddresses ? "i-circle-check" : "i-circle")"></use></svg><span class="checklist__text"><a asp-controller="Addresses" asp-action="Create" class="link">Add an address</a><span>The homes or locations that receive invoices.</span></span></li>
-                <li class="@(Model.HasServices ? "is-done" : null)"><svg class="icon" aria-hidden="true"><use href="#@(Model.HasServices ? "i-circle-check" : "i-circle")"></use></svg><span class="checklist__text"><a asp-controller="Services" asp-action="Create" class="link">Add a service</a><span>e.g. electricity, internet, water.</span></span></li>
-                <li class="@(Model.HasContacts ? "is-done" : null)"><svg class="icon" aria-hidden="true"><use href="#@(Model.HasContacts ? "i-circle-check" : "i-circle")"></use></svg><span class="checklist__text"><a asp-controller="Contacts" asp-action="Create" class="link">Add a contact</a><span>People who receive statements.</span></span></li>
-                <li class="@(Model.HasResidents ? "is-done" : null)"><svg class="icon" aria-hidden="true"><use href="#@(Model.HasResidents ? "i-circle-check" : "i-circle")"></use></svg><span class="checklist__text"><a asp-controller="AddressContacts" asp-action="Create" class="link">Link residents to addresses</a><span>Decides who shares each invoice.</span></span></li>
+                <li class="@(Model.HasAddresses ? "is-done" : null)"><svg class="icon" aria-hidden="true"><use href="#@(Model.HasAddresses ? "i-circle-check" : "i-circle")"></use></svg><span class="checklist__text"><a asp-controller="Addresses" asp-action="Create" class="link">@T["Add an address"]</a><span>@T["The homes or locations that receive invoices."]</span></span></li>
+                <li class="@(Model.HasServices ? "is-done" : null)"><svg class="icon" aria-hidden="true"><use href="#@(Model.HasServices ? "i-circle-check" : "i-circle")"></use></svg><span class="checklist__text"><a asp-controller="Services" asp-action="Create" class="link">@T["Add a service"]</a><span>@T["e.g. electricity, internet, water."]</span></span></li>
+                <li class="@(Model.HasContacts ? "is-done" : null)"><svg class="icon" aria-hidden="true"><use href="#@(Model.HasContacts ? "i-circle-check" : "i-circle")"></use></svg><span class="checklist__text"><a asp-controller="Contacts" asp-action="Create" class="link">@T["Add a contact"]</a><span>@T["People who receive statements."]</span></span></li>
+                <li class="@(Model.HasResidents ? "is-done" : null)"><svg class="icon" aria-hidden="true"><use href="#@(Model.HasResidents ? "i-circle-check" : "i-circle")"></use></svg><span class="checklist__text"><a asp-controller="AddressContacts" asp-action="Create" class="link">@T["Link residents to addresses"]</a><span>@T["Decides who shares each invoice."]</span></span></li>
             }
             @foreach (var missing in o.MissingInvoices)
             {
-                <li class="is-warning"><svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg><span class="checklist__text"><a asp-controller="Invoices" asp-action="Create" asp-route-addressId="@missing.Address.Id" asp-route-serviceId="@missing.Service.Id" class="link">@missing.Service.Name · @missing.Address.Name</a><span>Billed in @period.Previous.Label but not yet in @period.Label.</span></span></li>
+                <li class="is-warning"><svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg><span class="checklist__text"><a asp-controller="Invoices" asp-action="Create" asp-route-addressId="@missing.Address.Id" asp-route-serviceId="@missing.Service.Id" class="link">@missing.Service.Name · @missing.Address.Name</a><span>@T["Billed in {0} but not yet in {1}.", period.Previous.Label, period.Label]</span></span></li>
             }
             @foreach (var invoice in o.InvoicesWithoutResidents)
             {
-                <li class="is-warning"><svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg><span class="checklist__text"><a asp-controller="Addresses" asp-action="Details" asp-route-id="@invoice.AddressId" class="link">No residents at @invoice.Address.Name</a><span>@invoice.Service.Name (@Fmt.Date(invoice.InvoiceDate)) won't be billed to anyone.</span></span></li>
+                <li class="is-warning"><svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg><span class="checklist__text"><a asp-controller="Addresses" asp-action="Details" asp-route-id="@invoice.AddressId" class="link">@T["No residents at {0}", invoice.Address.Name]</a><span>@T["{0} ({1}) won't be billed to anyone.", invoice.Service.Name, Fmt.Date(invoice.InvoiceDate)]</span></span></li>
             }
             @if (o.FailedCount > 0)
             {
-                <li class="is-warning"><svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg><span class="checklist__text"><a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" asp-route-status="Failed" class="link">@o.FailedCount failed statement(s)</a><span>Sending didn't go through.</span></span></li>
+                <li class="is-warning"><svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg><span class="checklist__text"><a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" asp-route-status="Failed" class="link">@T.Plural(o.FailedCount, "{0} failed statement", "{0} failed statements")</a><span>@T["Sending didn't go through."]</span></span></li>
             }
             @if (Model.SetupComplete && attention == 0)
             {
-                <li class="is-done"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"></use></svg><span class="checklist__text"><span>Nothing needs attention</span><span>Every recurring invoice is in and every invoice has someone to bill.</span></span></li>
+                <li class="is-done"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"></use></svg><span class="checklist__text"><span>@T["Nothing needs attention"]</span><span>@T["Every recurring invoice is in and every invoice has someone to bill."]</span></span></li>
             }
         </ul>
     </section>

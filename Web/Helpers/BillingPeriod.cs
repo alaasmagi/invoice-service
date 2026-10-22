@@ -17,7 +17,12 @@ public readonly record struct BillingPeriod(int Year, int Month) : IComparable<B
 
     public string Key => $"{Year:D4}-{Month:D2}";
 
-    public string Label => Start.ToString("MMMM yyyy", CultureInfo.InvariantCulture);
+    /// <summary>"October 2026" / "Oktoober 2026", in the current UI language.</summary>
+    public string Label => Formatter.Capitalize(Start.ToString("MMMM yyyy", CultureInfo.CurrentUICulture));
+
+    /// <summary>Short axis label, e.g. "Oct" or "Oct 26" when the year should show.</summary>
+    public string ShortLabel(bool withYear) =>
+        Formatter.Capitalize(Start.ToString(withYear ? "MMM yy" : "MMM", CultureInfo.CurrentUICulture).TrimEnd('.'));
 
     public DateOnly Start => new(Year, Month, 1);
 

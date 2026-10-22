@@ -2,4 +2,8 @@
 @using Web.Models
 @using Web.Helpers
 @using DTO.DataAccess.Web.DTO
+@using Web.Localization
+@using Microsoft.Extensions.Localization
+@inject Formatter Fmt
+@inject IStringLocalizer<SharedResource> T
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

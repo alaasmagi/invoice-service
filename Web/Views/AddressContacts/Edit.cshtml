@@ -1,12 +1,12 @@
 @model AddressContactDto
 @{
-    ViewData["Title"] = "Edit resident";
+    ViewData["Title"] = T["Edit resident"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Directory</p>
-        <h1>Edit resident</h1>
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Edit resident"]</h1>
     </div>
 </header>
 
@@ -14,9 +14,9 @@
     <input type="hidden" asp-for="Id" />
     <partial name="_ResidentFields" model="Model" />
     <div class="form-actions">
-        <button type="submit" class="btn btn--primary">Save changes</button>
-        <a href="@Url.LocalOr(ViewData["ReturnUrl"] as string, Url.Action("Index"))" class="btn btn--ghost">Cancel</a>
-        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn--ghost" style="margin-left:auto">Remove</a>
+        <button type="submit" class="btn btn--primary">@T["Save changes"]</button>
+        <a href="@Url.LocalOr(ViewData["ReturnUrl"] as string, Url.Action("Index"))" class="btn btn--ghost">@T["Cancel"]</a>
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn--ghost" style="margin-left:auto">@T["Remove"]</a>
     </div>
 </form>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

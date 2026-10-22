@@ -8,7 +8,7 @@
     <div class="alert alert--warning" role="alert">
         <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
         <div class="alert__body">
-            <span class="alert__title">This @noun can't be deleted yet</span>
+            <span class="alert__title">@T["This {0} can't be deleted yet", noun]</span>
             <ul>@foreach (var blocker in Model.Blockers) { <li>@blocker</li> }</ul>
         </div>
     </div>
@@ -18,8 +18,8 @@ else
     <div class="alert alert--danger" role="alert">
         <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
         <div class="alert__body">
-            <span class="alert__title">Delete this @noun?</span>
-            <span>This action cannot be undone.</span>
+            <span class="alert__title">@T["Delete this {0}?", noun]</span>
+            <span>@T["This action cannot be undone."]</span>
             @if (consequences.Any())
             {
                 <ul>@foreach (var consequence in consequences) { <li>@consequence</li> }</ul>

@@ -24,7 +24,7 @@ public class InvoiceDto : BaseEntityUserWithConcurrency
     [Display(Name = "Period end")]
     public DateOnly? PeriodEnd { get; set; }
 
-    [Display(Name = "Total (€)")]
+    [Display(Name = "Total")]
     public decimal TotalSum { get; set; }
 
     public ICollection<InvoiceAllocationDto> Allocations { get; set; }

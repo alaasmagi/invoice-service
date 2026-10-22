@@ -1,27 +1,27 @@
 @model IReadOnlyList<AddressDto>
 @{
-    ViewData["Title"] = "Addresses";
+    ViewData["Title"] = T["Addresses"];
     var residentCounts = ViewData["ResidentCounts"] as Dictionary<Guid, int> ?? new();
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Directory</p>
-        <h1>Addresses</h1>
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Addresses"]</h1>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add address</a>
+        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add address"]</a>
     </div>
 </header>
 
 @if (Model.Count > 5)
 {
-    <div class="search-field"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg><input type="search" class="input" placeholder="Search addresses" aria-label="Search addresses" data-table-filter="#addressesTable" /></div>
+    <div class="search-field"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg><input type="search" class="input" placeholder="@T["Search addresses"]" aria-label="@T["Search addresses"]" data-table-filter="#addressesTable" /></div>
 }
 
 <div class="card table-card">
     <table class="data-table" id="addressesTable">
-        <thead><tr><th>Name</th><th>Full address</th><th>Residents now</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <thead><tr><th>@T["Name"]</th><th>@T["Full address"]</th><th>@T["Residents now"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
         <tbody>
         @foreach (var item in Model)
         {
@@ -29,17 +29,17 @@
             <tr>
                 <td><a asp-action="Details" asp-route-id="@item.Id" class="link">@item.Name</a></td>
                 <td>@item.FullAddress</td>
-                <td>@if (residents == 0) { <span class="badge badge--warning">None</span> } else { @residents }</td>
+                <td>@if (residents == 0) { <span class="badge badge--warning">@T["None"]</span> } else { @residents }</td>
                 <td class="actions-col"><div class="row-actions">
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="@T["Edit"]" title="@T["Edit"]"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="@T["Delete"]" title="@T["Delete"]"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
                 </div></td>
             </tr>
         }
-        <tr class="no-match-row" hidden><td colspan="4" class="empty">No addresses match your search.</td></tr>
+        <tr class="no-match-row" hidden><td colspan="4" class="empty">@T["No addresses match your search."]</td></tr>
         @if (!Model.Any())
         {
-            <tr class="empty-row"><td colspan="4" class="empty">No addresses yet. <a asp-action="Create" class="link">Add the first one</a>.</td></tr>
+            <tr class="empty-row"><td colspan="4" class="empty">@T["No addresses yet."] <a asp-action="Create" class="link">@T["Add the first one"]</a>.</td></tr>
         }
         </tbody>
     </table>

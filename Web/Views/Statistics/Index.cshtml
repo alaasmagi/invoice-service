@@ -1,6 +1,6 @@
 @model StatisticsViewModel
 @{
-    ViewData["Title"] = "Statistics";
+    ViewData["Title"] = T["Statistics"];
     var current = BillingPeriod.Current;
     var labelEvery = Model.Columns.Count <= 12 ? 1 : 3;
     var maxService = Model.ByService.Select(r => r.Total).DefaultIfEmpty(0).Max();
@@ -10,29 +10,29 @@
 
 @functions {
     // Costs going up is the unwelcome direction, so it takes the warning tone; arrow + sign keep it readable without color.
-    private static (string Tone, string Icon, string Text) Delta(decimal? percent)
+    private (string Tone, string Icon, string Text) Delta(decimal? percent)
     {
-        if (percent is not { } p) return ("muted", "", "No earlier data");
+        if (percent is not { } p) return ("muted", "", T["No earlier data"]);
         var rounded = Math.Round(p, 0);
-        if (rounded == 0) return ("muted", "", "No change");
+        if (rounded == 0) return ("muted", "", T["No change"]);
         return rounded > 0
-            ? ("up", "i-trend-up", $"+{rounded:0}%")
-            : ("down", "i-trend-down", $"{rounded:0}%");
+            ? ("up", "i-trend-up", "+" + Fmt.Percent(rounded))
+            : ("down", "i-trend-down", Fmt.Percent(rounded));
     }
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Billing</p>
-        <h1>Statistics</h1>
-        <p class="page-header__lede">Where the money goes: invoice costs by month, service, address and person. Invoices count in the month of their invoice date.</p>
+        <p class="kicker">@T["Billing"]</p>
+        <h1>@T["Statistics"]</h1>
+        <p class="page-header__lede">@T["Where the money goes: invoice costs by month, service, address and person. Invoices count in the month of their invoice date."]</p>
     </div>
 </header>
 
-<nav class="segmented" aria-label="Time range">
+<nav class="segmented" aria-label="@T["Time range"]">
     @foreach (var option in StatisticsViewModel.MonthOptions)
     {
-        <a asp-action="Index" asp-route-months="@option" class="segmented__item" aria-current="@(option == Model.Months ? "page" : null)">Last @option months</a>
+        <a asp-action="Index" asp-route-months="@option" class="segmented__item" aria-current="@(option == Model.Months ? "page" : null)">@T["Last {0} months", option]</a>
     }
 </nav>
 
@@ -40,11 +40,11 @@
 {
     <div class="card empty-state">
         <span class="icon-tile"><svg class="icon icon--lg" aria-hidden="true"><use href="#i-chart"></use></svg></span>
-        <h2 class="section-title">No invoices in the last @Model.Months months</h2>
-        <p class="secondary">Statistics appear as soon as there are invoices to count.</p>
+        <h2 class="section-title">@T["No invoices in the last {0} months", Model.Months]</h2>
+        <p class="secondary">@T["Statistics appear as soon as there are invoices to count."]</p>
         <div class="actions">
-            <a asp-controller="InvoiceImports" asp-action="Upload" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>Import PDF</a>
-            <a asp-controller="Invoices" asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add invoice</a>
+            <a asp-controller="InvoiceImports" asp-action="Upload" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>@T["Import PDF"]</a>
+            <a asp-controller="Invoices" asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add invoice"]</a>
         </div>
     </div>
 }
@@ -53,44 +53,44 @@ else
     var totalDelta = Delta(Model.ChangePercent);
     var highest = Model.HighestMonth;
 
-    <section class="stat-grid" aria-label="Totals for the last @Model.Months months">
+    <section class="stat-grid" aria-label="@T["Totals for the last {0} months", Model.Months]">
         <div class="card stat">
-            <span class="stat__label">Total invoiced</span>
+            <span class="stat__label">@T["Total invoiced"]</span>
             <span class="stat__value">@Fmt.Money(Model.Total)</span>
             <span class="stat__hint delta delta--@totalDelta.Tone">
                 @if (totalDelta.Icon != "") { <svg class="icon icon--sm" aria-hidden="true"><use href="#@totalDelta.Icon"></use></svg> }
-                @totalDelta.Text<span class="secondary">@(Model.ChangePercent == null ? "" : $" vs previous {Model.Months} months")</span>
+                @totalDelta.Text<span class="secondary">@(Model.ChangePercent == null ? "" : " " + T["vs previous {0} months", Model.Months])</span>
             </span>
         </div>
         <div class="card stat">
-            <span class="stat__label">Average per month</span>
+            <span class="stat__label">@T["Average per month"]</span>
             <span class="stat__value">@Fmt.Money(Model.AveragePerMonth)</span>
-            <span class="stat__hint">Over @Model.Columns.Count months</span>
+            <span class="stat__hint">@T["Over {0} months", Model.Columns.Count]</span>
         </div>
         <div class="card stat">
-            <span class="stat__label">Most expensive month</span>
+            <span class="stat__label">@T["Most expensive month"]</span>
             <span class="stat__value">@(highest == null ? "—" : Fmt.Money(highest.Total))</span>
             <span class="stat__hint">@(highest?.Period.Label ?? "")</span>
         </div>
         <a asp-controller="Invoices" asp-action="Index" class="card stat">
-            <span class="stat__label">Invoices</span>
+            <span class="stat__label">@T["Invoices"]</span>
             <span class="stat__value">@Model.InvoiceCount</span>
-            <span class="stat__hint">@Fmt.Money(Model.InvoiceCount == 0 ? 0 : Model.Total / Model.InvoiceCount) on average</span>
+            <span class="stat__hint">@T["{0} on average", Fmt.Money(Model.InvoiceCount == 0 ? 0 : Model.Total / Model.InvoiceCount)]</span>
         </a>
     </section>
 
     <section class="card viz" aria-labelledby="monthlyTitle">
         <div class="viz__head">
             <div>
-                <h2 id="monthlyTitle" class="section-title">Monthly costs by service</h2>
-                <p class="viz__sub">@Model.Columns.First().Period.Label – @Model.Columns.Last().Period.Label · @current.Label is still in progress</p>
+                <h2 id="monthlyTitle" class="section-title">@T["Monthly costs by service"]</h2>
+                <p class="viz__sub">@Model.Columns.First().Period.Label – @Model.Columns.Last().Period.Label · @T["{0} is still in progress", current.Label]</p>
             </div>
             @if (Model.Series.Count > 1)
             {
-                <ul class="viz-legend" aria-label="Legend">
+                <ul class="viz-legend" aria-label="@T["Legend"]">
                     @foreach (var s in Model.Series)
                     {
-                        <li><span class="viz-swatch" style="background: var(--series-@s.Slot)"></span>@s.Name</li>
+                        <li><span class="viz-swatch" style="background: var(--series-@s.Slot)"></span>@(s.Slot == 0 ? T["Other"] : s.Name)</li>
                     }
                 </ul>
             }
@@ -100,7 +100,7 @@ else
             <div class="viz-yaxis" aria-hidden="true">
                 @foreach (var tick in Model.Ticks)
                 {
-                    <span class="viz-tick" style="bottom: @Pct(tick, Model.AxisMax)%">@tick.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</span>
+                    <span class="viz-tick" style="bottom: @Pct(tick, Model.AxisMax)%">@Fmt.Number(tick)</span>
                     <span class="viz-gridline" style="bottom: @Pct(tick, Model.AxisMax)%"></span>
                 }
             </div>
@@ -108,21 +108,21 @@ else
                 @foreach (var column in Model.Columns)
                 {
                     var inProgress = column.Period == current;
-                    <div class="viz-col@(inProgress ? " is-current" : "")" tabindex="0" aria-label="@column.Period.Label: @Fmt.Money(column.Total)@(inProgress ? " (in progress)" : "")">
+                    <div class="viz-col@(inProgress ? " is-current" : "")" tabindex="0" aria-label="@column.Period.Label: @Fmt.Money(column.Total)@(inProgress ? " (" + T["in progress"] + ")" : "")">
                         <div class="viz-stack" style="height: @Pct(column.Total, Model.AxisMax)%">
                             @for (var i = 0; i < Model.Series.Count; i++)
                             {
                                 if (column.Amounts[i] <= 0) continue;
-                                <span class="viz-seg" style="flex-grow: @column.Amounts[i].ToString(System.Globalization.CultureInfo.InvariantCulture); background: var(--series-@Model.Series[i].Slot)"></span>
+                                <span class="viz-seg" style="flex-grow: @Formatter.Css(column.Amounts[i]); background: var(--series-@Model.Series[i].Slot)"></span>
                             }
                         </div>
                         <div class="viz-tip-data" hidden>
-                            <div class="viz-tip__title">@column.Period.Label@(inProgress ? " · in progress" : "")</div>
+                            <div class="viz-tip__title">@column.Period.Label@(inProgress ? " · " + T["in progress"] : "")</div>
                             <div class="viz-tip__total">@Fmt.Money(column.Total)</div>
                             @for (var i = Model.Series.Count - 1; i >= 0; i--)
                             {
                                 if (column.Amounts[i] <= 0) continue;
-                                <div class="viz-tip__row"><span class="viz-tip__key" style="background: var(--series-@Model.Series[i].Slot)"></span><strong>@Fmt.Money(column.Amounts[i])</strong><span>@Model.Series[i].Name</span></div>
+                                <div class="viz-tip__row"><span class="viz-tip__key" style="background: var(--series-@Model.Series[i].Slot)"></span><strong>@Fmt.Money(column.Amounts[i])</strong><span>@(Model.Series[i].Slot == 0 ? T["Other"] : Model.Series[i].Name)</span></div>
                             }
                         </div>
                     </div>
@@ -136,15 +136,15 @@ else
                 var p = Model.Columns[i].Period;
                 var show = (Model.Columns.Count - 1 - i) % labelEvery == 0;
                 var alt = (Model.Columns.Count - 1 - i) % (labelEvery * 2) != 0;
-                <span class="@(alt ? "is-alt" : null)">@(show ? (p.Month == 1 || i == 0 ? p.Start.ToString("MMM yy", System.Globalization.CultureInfo.InvariantCulture) : p.Start.ToString("MMM", System.Globalization.CultureInfo.InvariantCulture)) : "")</span>
+                <span class="@(alt ? "is-alt" : null)">@(show ? p.ShortLabel(p.Month == 1 || i == 0) : "")</span>
             }
         </div>
 
         <details class="viz-table">
-            <summary>Show as table</summary>
+            <summary>@T["Show as table"]</summary>
             <div class="table-card">
                 <table class="data-table">
-                    <thead><tr><th>Month</th>@foreach (var s in Model.Series) { <th class="num">@s.Name</th> }<th class="num">Total</th></tr></thead>
+                    <thead><tr><th>@T["Month"]</th>@foreach (var s in Model.Series) { <th class="num">@(s.Slot == 0 ? T["Other"] : s.Name)</th> }<th class="num">@T["Total"]</th></tr></thead>
                     <tbody>
                     @foreach (var column in Model.Columns.AsEnumerable().Reverse())
                     {
@@ -162,7 +162,7 @@ else
 
     <div class="stats-split">
         <section class="card breakdown" aria-labelledby="byServiceTitle">
-            <h2 id="byServiceTitle" class="section-title">By service</h2>
+            <h2 id="byServiceTitle" class="section-title">@T["By service"]</h2>
             <ul class="breakdown__list">
                 @foreach (var row in Model.ByService)
                 {
@@ -171,14 +171,14 @@ else
                         <a asp-controller="Invoices" asp-action="Index" asp-route-serviceId="@row.Id" class="breakdown__name link">@row.Name</a>
                         <span class="breakdown__value">@Fmt.Money(row.Total)</span>
                         <span class="breakdown__track"><span class="breakdown__bar" style="width: @Pct(row.Total, maxService)%; background: var(--series-@row.Slot)"></span></span>
-                        <span class="breakdown__meta">@Pct(row.Total, Model.Total)% of total · @row.InvoiceCount invoice(s) · <span class="delta delta--@d.Tone">@d.Text</span></span>
+                        <span class="breakdown__meta">@T["{0} of total", Fmt.Percent(Model.Total <= 0 ? 0 : row.Total / Model.Total * 100)] · @T.Plural(row.InvoiceCount, "{0} invoice", "{0} invoices") · <span class="delta delta--@d.Tone">@d.Text</span></span>
                     </li>
                 }
             </ul>
         </section>
 
         <section class="card breakdown" aria-labelledby="byAddressTitle">
-            <h2 id="byAddressTitle" class="section-title">By address</h2>
+            <h2 id="byAddressTitle" class="section-title">@T["By address"]</h2>
             <ul class="breakdown__list">
                 @foreach (var row in Model.ByAddress)
                 {
@@ -187,7 +187,7 @@ else
                         <a asp-controller="Addresses" asp-action="Details" asp-route-id="@row.Id" class="breakdown__name link">@row.Name</a>
                         <span class="breakdown__value">@Fmt.Money(row.Total)</span>
                         <span class="breakdown__track"><span class="breakdown__bar" style="width: @Pct(row.Total, maxAddress)%; background: var(--series-1)"></span></span>
-                        <span class="breakdown__meta">@Fmt.Money(row.Total / Model.Columns.Count) per month · <span class="delta delta--@d.Tone">@d.Text</span></span>
+                        <span class="breakdown__meta">@T["{0} per month", Fmt.Money(row.Total / Model.Columns.Count)] · <span class="delta delta--@d.Tone">@d.Text</span></span>
                     </li>
                 }
             </ul>
@@ -195,11 +195,11 @@ else
     </div>
 
     <section class="section">
-        <h2 class="section-title">By person</h2>
-        <p class="secondary">From monthly statements for the same months.</p>
+        <h2 class="section-title">@T["By person"]</h2>
+        <p class="secondary">@T["From monthly statements for the same months."]</p>
         <div class="card table-card">
             <table class="data-table">
-                <thead><tr><th>Person</th><th class="num">Statements</th><th class="num">Billed</th><th class="num">Sent</th><th class="num">Not sent yet</th><th class="num">Per month</th></tr></thead>
+                <thead><tr><th>@T["Person"]</th><th class="num">@T["Statements"]</th><th class="num">@T["Billed"]</th><th class="num">@T["Sent"]</th><th class="num">@T["Not sent yet"]</th><th class="num">@T["Per month"]</th></tr></thead>
                 <tbody>
                 @foreach (var person in Model.ByPerson)
                 {
@@ -214,12 +214,12 @@ else
                 }
                 @if (!Model.ByPerson.Any())
                 {
-                    <tr><td colspan="6" class="empty">No statements in this range yet. <a asp-controller="MonthlyStatements" asp-action="Index" class="link">Generate statements</a> to see who pays what.</td></tr>
+                    <tr><td colspan="6" class="empty">@T["No statements in this range yet."] <a asp-controller="MonthlyStatements" asp-action="Index" class="link">@T["Generate statements"]</a> @T["to see who pays what."]</td></tr>
                 }
                 </tbody>
                 @if (Model.ByPerson.Any())
                 {
-                    <tfoot><tr><td>Total</td><td class="num">@Model.ByPerson.Sum(p => p.StatementCount)</td><td class="num">@Fmt.Money(Model.ByPerson.Sum(p => p.Billed))</td><td class="num">@Fmt.Money(Model.ByPerson.Sum(p => p.Sent))</td><td class="num">@Fmt.Money(Model.ByPerson.Sum(p => p.Outstanding))</td><td></td></tr></tfoot>
+                    <tfoot><tr><td>@T["Total"]</td><td class="num">@Model.ByPerson.Sum(p => p.StatementCount)</td><td class="num">@Fmt.Money(Model.ByPerson.Sum(p => p.Billed))</td><td class="num">@Fmt.Money(Model.ByPerson.Sum(p => p.Sent))</td><td class="num">@Fmt.Money(Model.ByPerson.Sum(p => p.Outstanding))</td><td></td></tr></tfoot>
                 }
             </table>
         </div>

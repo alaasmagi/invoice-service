@@ -1,63 +1,63 @@
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = T["Home"];
 }
 
 <section class="hero">
     <div class="hero__copy">
-        <p class="kicker">Invoice operations</p>
-        <h1>Track invoices, residents, allocations, and monthly statements from one workspace.</h1>
-        <p>Import utility invoices, keep address and contact records tidy, split costs, and send monthly statements without leaving the service.</p>
+        <p class="kicker">@T["Invoice operations"]</p>
+        <h1>@T["Track invoices, residents, allocations, and monthly statements from one workspace."]</h1>
+        <p>@T["Import utility invoices, keep address and contact records tidy, split costs, and send monthly statements without leaving the service."]</p>
         <div class="actions">
-            <a asp-controller="Invoices" asp-action="Index" class="btn btn--primary">Open invoices</a>
-            <a asp-controller="Auth" asp-action="Login" class="btn btn--secondary">Log in</a>
+            <a asp-controller="Invoices" asp-action="Index" class="btn btn--primary">@T["Open invoices"]</a>
+            <a asp-controller="Auth" asp-action="Login" class="btn btn--secondary">@T["Log in"]</a>
         </div>
     </div>
-    <aside class="card workflow" aria-label="Primary workflow">
-        <p class="kicker">Primary workflow</p>
-        <p class="workflow__title">Import, split, send</p>
+    <aside class="card workflow" aria-label="@T["Primary workflow"]">
+        <p class="kicker">@T["Primary workflow"]</p>
+        <p class="workflow__title">@T["Import, split, send"]</p>
         <ol>
-            <li class="step"><span class="step__n">1</span>Import a provider PDF</li>
-            <li class="step"><span class="step__n">2</span>Review the invoice and split</li>
-            <li class="step"><span class="step__n">3</span>Send person-level statements</li>
+            <li class="step"><span class="step__n">1</span>@T["Import a provider PDF"]</li>
+            <li class="step"><span class="step__n">2</span>@T["Review the invoice and split"]</li>
+            <li class="step"><span class="step__n">3</span>@T["Send person-level statements"]</li>
         </ol>
     </aside>
 </section>
 
-<section class="quick-grid" aria-label="Primary sections">
+<section class="quick-grid" aria-label="@T["Primary sections"]">
     <a asp-controller="Invoices" asp-action="Index" class="card quick-card">
         <span class="quick-card__top">
             <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-file-text"></use></svg></span>
-            <span class="badge badge--accent">Billing</span>
+            <span class="badge badge--accent">@T["Billing"]</span>
         </span>
-        <h2>Invoices</h2>
-        <p>Create invoices manually or import provider PDFs for Telia and Enefit.</p>
-        <span class="quick-card__link">View invoices <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
+        <h2>@T["Invoices"]</h2>
+        <p>@T["Create invoices manually or import provider PDFs for Telia and Enefit."]</p>
+        <span class="quick-card__link">@T["View invoices"] <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
     </a>
     <a asp-controller="MonthlyStatements" asp-action="Index" class="card quick-card">
         <span class="quick-card__top">
             <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-receipt"></use></svg></span>
-            <span class="badge badge--accent">Statements</span>
+            <span class="badge badge--accent">@T["Statements"]</span>
         </span>
-        <h2>Monthly statements</h2>
-        <p>Review generated statements, inspect invoice shares, and send drafts.</p>
-        <span class="quick-card__link">View statements <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
+        <h2>@T["Monthly statements"]</h2>
+        <p>@T["Review generated statements, inspect invoice shares, and send drafts."]</p>
+        <span class="quick-card__link">@T["View statements"] <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
     </a>
     <a asp-controller="Contacts" asp-action="Index" class="card quick-card">
         <span class="quick-card__top">
             <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg></span>
-            <span class="badge badge--neutral">People</span>
+            <span class="badge badge--neutral">@T["People"]</span>
         </span>
-        <h2>Contacts</h2>
-        <p>Manage the residents and recipients connected to each address.</p>
-        <span class="quick-card__link">View contacts <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
+        <h2>@T["Contacts"]</h2>
+        <p>@T["Manage the residents and recipients connected to each address."]</p>
+        <span class="quick-card__link">@T["View contacts"] <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
     </a>
     <a asp-controller="Addresses" asp-action="Index" class="card quick-card">
         <span class="quick-card__top">
             <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-map-pin"></use></svg></span>
-            <span class="badge badge--neutral">Places</span>
+            <span class="badge badge--neutral">@T["Places"]</span>
         </span>
-        <h2>Addresses</h2>
-        <p>Maintain homes, service locations, and contact assignments.</p>
-        <span class="quick-card__link">View addresses <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
+        <h2>@T["Addresses"]</h2>
+        <p>@T["Maintain homes, service locations, and contact assignments."]</p>
+        <span class="quick-card__link">@T["View addresses"] <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
     </a>
 </section>

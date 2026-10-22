@@ -1,27 +1,27 @@
 @model DeleteViewModel<MonthlyStatementDto>
 @{
-    ViewData["Title"] = "Delete statement";
+    ViewData["Title"] = T["Delete statement"];
     var statement = Model.Item;
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Billing</p>
-        <h1>Delete statement</h1>
+        <p class="kicker">@T["Billing"]</p>
+        <h1>@T["Delete statement"]</h1>
     </div>
 </header>
 
 <div class="section medium">
-    <partial name="_DeleteNotice" model='Model.Notice("statement")' />
+    <partial name="_DeleteNotice" model='Model.Notice(T["statement"])' />
     <dl class="card details">
-        <div class="details__row"><dt>Person</dt><dd>@statement.Contact.FullName</dd></div>
-        <div class="details__row"><dt>Month</dt><dd>@(new BillingPeriod(statement.Year, statement.Month).Label)</dd></div>
-        <div class="details__row"><dt>Total</dt><dd>@Fmt.Money(statement.TotalSum)</dd></div>
-        <div class="details__row"><dt>Status</dt><dd><partial name="_StatementStatus" model="statement.Status" /></dd></div>
+        <div class="details__row"><dt>@T["Person"]</dt><dd>@statement.Contact.FullName</dd></div>
+        <div class="details__row"><dt>@T["Month"]</dt><dd>@(new BillingPeriod(statement.Year, statement.Month).Label)</dd></div>
+        <div class="details__row"><dt>@T["Total"]</dt><dd>@Fmt.Money(statement.TotalSum)</dd></div>
+        <div class="details__row"><dt>@T["Status"]</dt><dd><partial name="_StatementStatus" model="statement.Status" /></dd></div>
     </dl>
     <form asp-action="Delete" method="post" class="form-actions">
         <input type="hidden" name="Id" value="@statement.Id" />
-        <button type="submit" class="btn btn--danger">Delete statement</button>
-        <a asp-action="Details" asp-route-id="@statement.Id" class="btn btn--ghost">Cancel</a>
+        <button type="submit" class="btn btn--danger">@T["Delete statement"]</button>
+        <a asp-action="Details" asp-route-id="@statement.Id" class="btn btn--ghost">@T["Cancel"]</a>
     </form>
 </div>

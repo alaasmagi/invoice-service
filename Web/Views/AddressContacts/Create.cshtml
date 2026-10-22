@@ -1,21 +1,21 @@
 @model AddressContactDto
 @{
-    ViewData["Title"] = "Add resident";
+    ViewData["Title"] = T["Add resident"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Directory</p>
-        <h1>Add resident</h1>
-        <p class="page-header__lede">Link a person to an address. Each invoice is split equally between everyone living at the address on the invoice date.</p>
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Add resident"]</h1>
+        <p class="page-header__lede">@T["Link a person to an address. Each invoice is split equally between everyone living at the address on the invoice date."]</p>
     </div>
 </header>
 
 <form asp-action="Create" method="post" class="card form narrow">
     <partial name="_ResidentFields" model="Model" />
     <div class="form-actions">
-        <button type="submit" class="btn btn--primary">Save resident</button>
-        <a href="@Url.LocalOr(ViewData["ReturnUrl"] as string, Url.Action("Index"))" class="btn btn--ghost">Cancel</a>
+        <button type="submit" class="btn btn--primary">@T["Save resident"]</button>
+        <a href="@Url.LocalOr(ViewData["ReturnUrl"] as string, Url.Action("Index"))" class="btn btn--ghost">@T["Cancel"]</a>
     </div>
 </form>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

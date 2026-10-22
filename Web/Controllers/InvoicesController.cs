@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Web.Helpers;
+using Web.Localization;
 using Web.Mapping;
 using Web.Models;
 
@@ -94,7 +95,7 @@ public class InvoicesController(AppDbContext context, ICreateInvoiceService crea
         ClearServerManagedModelState(dto);
         ClearNavigationModelState(nameof(dto.Address), nameof(dto.Service), nameof(dto.Allocations));
         ValidatePeriod(dto);
-        if (!await OwnsAddressAndService(userId, dto.AddressId, dto.ServiceId)) ModelState.AddModelError(string.Empty, "Selected address or service was not found.");
+        if (!await OwnsAddressAndService(userId, dto.AddressId, dto.ServiceId)) ModelState.AddModelError(string.Empty, T["Selected address or service was not found."]);
         if (!ModelState.IsValid)
         {
             await PopulateForm(userId);
@@ -109,7 +110,7 @@ public class InvoicesController(AppDbContext context, ICreateInvoiceService crea
         var addressName = await context.Addresses.Where(e => e.Id == dto.AddressId).Select(e => e.Name).FirstAsync();
         if (next == "another")
         {
-            Flash($"Invoice saved for {addressName} ({Fmt.Money(dto.TotalSum)}). Add the next one.");
+            Flash(T["Invoice saved for {0} ({1}). Add the next one.", addressName, Fmt.Money(dto.TotalSum)]);
             return RedirectToAction(nameof(Create), new
             {
                 addressId = dto.AddressId,
@@ -119,7 +120,7 @@ public class InvoicesController(AppDbContext context, ICreateInvoiceService crea
             });
         }
 
-        Flash($"Invoice saved for {addressName} ({Fmt.Money(dto.TotalSum)}).");
+        Flash(T["Invoice saved for {0} ({1}).", addressName, Fmt.Money(dto.TotalSum)]);
         return RedirectToAction(nameof(Index), new { period = BillingPeriod.From(dto.InvoiceDate).Key });
     }
 
@@ -142,7 +143,7 @@ public class InvoicesController(AppDbContext context, ICreateInvoiceService crea
         ClearServerManagedModelState(dto);
         ClearNavigationModelState(nameof(dto.Address), nameof(dto.Service), nameof(dto.Allocations));
         ValidatePeriod(dto);
-        if (!await OwnsAddressAndService(userId, dto.AddressId, dto.ServiceId)) ModelState.AddModelError(string.Empty, "Selected address or service was not found.");
+        if (!await OwnsAddressAndService(userId, dto.AddressId, dto.ServiceId)) ModelState.AddModelError(string.Empty, T["Selected address or service was not found."]);
         if (!ModelState.IsValid)
         {
             await PopulateForm(userId, dto.Id);
@@ -156,8 +157,8 @@ public class InvoicesController(AppDbContext context, ICreateInvoiceService crea
         await context.SaveChangesAsync();
 
         var inStatements = await context.MonthlyStatementLines.AnyAsync(e => e.UserId == userId && e.InvoiceId == id);
-        if (inStatements) Flash("Invoice updated. Regenerate the statements that include it so they show the new figures.", "warning");
-        else Flash("Invoice updated.");
+        if (inStatements) Flash(T["Invoice updated. Regenerate the statements that include it so they show the new figures."], "warning");
+        else Flash(T["Invoice updated."]);
         return RedirectToAction(nameof(Details), new { id });
     }
 
@@ -181,12 +182,12 @@ public class InvoicesController(AppDbContext context, ICreateInvoiceService crea
         {
             if (await context.MonthlyStatementLines.AnyAsync(e => e.UserId == userId && e.InvoiceId == id))
             {
-                Flash("This invoice is part of a monthly statement and can't be deleted.", "danger");
+                Flash(T["This invoice is part of a monthly statement and can't be deleted."], "danger");
                 return RedirectToAction(nameof(Delete), new { id });
             }
             context.Invoices.Remove(entity);
             await context.SaveChangesAsync();
-            Flash("Invoice deleted.");
+            Flash(T["Invoice deleted."]);
         }
         return RedirectToAction(nameof(Index));
     }
@@ -203,9 +204,9 @@ public class InvoicesController(AppDbContext context, ICreateInvoiceService crea
         {
             Item = dto,
             Blockers = statements
-                .Select(s => $"Included in the {new BillingPeriod(s.Year, s.Month).Label} statement for {s.FullName} ({s.Status}). Delete that statement first.")
+                .Select(s => T["Included in the {0} statement for {1} ({2}). Delete that statement first.", new BillingPeriod(s.Year, s.Month).Label, s.FullName, Fmt.StatusLabel(s.Status)].Value)
                 .ToList(),
-            Consequences = allocationCount > 0 ? [$"{allocationCount} allocation record(s) for this invoice will also be deleted."] : []
+            Consequences = allocationCount > 0 ? [T.Plural(allocationCount, "{0} allocation record for this invoice will also be deleted.", "{0} allocation records for this invoice will also be deleted.")] : []
         };
     }
 
@@ -213,7 +214,7 @@ public class InvoicesController(AppDbContext context, ICreateInvoiceService crea
     {
         if (dto.PeriodStart != null && dto.PeriodEnd != null && dto.PeriodEnd < dto.PeriodStart)
         {
-            ModelState.AddModelError(nameof(dto.PeriodEnd), "Period end can't be before period start.");
+            ModelState.AddModelError(nameof(dto.PeriodEnd), T["Period end can't be before period start."]);
         }
     }
 

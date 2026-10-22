@@ -2,6 +2,7 @@ using DataAccess.Context;
 using DTO.DataAccess.Web.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Web.Localization;
 using Web.Mapping;
 using Web.Models;
 
@@ -65,10 +66,10 @@ public class ContactsController(AppDbContext context, WebDtoMapper mapper) : Use
 
         if (next == "another")
         {
-            Flash($"{entity.FullName} added. Add the next contact.");
+            Flash(T["{0} added. Add the next contact.", entity.FullName]);
             return RedirectToAction(nameof(Create), new { returnUrl });
         }
-        Flash($"{entity.FullName} added.");
+        Flash(T["{0} added.", entity.FullName]);
         return RedirectToLocalOr(returnUrl, nameof(Details), new { id = entity.Id });
     }
 
@@ -95,7 +96,7 @@ public class ContactsController(AppDbContext context, WebDtoMapper mapper) : Use
         StampExisting(entity, userId, existing);
         context.Update(entity);
         await context.SaveChangesAsync();
-        Flash("Contact updated.");
+        Flash(T["Contact updated."]);
         return RedirectToAction(nameof(Details), new { id });
     }
 
@@ -119,12 +120,12 @@ public class ContactsController(AppDbContext context, WebDtoMapper mapper) : Use
             var model = await BuildDeleteModel(id, userId, mapper.ToDto(entity));
             if (model.Blockers.Any())
             {
-                Flash("This contact still has statements or allocations and can't be deleted.", "danger");
+                Flash(T["This contact still has statements or allocations and can't be deleted."], "danger");
                 return RedirectToAction(nameof(Delete), new { id });
             }
             context.Contacts.Remove(entity);
             await context.SaveChangesAsync();
-            Flash($"{entity.FullName} deleted.");
+            Flash(T["{0} deleted.", entity.FullName]);
         }
         return RedirectToAction(nameof(Index));
     }
@@ -136,14 +137,14 @@ public class ContactsController(AppDbContext context, WebDtoMapper mapper) : Use
         var residencyCount = await context.AddressContacts.CountAsync(e => e.UserId == userId && e.ContactId == contactId);
 
         var blockers = new List<string>();
-        if (statementCount > 0) blockers.Add($"{dto.FullName} has {statementCount} monthly statement(s). Delete them first, or keep the contact for history.");
-        if (allocationCount > 0) blockers.Add($"{dto.FullName} has {allocationCount} invoice allocation(s). Delete them first.");
+        if (statementCount > 0) blockers.Add(T.Plural(statementCount, "{1} has {0} monthly statement. Delete it first, or keep the contact for history.", "{1} has {0} monthly statements. Delete them first, or keep the contact for history.", dto.FullName));
+        if (allocationCount > 0) blockers.Add(T.Plural(allocationCount, "{1} has {0} invoice allocation. Delete it first.", "{1} has {0} invoice allocations. Delete them first.", dto.FullName));
 
         return new DeleteViewModel<ContactDto>
         {
             Item = dto,
             Blockers = blockers,
-            Consequences = residencyCount > 0 ? [$"{residencyCount} resident record(s) at addresses will also be deleted."] : []
+            Consequences = residencyCount > 0 ? [T.Plural(residencyCount, "{0} resident record at an address will also be deleted.", "{0} resident records at addresses will also be deleted.")] : []
         };
     }
 }

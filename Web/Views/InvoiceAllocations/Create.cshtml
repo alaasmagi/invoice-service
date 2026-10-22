@@ -1,12 +1,12 @@
 @model InvoiceAllocationDto
 @{
-    ViewData["Title"] = "Create allocation";
+    ViewData["Title"] = T["Create allocation"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Billing</p>
-        <h1>Create allocation</h1>
+        <p class="kicker">@T["Billing"]</p>
+        <h1>@T["Create allocation"]</h1>
     </div>
 </header>
 
@@ -14,24 +14,24 @@
     <div asp-validation-summary="ModelOnly"></div>
     <div class="field">
         <label asp-for="InvoiceId" class="field__label"></label>
-        <div class="field__control"><select asp-for="InvoiceId" class="input" asp-items="ViewBag.InvoiceId"><option value="">Select invoice…</option></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+        <div class="field__control"><select asp-for="InvoiceId" class="input" asp-items="ViewBag.InvoiceId"><option value="">@T["Select invoice…"]</option></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
         <span asp-validation-for="InvoiceId"></span>
     </div>
     <div class="form-row">
         <div class="field">
             <label asp-for="ContactId" class="field__label"></label>
-            <div class="field__control"><select asp-for="ContactId" class="input" asp-items="ViewBag.ContactId"><option value="">Select contact…</option></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+            <div class="field__control"><select asp-for="ContactId" class="input" asp-items="ViewBag.ContactId"><option value="">@T["Select contact…"]</option></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
             <span asp-validation-for="ContactId"></span>
         </div>
         <div class="field">
             <label asp-for="AllocatedSum" class="field__label"></label>
-            <input asp-for="AllocatedSum" class="input" type="number" step="0.01" placeholder="e.g. 42.06" />
+            <input asp-for="AllocatedSum" class="input" type="number" step="0.01" value="@Formatter.InputNumber(Model.AllocatedSum)" placeholder="@T["e.g. 42.06"]" />
             <span asp-validation-for="AllocatedSum"></span>
         </div>
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn--primary">Create allocation</button>
-        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+        <button type="submit" class="btn btn--primary">@T["Create allocation"]</button>
+        <a asp-action="Index" class="btn btn--ghost">@T["Cancel"]</a>
     </div>
 </form>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

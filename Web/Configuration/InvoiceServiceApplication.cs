@@ -21,6 +21,13 @@ using Serilog;
 using Serilog.Events;
 using System.Net;
 using Web.Filters;
+using Web.Helpers;
+using Web.Localization;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Localization;
 using Web.Mapping;
 using Web.Services;
 using IPNetwork = System.Net.IPNetwork;
@@ -142,13 +149,21 @@ public static class InvoiceServiceApplication
         builder.Services.AddScoped<PeriodOverviewService>();
         builder.Services.AddScoped<StatisticsService>();
 
+        builder.Services.AddLocalizationSupport();
+
         builder.Services.AddScoped<CurrentAppUserViewDataFilter>();
         builder.Services.AddControllersWithViews(options =>
-        {
-            options.Filters.Add<CurrentAppUserViewDataFilter>();
-            // Empty "Select …" placeholder options post an empty value for non-nullable ids and amounts.
-            options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "This field is required.");
-        });
+            {
+                options.Filters.Add<CurrentAppUserViewDataFilter>();
+                options.ModelMetadataDetailsProviders.Add(new RequiredMessageMetadataProvider());
+                var formFactory = options.ValueProviderFactories.OfType<FormValueProviderFactory>().FirstOrDefault();
+                var formIndex = formFactory == null ? 0 : options.ValueProviderFactories.IndexOf(formFactory);
+                if (formFactory != null) options.ValueProviderFactories.RemoveAt(formIndex);
+                options.ValueProviderFactories.Insert(formIndex, new InvariantFormValueProviderFactory());
+            })
+            .AddViewLocalization()
+            .AddDataAnnotationsLocalization(options =>
+                options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(SharedResource)));
         builder.Services.ConfigureForwardedHeaders();
     }
 
@@ -208,6 +223,49 @@ public static class InvoiceServiceApplication
         services.AddScoped<IPdfInvoiceProviderDetector, PdfInvoiceProviderDetector>();
         services.AddScoped<IPdfInvoiceParser, TeliaPdfInvoiceParser>();
         services.AddScoped<IPdfInvoiceParser, EnefitPdfInvoiceParser>();
+    }
+
+    private static void AddLocalizationSupport(this IServiceCollection services)
+    {
+        services.AddLocalization(options => options.ResourcesPath = "Resources");
+        services.AddMemoryCache();
+        services.AddSingleton<UserPreferencesProvider>();
+        services.AddScoped<Formatter>();
+
+        services.Configure<RequestLocalizationOptions>(options =>
+        {
+            var formatCultures = LocalizationSettings.FormatCultures
+                .Concat(LocalizationSettings.Languages)
+                .Select(name => new CultureInfo(name))
+                .ToList();
+            options.DefaultRequestCulture = new RequestCulture(
+                LocalizationSettings.FormatCultureFor(null, LocalizationSettings.DefaultLanguage),
+                LocalizationSettings.DefaultLanguage);
+            options.SupportedCultures = formatCultures;
+            options.SupportedUICultures = LocalizationSettings.Languages.Select(name => new CultureInfo(name)).ToList();
+            options.FallBackToParentCultures = true;
+            options.FallBackToParentUICultures = true;
+            // Signed-in users get their own settings; visitors get their browser language.
+            options.RequestCultureProviders =
+            [
+                new UserPreferencesCultureProvider(),
+                new AcceptLanguageHeaderRequestCultureProvider()
+            ];
+        });
+
+        // Model binding messages are produced at request time, so they translate with the request's UI culture.
+        services.AddOptions<MvcOptions>().Configure<IStringLocalizerFactory>((options, factory) =>
+        {
+            var t = factory.Create(typeof(SharedResource));
+            var messages = options.ModelBindingMessageProvider;
+            // Empty "Select …" placeholder options post an empty value for non-nullable ids and amounts.
+            messages.SetValueMustNotBeNullAccessor(_ => t["This field is required."]);
+            messages.SetMissingBindRequiredValueAccessor(_ => t["This field is required."]);
+            messages.SetAttemptedValueIsInvalidAccessor((value, field) => t["The value '{0}' is not valid for {1}.", value, field]);
+            messages.SetValueIsInvalidAccessor(value => t["The value '{0}' is invalid.", value]);
+            messages.SetValueMustBeANumberAccessor(field => t["The field {0} must be a number.", field]);
+            messages.SetNonPropertyValueMustBeANumberAccessor(() => t["The field must be a number."]);
+        });
     }
 
     private static void ConfigureForwardedHeaders(this IServiceCollection services)

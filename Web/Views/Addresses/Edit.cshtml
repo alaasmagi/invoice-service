@@ -1,12 +1,12 @@
 @model AddressDto
 @{
-    ViewData["Title"] = "Edit address";
+    ViewData["Title"] = T["Edit address"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Directory</p>
-        <h1>Edit address</h1>
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Edit address"]</h1>
     </div>
 </header>
 
@@ -15,17 +15,17 @@
     <div asp-validation-summary="ModelOnly"></div>
     <div class="field">
         <label asp-for="Name" class="field__label"></label>
-        <input asp-for="Name" class="input" placeholder="e.g. City centre flat" />
+        <input asp-for="Name" class="input" placeholder="@T["e.g. City centre flat"]" />
         <span asp-validation-for="Name"></span>
     </div>
     <div class="field">
         <label asp-for="FullAddress" class="field__label"></label>
-        <input asp-for="FullAddress" class="input" placeholder="e.g. Narva mnt 7-21, Tallinn" />
+        <input asp-for="FullAddress" class="input" placeholder="@T["e.g. Narva mnt 7-21, Tallinn"]" />
         <span asp-validation-for="FullAddress"></span>
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn--primary">Save changes</button>
-        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn--ghost">Cancel</a>
+        <button type="submit" class="btn btn--primary">@T["Save changes"]</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn--ghost">@T["Cancel"]</a>
     </div>
 </form>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

@@ -1,31 +1,31 @@
 @model DeleteViewModel<AddressContactDto>
 @{
-    ViewData["Title"] = "Remove resident";
+    ViewData["Title"] = T["Remove resident"];
     var item = Model.Item;
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Directory</p>
-        <h1>Remove resident</h1>
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Remove resident"]</h1>
     </div>
 </header>
 
 <div class="section medium">
-    <partial name="_DeleteNotice" model='Model.Notice("resident record")' />
+    <partial name="_DeleteNotice" model='Model.Notice(T["resident record"])' />
     <dl class="card details">
-        <div class="details__row"><dt>Address</dt><dd><div class="stack-cell"><span>@item.Address.Name</span><span>@item.Address.FullAddress</span></div></dd></div>
-        <div class="details__row"><dt>Person</dt><dd>@item.Contact.FullName</dd></div>
-        <div class="details__row"><dt>Moved in</dt><dd>@Fmt.Date(item.StartDate)</dd></div>
-        <div class="details__row"><dt>Moved out</dt><dd>@if (item.EndDate == null) { <span class="badge badge--success">Lives here</span> } else { @Fmt.Date(item.EndDate) }</dd></div>
+        <div class="details__row"><dt>@T["Address"]</dt><dd><div class="stack-cell"><span>@item.Address.Name</span><span>@item.Address.FullAddress</span></div></dd></div>
+        <div class="details__row"><dt>@T["Person"]</dt><dd>@item.Contact.FullName</dd></div>
+        <div class="details__row"><dt>@T["Moved in"]</dt><dd>@Fmt.Date(item.StartDate)</dd></div>
+        <div class="details__row"><dt>@T["Moved out"]</dt><dd>@if (item.EndDate == null) { <span class="badge badge--success">@T["Lives here"]</span> } else { @Fmt.Date(item.EndDate) }</dd></div>
     </dl>
     <form asp-action="Delete" method="post" class="form-actions">
         <input type="hidden" name="Id" value="@item.Id" />
-        <button type="submit" class="btn btn--danger">Remove resident</button>
+        <button type="submit" class="btn btn--danger">@T["Remove resident"]</button>
         @if (item.EndDate == null)
         {
-            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn--secondary">Set a move-out date instead</a>
+            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn--secondary">@T["Set a move-out date instead"]</a>
         }
-        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+        <a asp-action="Index" class="btn btn--ghost">@T["Cancel"]</a>
     </form>
 </div>

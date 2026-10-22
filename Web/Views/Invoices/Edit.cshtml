@@ -1,14 +1,14 @@
 @model InvoiceDto
 @{
-    ViewData["Title"] = "Edit invoice";
+    ViewData["Title"] = T["Edit invoice"];
     var form = ViewData["Form"] as InvoiceFormViewModel ?? new InvoiceFormViewModel();
     var sent = form.IncludedInStatements.Count(e => e.Status == Domain.EMonthlyStatementStatus.Sent);
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Billing</p>
-        <h1>Edit invoice</h1>
+        <p class="kicker">@T["Billing"]</p>
+        <h1>@T["Edit invoice"]</h1>
     </div>
 </header>
 
@@ -17,8 +17,8 @@
     <div class="alert alert--warning narrow">
         <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
         <div class="alert__body">
-            <span class="alert__title">This invoice is already part of @form.IncludedInStatements.Count statement(s)@(sent > 0 ? $", {sent} of them sent" : "").</span>
-            <span>Saving won't change those statements. Regenerate the period afterwards so the amounts are updated@(sent > 0 ? ", and let recipients know if a sent statement changes" : "").</span>
+            <span class="alert__title">@(sent > 0 ? T["This invoice is already part of {0} statement(s), {1} of them sent.", form.IncludedInStatements.Count, sent] : T.Plural(form.IncludedInStatements.Count, "This invoice is already part of {0} statement.", "This invoice is already part of {0} statements."))</span>
+            <span>@(sent > 0 ? T["Saving won't change those statements. Regenerate the period afterwards so the amounts are updated, and let recipients know if a sent statement changes."] : T["Saving won't change those statements. Regenerate the period afterwards so the amounts are updated."])</span>
         </div>
     </div>
 }
@@ -27,8 +27,8 @@
     <input type="hidden" asp-for="Id" />
     <partial name="_InvoiceFields" model="Model" />
     <div class="form-actions">
-        <button type="submit" class="btn btn--primary">Save changes</button>
-        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn--ghost">Cancel</a>
+        <button type="submit" class="btn btn--primary">@T["Save changes"]</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn--ghost">@T["Cancel"]</a>
     </div>
 </form>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

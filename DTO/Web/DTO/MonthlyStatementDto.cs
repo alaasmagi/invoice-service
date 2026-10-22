@@ -17,7 +17,7 @@ public class MonthlyStatementDto : BaseEntityUserWithConcurrency
     [Display(Name = "Month")]
     public int Month { get; set; }
 
-    [Display(Name = "Total (€)")]
+    [Display(Name = "Total")]
     public decimal TotalSum { get; set; }
 
     [Display(Name = "Status")]

@@ -1,23 +1,23 @@
 @model IReadOnlyList<ServiceDto>
 @{
-    ViewData["Title"] = "Services";
+    ViewData["Title"] = T["Services"];
     var invoiceCounts = ViewData["InvoiceCounts"] as Dictionary<Guid, int> ?? new();
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Directory</p>
-        <h1>Services</h1>
-        <p class="page-header__lede">The kinds of invoices you receive, e.g. electricity, internet or water.</p>
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Services"]</h1>
+        <p class="page-header__lede">@T["The kinds of invoices you receive, e.g. electricity, internet or water."]</p>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add service</a>
+        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add service"]</a>
     </div>
 </header>
 
 <div class="card table-card">
     <table class="data-table">
-        <thead><tr><th>Name</th><th class="num">Invoices</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <thead><tr><th>@T["Name"]</th><th class="num">@T["Invoices"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
         <tbody>
         @foreach (var item in Model)
         {
@@ -26,14 +26,14 @@
                 <td>@item.Name</td>
                 <td class="num">@if (count > 0) { <a asp-controller="Invoices" asp-action="Index" asp-route-serviceId="@item.Id" class="link">@count</a> } else { <span class="secondary">0</span> }</td>
                 <td class="actions-col"><div class="row-actions">
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="@T["Edit"]" title="@T["Edit"]"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="@T["Delete"]" title="@T["Delete"]"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
                 </div></td>
             </tr>
         }
         @if (!Model.Any())
         {
-            <tr><td colspan="3" class="empty">No services yet. <a asp-action="Create" class="link">Add the first one</a>.</td></tr>
+            <tr><td colspan="3" class="empty">@T["No services yet."] <a asp-action="Create" class="link">@T["Add the first one"]</a>.</td></tr>
         }
         </tbody>
     </table>

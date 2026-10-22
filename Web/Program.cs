@@ -19,6 +19,7 @@ InvoiceServiceApplication.Run(args, app =>
     app.UseRouting();
 
     app.UseAuthentication();
+    app.UseRequestLocalization();
     app.UseAuthorization();
 
     app.MapStaticAssets();

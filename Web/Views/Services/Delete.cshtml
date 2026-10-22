@@ -1,26 +1,26 @@
 @model DeleteViewModel<ServiceDto>
 @{
-    ViewData["Title"] = "Delete service";
+    ViewData["Title"] = T["Delete service"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Directory</p>
-        <h1>Delete service</h1>
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Delete service"]</h1>
     </div>
 </header>
 
 <div class="section medium">
-    <partial name="_DeleteNotice" model='Model.Notice("service")' />
+    <partial name="_DeleteNotice" model='Model.Notice(T["service"])' />
     <dl class="card details">
-        <div class="details__row"><dt>Name</dt><dd>@Model.Item.Name</dd></div>
+        <div class="details__row"><dt>@T["Name"]</dt><dd>@Model.Item.Name</dd></div>
     </dl>
     <form asp-action="Delete" method="post" class="form-actions">
         <input type="hidden" name="Id" value="@Model.Item.Id" />
         @if (!Model.Blockers.Any())
         {
-            <button type="submit" class="btn btn--danger">Delete service</button>
+            <button type="submit" class="btn btn--danger">@T["Delete service"]</button>
         }
-        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+        <a asp-action="Index" class="btn btn--ghost">@T["Cancel"]</a>
     </form>
 </div>

@@ -125,7 +125,7 @@ public class SendMonthlyStatementService(
             InvoiceDate = FormatDate(invoiceDate),          // ISO date, e.g. 2026-06-06
             InvoiceDueDate = FormatDate(dueDate),
             InvoiceTotal = FormatMoney(statement.TotalSum), // invariant decimal string, e.g. 97.87
-            Currency = "EUR",
+            Currency = senderPaymentDetails.Currency,
             InvoiceRows = lines
                 .OrderBy(line => line.AddressName)
                 .ThenBy(line => line.InvoiceDate)

@@ -65,7 +65,7 @@ public class AddressContactsController(AppDbContext context, WebDtoMapper mapper
         StampNew(entity, userId);
         context.Add(entity);
         await context.SaveChangesAsync();
-        Flash(await DescribeAsync(dto, "now lives at"));
+        Flash(await DescribeAsync(dto));
         return RedirectToLocalOr(returnUrl, nameof(Index));
     }
 
@@ -97,7 +97,7 @@ public class AddressContactsController(AppDbContext context, WebDtoMapper mapper
         StampExisting(entity, userId, existing);
         context.Update(entity);
         await context.SaveChangesAsync();
-        Flash("Resident updated. Regenerate statements for affected months to apply the change.");
+        Flash(T["Resident updated. Regenerate statements for affected months to apply the change."]);
         return RedirectToLocalOr(returnUrl, nameof(Index));
     }
 
@@ -113,7 +113,7 @@ public class AddressContactsController(AppDbContext context, WebDtoMapper mapper
             Item = mapper.ToDto(entity),
             Consequences =
             [
-                $"Invoices for {entity.Address.Name} will no longer be split with {entity.Contact.FullName} when statements are regenerated. If they moved out, set a move-out date instead to keep the history."
+                T["Invoices for {0} will no longer be split with {1} when statements are regenerated. If they moved out, set a move-out date instead to keep the history.", entity.Address.Name, entity.Contact.FullName]
             ]
         });
     }
@@ -128,7 +128,7 @@ public class AddressContactsController(AppDbContext context, WebDtoMapper mapper
         {
             context.AddressContacts.Remove(entity);
             await context.SaveChangesAsync();
-            Flash("Resident removed.");
+            Flash(T["Resident removed."]);
         }
         return RedirectToAction(nameof(Index));
     }
@@ -139,12 +139,12 @@ public class AddressContactsController(AppDbContext context, WebDtoMapper mapper
         ClearNavigationModelState(nameof(dto.Address), nameof(dto.Contact));
         if (!await OwnsAddressAndContact(userId, dto.AddressId, dto.ContactId))
         {
-            ModelState.AddModelError(string.Empty, "Selected address or contact was not found.");
+            ModelState.AddModelError(string.Empty, T["Selected address or contact was not found."]);
             return;
         }
         if (dto.EndDate != null && dto.EndDate < dto.StartDate)
         {
-            ModelState.AddModelError(nameof(dto.EndDate), "Move-out can't be before move-in.");
+            ModelState.AddModelError(nameof(dto.EndDate), T["Move-out can't be before move-in."]);
         }
 
         var newEnd = dto.EndDate ?? DateOnly.MaxValue;
@@ -153,15 +153,15 @@ public class AddressContactsController(AppDbContext context, WebDtoMapper mapper
             .AnyAsync(e => e.StartDate <= newEnd && (e.EndDate == null || e.EndDate >= dto.StartDate));
         if (overlaps)
         {
-            ModelState.AddModelError(string.Empty, "This person already lives at this address during these dates. Edit the existing entry instead.");
+            ModelState.AddModelError(string.Empty, T["This person already lives at this address during these dates. Edit the existing entry instead."]);
         }
     }
 
-    private async Task<string> DescribeAsync(AddressContactDto dto, string verb)
+    private async Task<string> DescribeAsync(AddressContactDto dto)
     {
         var contact = await context.Contacts.Where(e => e.Id == dto.ContactId).Select(e => e.FullName).FirstAsync();
         var address = await context.Addresses.Where(e => e.Id == dto.AddressId).Select(e => e.Name).FirstAsync();
-        return $"{contact} {verb} {address}.";
+        return T["{0} now lives at {1}.", contact, address];
     }
 
     private async Task PopulateForm(Guid userId, string? returnUrl)

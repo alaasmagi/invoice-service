@@ -2,6 +2,7 @@ using DataAccess.Context;
 using DTO.DataAccess.Web.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Web.Localization;
 using Web.Mapping;
 using Web.Models;
 
@@ -50,7 +51,7 @@ public class ServicesController(AppDbContext context, WebDtoMapper mapper) : Use
         StampNew(entity, CurrentUserId());
         context.Add(entity);
         await context.SaveChangesAsync();
-        Flash($"Service \"{entity.Name}\" added.");
+        Flash(T["Service \"{0}\" added.", entity.Name]);
         return RedirectToLocalOr(returnUrl, nameof(Index));
     }
 
@@ -76,7 +77,7 @@ public class ServicesController(AppDbContext context, WebDtoMapper mapper) : Use
         StampExisting(entity, userId, existing);
         context.Update(entity);
         await context.SaveChangesAsync();
-        Flash("Service updated.");
+        Flash(T["Service updated."]);
         return RedirectToAction(nameof(Index));
     }
 
@@ -99,12 +100,12 @@ public class ServicesController(AppDbContext context, WebDtoMapper mapper) : Use
         {
             if ((await BuildDeleteModel(id, userId, mapper.ToDto(entity))).Blockers.Any())
             {
-                Flash("This service is still used by invoices and can't be deleted.", "danger");
+                Flash(T["This service is still used by invoices and can't be deleted."], "danger");
                 return RedirectToAction(nameof(Delete), new { id });
             }
             context.Services.Remove(entity);
             await context.SaveChangesAsync();
-            Flash($"Service \"{entity.Name}\" deleted.");
+            Flash(T["Service \"{0}\" deleted.", entity.Name]);
         }
         return RedirectToAction(nameof(Index));
     }
@@ -114,8 +115,8 @@ public class ServicesController(AppDbContext context, WebDtoMapper mapper) : Use
         var invoiceCount = await context.Invoices.CountAsync(e => e.UserId == userId && e.ServiceId == serviceId);
         var lineCount = await context.MonthlyStatementLines.CountAsync(e => e.UserId == userId && e.ServiceId == serviceId);
         var blockers = new List<string>();
-        if (invoiceCount > 0) blockers.Add($"{invoiceCount} invoice(s) use this service. Delete or change them first.");
-        else if (lineCount > 0) blockers.Add("Monthly statements still reference this service.");
+        if (invoiceCount > 0) blockers.Add(T.Plural(invoiceCount, "{0} invoice uses this service. Delete or change it first.", "{0} invoices use this service. Delete or change them first."));
+        else if (lineCount > 0) blockers.Add(T["Monthly statements still reference this service."]);
         return new DeleteViewModel<ServiceDto> { Item = dto, Blockers = blockers };
     }
 }

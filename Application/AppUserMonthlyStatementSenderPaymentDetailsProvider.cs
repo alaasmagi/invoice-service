@@ -14,7 +14,8 @@ public sealed class AppUserMonthlyStatementSenderPaymentDetailsProvider(IAppUser
             {
                 FullName = user.FullName,
                 Locale = user.Locale,
-                BankIban = user.BankIban ?? string.Empty
+                BankIban = user.BankIban ?? string.Empty,
+                Currency = string.IsNullOrWhiteSpace(user.Currency) ? "EUR" : user.Currency
             };
     }
 }

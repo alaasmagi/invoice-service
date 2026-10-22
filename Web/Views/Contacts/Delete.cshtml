@@ -1,28 +1,28 @@
 @model DeleteViewModel<ContactDto>
 @{
-    ViewData["Title"] = "Delete contact";
+    ViewData["Title"] = T["Delete contact"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Directory</p>
-        <h1>Delete contact</h1>
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Delete contact"]</h1>
     </div>
 </header>
 
 <div class="section medium">
-    <partial name="_DeleteNotice" model='Model.Notice("contact")' />
+    <partial name="_DeleteNotice" model='Model.Notice(T["contact"])' />
     <dl class="card details">
-        <div class="details__row"><dt>Name</dt><dd>@Model.Item.FullName</dd></div>
-        <div class="details__row"><dt>Email</dt><dd>@Model.Item.Email</dd></div>
-        <div class="details__row"><dt>Phone</dt><dd>@(string.IsNullOrEmpty(Model.Item.Phone) ? "—" : Model.Item.Phone)</dd></div>
+        <div class="details__row"><dt>@T["Name"]</dt><dd>@Model.Item.FullName</dd></div>
+        <div class="details__row"><dt>@T["Email"]</dt><dd>@Model.Item.Email</dd></div>
+        <div class="details__row"><dt>@T["Phone"]</dt><dd>@(string.IsNullOrEmpty(Model.Item.Phone) ? "—" : Model.Item.Phone)</dd></div>
     </dl>
     <form asp-action="Delete" method="post" class="form-actions">
         <input type="hidden" name="Id" value="@Model.Item.Id" />
         @if (!Model.Blockers.Any())
         {
-            <button type="submit" class="btn btn--danger">Delete contact</button>
+            <button type="submit" class="btn btn--danger">@T["Delete contact"]</button>
         }
-        <a asp-action="Details" asp-route-id="@Model.Item.Id" class="btn btn--ghost">Cancel</a>
+        <a asp-action="Details" asp-route-id="@Model.Item.Id" class="btn btn--ghost">@T["Cancel"]</a>
     </form>
 </div>

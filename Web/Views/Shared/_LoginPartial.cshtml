@@ -1,13 +1,14 @@
 @{
-    var appUserEmail = ViewData["CurrentAppUserEmail"] as string ?? User.Identity?.Name ?? "Account";
+    var appUserEmail = ViewData["CurrentAppUserEmail"] as string ?? User.Identity?.Name ?? T["Account"].Value;
 }
 
 @if (User.Identity?.IsAuthenticated == true)
 {
     <div class="user-row">
-        <a class="user-row__email" asp-area="" asp-controller="AppUsers" asp-action="Edit" title="@appUserEmail">@appUserEmail</a>
+        <a class="user-row__email" asp-area="" asp-controller="AppUsers" asp-action="Edit" title="@T["Settings"] · @appUserEmail">@appUserEmail</a>
+        <a class="icon-btn" asp-area="" asp-controller="AppUsers" asp-action="Edit" aria-label="@T["Settings"]" title="@T["Settings"]"><svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg></a>
         <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post">
-            <button type="submit" class="icon-btn" aria-label="Logout" title="Logout">
+            <button type="submit" class="icon-btn" aria-label="@T["Logout"]" title="@T["Logout"]">
                 <svg class="icon" aria-hidden="true"><use href="#i-log-out"></use></svg>
             </button>
         </form>
@@ -16,6 +17,6 @@
 else
 {
     <a class="btn btn--secondary" asp-area="" asp-controller="Auth" asp-action="Login">
-        <svg class="icon" aria-hidden="true"><use href="#i-log-in"></use></svg>Login
+        <svg class="icon" aria-hidden="true"><use href="#i-log-in"></use></svg>@T["Login"]
     </a>
 }

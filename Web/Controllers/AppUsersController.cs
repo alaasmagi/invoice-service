@@ -3,11 +3,12 @@ using DataAccess.Context;
 using DTO.DataAccess.DataAccess.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Web.Localization;
 using Web.Models;
 
 namespace Web.Controllers;
 
-public sealed class AppUsersController(AppDbContext context) : UserScopedControllerBase
+public sealed class AppUsersController(AppDbContext context, UserPreferencesProvider preferencesProvider) : UserScopedControllerBase
 {
     public async Task<IActionResult> Edit()
     {
@@ -17,6 +18,12 @@ public sealed class AppUsersController(AppDbContext context) : UserScopedControl
             .FirstOrDefaultAsync(user => user.Id == userId, HttpContext.RequestAborted);
 
         return View(ToViewModel(userId, entity));
+    }
+
+    public override void OnActionExecuted(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext context)
+    {
+        ViewData["AccountUrl"] = KeycloakAccountUrl();
+        base.OnActionExecuted(context);
     }
 
     [HttpPost]
@@ -33,9 +40,18 @@ public sealed class AppUsersController(AppDbContext context) : UserScopedControl
         model.Username = IdentityUsername();
         ModelState.Remove(nameof(model.Email));
         ModelState.Remove(nameof(model.Username));
+        ModelState.Remove(nameof(model.Locale));
+        if (!string.IsNullOrEmpty(model.FormatCulture) && !LocalizationSettings.FormatCultures.Contains(model.FormatCulture))
+            ModelState.AddModelError(nameof(model.FormatCulture), T["Choose a format from the list."]);
+        if (!LocalizationSettings.Currencies.Contains(model.Currency))
+            ModelState.AddModelError(nameof(model.Currency), T["Choose a currency from the list."]);
+        if (!TimeZoneInfo.TryFindSystemTimeZoneById(model.TimeZone, out _))
+            ModelState.AddModelError(nameof(model.TimeZone), T["Choose a time zone from the list."]);
 
         if (!ModelState.IsValid)
         {
+            model.Locale = (await context.AppUsers.AsNoTracking().Where(user => user.Id == userId)
+                .Select(user => user.Locale).FirstOrDefaultAsync(HttpContext.RequestAborted)) ?? model.Locale;
             return View(model);
         }
 
@@ -59,11 +75,15 @@ public sealed class AppUsersController(AppDbContext context) : UserScopedControl
         }
 
         entity.FullName = model.FullName.Trim();
-        entity.Locale = NormalizeLocale(model.Locale);
+        // The language (Locale) is owned by Keycloak and synced from identity events, so it isn't written here.
         entity.BankIban = string.IsNullOrWhiteSpace(model.BankIban) ? null : model.BankIban.Trim();
+        entity.FormatCulture = string.IsNullOrEmpty(model.FormatCulture) ? null : model.FormatCulture;
+        entity.Currency = model.Currency;
+        entity.TimeZone = model.TimeZone;
 
         await context.SaveChangesAsync(HttpContext.RequestAborted);
-        Flash("Your details were saved.");
+        preferencesProvider.Invalidate(userId);
+        Flash(T["Your settings were saved."]);
 
         return RedirectToAction(nameof(Edit));
     }
@@ -77,7 +97,10 @@ public sealed class AppUsersController(AppDbContext context) : UserScopedControl
             Username = string.IsNullOrWhiteSpace(entity?.Username) ? IdentityUsername() : entity.Username,
             FullName = string.IsNullOrWhiteSpace(entity?.FullName) ? IdentityFullName() : entity.FullName,
             Locale = string.IsNullOrWhiteSpace(entity?.Locale) ? "et" : entity.Locale,
-            BankIban = entity?.BankIban
+            BankIban = entity?.BankIban,
+            FormatCulture = entity?.FormatCulture,
+            Currency = LocalizationSettings.CurrencyFor(entity?.Currency),
+            TimeZone = LocalizationSettings.TimeZoneFor(entity?.TimeZone).Id
         };
     }
 
@@ -111,9 +134,11 @@ public sealed class AppUsersController(AppDbContext context) : UserScopedControl
             .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
     }
 
-    private static string NormalizeLocale(string locale)
+    /// <summary>Keycloak's account console, where the user changes their language.</summary>
+    private static string? KeycloakAccountUrl()
     {
-        return string.IsNullOrWhiteSpace(locale) ? "et" : locale.Trim();
+        var authority = Environment.GetEnvironmentVariable("KEYCLOAK_AUTHORITY");
+        return string.IsNullOrWhiteSpace(authority) ? null : authority.TrimEnd('/') + "/account";
     }
 
     private static void StampNew(AppUserEntity entity, Guid userId)

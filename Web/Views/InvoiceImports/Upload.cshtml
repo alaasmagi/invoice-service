@@ -1,29 +1,29 @@
 @{
-    ViewData["Title"] = "Import invoice PDF";
+    ViewData["Title"] = T["Import invoice PDF"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Billing</p>
-        <h1>Import invoice PDF</h1>
-        <p class="page-header__lede">Upload a Telia or Enefit invoice PDF. The importer will match service and address records before creating invoices.</p>
+        <p class="kicker">@T["Billing"]</p>
+        <h1>@T["Import invoice PDF"]</h1>
+        <p class="page-header__lede">@T["Upload a Telia or Enefit invoice PDF. The importer will match service and address records before creating invoices."]</p>
     </div>
 </header>
 
 <form asp-action="Upload" method="post" enctype="multipart/form-data" class="card form narrow">
     <div class="field">
-        <label for="pdfFile" class="field__label">PDF invoice</label>
+        <label for="pdfFile" class="field__label">@T["PDF invoice"]</label>
         <div class="dropzone" data-dropzone>
             <input id="pdfFile" name="pdfFile" type="file" accept="application/pdf,.pdf" required aria-describedby="pdfFileHelp" />
             <span class="icon-tile"><svg class="icon icon--lg" aria-hidden="true"><use href="#i-upload"></use></svg></span>
-            <span class="dropzone__prompt" data-dropzone-prompt>Drop a PDF here or <strong>browse files</strong></span>
+            <span class="dropzone__prompt" data-dropzone-prompt>@T["Drop a PDF here or"] <strong>@T["browse files"]</strong></span>
             <span class="dropzone__file" data-dropzone-file hidden></span>
-            <span class="field__help" id="pdfFileHelp">Telia or Enefit invoice · PDF · Maximum file size: 10 MB.</span>
+            <span class="field__help" id="pdfFileHelp">@T["Telia or Enefit invoice · PDF · Maximum file size: 10 MB."]</span>
         </div>
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn--primary">Import PDF</button>
-        <a asp-controller="Invoices" asp-action="Index" class="btn btn--ghost">Back to invoices</a>
+        <button type="submit" class="btn btn--primary">@T["Import PDF"]</button>
+        <a asp-controller="Invoices" asp-action="Index" class="btn btn--ghost">@T["Back to invoices"]</a>
     </div>
 </form>
 

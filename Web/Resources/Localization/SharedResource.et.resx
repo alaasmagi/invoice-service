@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Estonian UI strings. Keys are the English source texts used in views and controllers
+     (IStringLocalizer<SharedResource>); a key without an entry here falls back to English. -->
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name=". Create one by hand only for special cases. It won't have invoice lines." xml:space="preserve"><value>. Loo aruanne käsitsi ainult erijuhtudel. Sellel ei ole arveridu.</value></data>
+  <data name=": no resident lived there on the invoice date." xml:space="preserve"><value>: arve kuupäeval ei elanud seal ühtegi elanikku.</value></data>
+  <data name="A record of how manually added invoices were split when they were created. Monthly statements don't read these. They split each invoice equally between the residents on the invoice date, so editing an allocation doesn't change any statement." xml:space="preserve"><value>Ülevaade sellest, kuidas käsitsi lisatud arved loomise hetkel jagati. Igakuised aruanded neid ei kasuta: aruanded jagavad iga arve võrdselt arve kuupäeval elanud elanike vahel, nii et jaotuse muutmine ühtegi aruannet ei muuda.</value></data>
+  <data name="A resident needs an address and a contact. Add what's missing first:" xml:space="preserve"><value>Elaniku jaoks on vaja aadressi ja kontakti. Lisa enne puuduolev:</value></data>
+  <data name="Access to this application should be limited to authorized users who need that operational data." xml:space="preserve"><value>Ligipääs rakendusele peaks olema ainult volitatud kasutajatel, kes neid andmeid oma töös vajavad.</value></data>
+  <data name="Account" xml:space="preserve"><value>Konto</value></data>
+  <data name="Actions" xml:space="preserve"><value>Toimingud</value></data>
+  <data name="Add a contact" xml:space="preserve"><value>Lisa kontakt</value></data>
+  <data name="Add a new contact" xml:space="preserve"><value>Lisa uus kontakt</value></data>
+  <data name="Add a resident" xml:space="preserve"><value>Lisa elanik</value></data>
+  <data name="Add a service" xml:space="preserve"><value>Lisa teenus</value></data>
+  <data name="Add address" xml:space="preserve"><value>Lisa aadress</value></data>
+  <data name="Add an address" xml:space="preserve"><value>Lisa aadress</value></data>
+  <data name="Add an invoice" xml:space="preserve"><value>Lisa arve</value></data>
+  <data name="Add contact" xml:space="preserve"><value>Lisa kontakt</value></data>
+  <data name="Add invoice" xml:space="preserve"><value>Lisa arve</value></data>
+  <data name="Add invoices for {0}" xml:space="preserve"><value>Lisa arved: {0}</value></data>
+  <data name="Add one manually" xml:space="preserve"><value>Lisa käsitsi</value></data>
+  <data name="Add resident" xml:space="preserve"><value>Lisa elanik</value></data>
+  <data name="Add residents to bill" xml:space="preserve"><value>Lisa arveldatavad elanikud</value></data>
+  <data name="Add service" xml:space="preserve"><value>Lisa teenus</value></data>
+  <data name="Add the first one" xml:space="preserve"><value>Lisa esimene</value></data>
+  <data name="Add to address" xml:space="preserve"><value>Lisa aadressile</value></data>
+  <data name="Add to an address" xml:space="preserve"><value>Lisa aadressile</value></data>
+  <data name="Address" xml:space="preserve"><value>Aadress</value></data>
+  <data name="address" xml:space="preserve"><value>aadress</value></data>
+  <data name="Address &quot;{0}&quot; added. Next, add the people who live there." xml:space="preserve"><value>Aadress "{0}" lisatud. Järgmisena lisa seal elavad inimesed.</value></data>
+  <data name="Address &quot;{0}&quot; deleted." xml:space="preserve"><value>Aadress "{0}" kustutatud.</value></data>
+  <data name="Address text" xml:space="preserve"><value>Aadressi tekst</value></data>
+  <data name="Address updated." xml:space="preserve"><value>Aadress uuendatud.</value></data>
+  <data name="Addresses" xml:space="preserve"><value>Aadressid</value></data>
+  <data name="All addresses" xml:space="preserve"><value>Kõik aadressid</value></data>
+  <data name="All clear" xml:space="preserve"><value>Kõik korras</value></data>
+  <data name="All done" xml:space="preserve"><value>Kõik tehtud</value></data>
+  <data name="All months" xml:space="preserve"><value>Kõik kuud</value></data>
+  <data name="All services" xml:space="preserve"><value>Kõik teenused</value></data>
+  <data name="All {0} invoices" xml:space="preserve"><value>Kõik arved ({0})</value></data>
+  <data name="Allocation deleted." xml:space="preserve"><value>Jaotus kustutatud.</value></data>
+  <data name="Allocation details" xml:space="preserve"><value>Jaotuse andmed</value></data>
+  <data name="Allocation saved." xml:space="preserve"><value>Jaotus salvestatud.</value></data>
+  <data name="Allocation updated." xml:space="preserve"><value>Jaotus uuendatud.</value></data>
+  <data name="Allocations" xml:space="preserve"><value>Jaotused</value></data>
+  <data name="Amount" xml:space="preserve"><value>Summa</value></data>
+  <data name="An error occurred while processing your request." xml:space="preserve"><value>Päringu töötlemisel tekkis viga.</value></data>
+  <data name="An invoice needs an address and a service. Add what's missing first:" xml:space="preserve"><value>Arve jaoks on vaja aadressi ja teenust. Lisa enne puuduolev:</value></data>
+  <data name="and restarting the app." xml:space="preserve"><value>ja taaskäivitades rakenduse.</value></data>
+  <data name="Any status" xml:space="preserve"><value>Kõik olekud</value></data>
+  <data name="Apply" xml:space="preserve"><value>Rakenda</value></data>
+  <data name="Are you sure?" xml:space="preserve"><value>Kas oled kindel?</value></data>
+  <data name="ASPNETCORE_ENVIRONMENT" xml:space="preserve"><value>ASPNETCORE_ENVIRONMENT</value></data>
+  <data name="Average per month" xml:space="preserve"><value>Keskmiselt kuus</value></data>
+  <data name="Back" xml:space="preserve"><value>Tagasi</value></data>
+  <data name="Back to addresses" xml:space="preserve"><value>Tagasi aadresside juurde</value></data>
+  <data name="Back to allocations" xml:space="preserve"><value>Tagasi jaotuste juurde</value></data>
+  <data name="Back to contacts" xml:space="preserve"><value>Tagasi kontaktide juurde</value></data>
+  <data name="Back to invoices" xml:space="preserve"><value>Tagasi arvete juurde</value></data>
+  <data name="Back to residents" xml:space="preserve"><value>Tagasi elanike juurde</value></data>
+  <data name="Back to services" xml:space="preserve"><value>Tagasi teenuste juurde</value></data>
+  <data name="Back to {0} statements" xml:space="preserve"><value>Tagasi perioodi {0} aruannete juurde</value></data>
+  <data name="Bank IBAN" xml:space="preserve"><value>Panga IBAN</value></data>
+  <data name="Billed" xml:space="preserve"><value>Arveldatud</value></data>
+  <data name="Billed in {0} but not yet in {1}." xml:space="preserve"><value>Arveldati perioodil {0}, aga perioodil {1} veel mitte.</value></data>
+  <data name="Billed period" xml:space="preserve"><value>Arveldusperiood</value></data>
+  <data name="Billing" xml:space="preserve"><value>Arveldus</value></data>
+  <data name="browse files" xml:space="preserve"><value>vali fail</value></data>
+  <data name="By address" xml:space="preserve"><value>Aadresside kaupa</value></data>
+  <data name="By person" xml:space="preserve"><value>Inimeste kaupa</value></data>
+  <data name="By service" xml:space="preserve"><value>Teenuste kaupa</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Tühista</value></data>
+  <data name="Change it in your account" xml:space="preserve"><value>Muuda seda oma kontol</value></data>
+  <data name="Check the amounts below. When every invoice for the month is in, generate the statements so they can be sent." xml:space="preserve"><value>Kontrolli allolevaid summasid. Kui kõik kuu arved on sees, genereeri aruanded, et neid saaks saata.</value></data>
+  <data name="Check the recipients' email addresses and send them again." xml:space="preserve"><value>Kontrolli saajate e-posti aadresse ja saada uuesti.</value></data>
+  <data name="Check the {0} invoice that may still be missing first." xml:space="preserve"><value>Kontrolli enne üle {0} arve, mis võib veel puududa.</value></data>
+  <data name="Check the {0} invoices that may still be missing first." xml:space="preserve"><value>Kontrolli enne üle {0} arvet, mis võivad veel puududa.</value></data>
+  <data name="Checklist" xml:space="preserve"><value>Kontrollnimekiri</value></data>
+  <data name="Choose a currency from the list." xml:space="preserve"><value>Vali valuuta nimekirjast.</value></data>
+  <data name="Choose a format from the list." xml:space="preserve"><value>Vali vorming nimekirjast.</value></data>
+  <data name="Choose a time zone from the list." xml:space="preserve"><value>Vali ajavöönd nimekirjast.</value></data>
+  <data name="Choose a valid month to generate statements for." xml:space="preserve"><value>Vali kehtiv kuu, mille aruandeid genereerida.</value></data>
+  <data name="Choose month" xml:space="preserve"><value>Vali kuu</value></data>
+  <data name="Clear filters" xml:space="preserve"><value>Tühjenda filtrid</value></data>
+  <data name="Close" xml:space="preserve"><value>Sulge</value></data>
+  <data name="Comes from your account. It also sets the language of statement emails." xml:space="preserve"><value>Tuleb sinu kontolt. See määrab ka aruannete e-kirjade keele.</value></data>
+  <data name="Confirm" xml:space="preserve"><value>Kinnita</value></data>
+  <data name="Contact" xml:space="preserve"><value>Kontakt</value></data>
+  <data name="contact" xml:space="preserve"><value>kontakt</value></data>
+  <data name="Contact updated." xml:space="preserve"><value>Kontakt uuendatud.</value></data>
+  <data name="Contacts" xml:space="preserve"><value>Kontaktid</value></data>
+  <data name="Create allocation" xml:space="preserve"><value>Lisa jaotus</value></data>
+  <data name="Create invoices manually or import provider PDFs for Telia and Enefit." xml:space="preserve"><value>Lisa arveid käsitsi või impordi Telia ja Enefiti PDF-arved.</value></data>
+  <data name="Create statement" xml:space="preserve"><value>Loo aruanne</value></data>
+  <data name="Created invoices" xml:space="preserve"><value>Loodud arved</value></data>
+  <data name="Currency" xml:space="preserve"><value>Valuuta</value></data>
+  <data name="Dark mode" xml:space="preserve"><value>Tume režiim</value></data>
+  <data name="Date" xml:space="preserve"><value>Kuupäev</value></data>
+  <data name="Date and number format" xml:space="preserve"><value>Kuupäeva ja numbrite vorming</value></data>
+  <data name="Decides who shares each invoice." xml:space="preserve"><value>Määrab, kes iga arve kulud jagavad.</value></data>
+  <data name="Delete" xml:space="preserve"><value>Kustuta</value></data>
+  <data name="Delete address" xml:space="preserve"><value>Kustuta aadress</value></data>
+  <data name="Delete allocation" xml:space="preserve"><value>Kustuta jaotus</value></data>
+  <data name="Delete contact" xml:space="preserve"><value>Kustuta kontakt</value></data>
+  <data name="Delete invoice" xml:space="preserve"><value>Kustuta arve</value></data>
+  <data name="Delete service" xml:space="preserve"><value>Kustuta teenus</value></data>
+  <data name="Delete statement" xml:space="preserve"><value>Kustuta aruanne</value></data>
+  <data name="Delete this allocation?" xml:space="preserve"><value>Kas kustutada see jaotus?</value></data>
+  <data name="Delete this {0}?" xml:space="preserve"><value>Kas kustutada see kirje ({0})?</value></data>
+  <data name="Details" xml:space="preserve"><value>Andmed</value></data>
+  <data name="Development" xml:space="preserve"><value>Development</value></data>
+  <data name="Development mode" xml:space="preserve"><value>Arendusrežiim</value></data>
+  <data name="Directory" xml:space="preserve"><value>Kataloog</value></data>
+  <data name="Dismiss" xml:space="preserve"><value>Sulge</value></data>
+  <data name="Draft" xml:space="preserve"><value>Mustand</value></data>
+  <data name="Drop a PDF here or" xml:space="preserve"><value>Lohista PDF siia või</value></data>
+  <data name="e.g. +372 5123 4567" xml:space="preserve"><value>nt +372 5123 4567</value></data>
+  <data name="e.g. 2026" xml:space="preserve"><value>nt 2026</value></data>
+  <data name="e.g. 42.06" xml:space="preserve"><value>nt 42.06</value></data>
+  <data name="e.g. 76.08" xml:space="preserve"><value>nt 76.08</value></data>
+  <data name="e.g. 84.12" xml:space="preserve"><value>nt 84.12</value></data>
+  <data name="e.g. Andres Tamm" xml:space="preserve"><value>nt Andres Tamm</value></data>
+  <data name="e.g. City centre flat" xml:space="preserve"><value>nt Kesklinna korter</value></data>
+  <data name="e.g. electricity, internet, water." xml:space="preserve"><value>nt elekter, internet, vesi.</value></data>
+  <data name="e.g. Enefit electricity" xml:space="preserve"><value>nt Enefiti elekter</value></data>
+  <data name="e.g. Narva mnt 7-21, Tallinn" xml:space="preserve"><value>nt Narva mnt 7-21, Tallinn</value></data>
+  <data name="e.g. {0}" xml:space="preserve"><value>nt {0}</value></data>
+  <data name="Each person gets one statement per month with their share of every invoice at the addresses they live at." xml:space="preserve"><value>Iga inimene saab kuus ühe aruande oma osaga kõigist arvetest aadressidel, kus ta elab.</value></data>
+  <data name="Edit" xml:space="preserve"><value>Muuda</value></data>
+  <data name="Edit address" xml:space="preserve"><value>Muuda aadressi</value></data>
+  <data name="Edit allocation" xml:space="preserve"><value>Muuda jaotust</value></data>
+  <data name="Edit contact" xml:space="preserve"><value>Muuda kontakti</value></data>
+  <data name="Edit invoice" xml:space="preserve"><value>Muuda arvet</value></data>
+  <data name="Edit resident" xml:space="preserve"><value>Muuda elanikku</value></data>
+  <data name="Edit service" xml:space="preserve"><value>Muuda teenust</value></data>
+  <data name="Edit statement" xml:space="preserve"><value>Muuda aruannet</value></data>
+  <data name="Email" xml:space="preserve"><value>E-post</value></data>
+  <data name="Email the {0} statement ({1}) to {2} &lt;{3}&gt;?" xml:space="preserve"><value>Kas saata perioodi {0} aruanne ({1}) isikule {2} &lt;{3}&gt;?</value></data>
+  <data name="Email this statement ({0}) to {1} &lt;{2}&gt;?" xml:space="preserve"><value>Kas saata see aruanne ({0}) isikule {1} &lt;{2}&gt;?</value></data>
+  <data name="Enter an invoice by hand. For Telia or Enefit PDFs you can" xml:space="preserve"><value>Sisesta arve käsitsi. Telia või Enefiti PDF-arved saad ka</value></data>
+  <data name="Enter invoices manually or import Telia and Enefit PDFs." xml:space="preserve"><value>Sisesta arved käsitsi või impordi Telia ja Enefiti PDF-id.</value></data>
+  <data name="environment by setting the" xml:space="preserve"><value>keskkond, määrates keskkonnamuutuja</value></data>
+  <data name="environment variable to" xml:space="preserve"><value>väärtuseks</value></data>
+  <data name="environment will display more detailed information about the error that occurred." xml:space="preserve"><value>kuvatakse tekkinud vea kohta täpsemat teavet.</value></data>
+  <data name="Error" xml:space="preserve"><value>Viga</value></data>
+  <data name="Every recurring invoice is in and every invoice has someone to bill." xml:space="preserve"><value>Kõik korduvad arved on sees ja igal arvel on, kellele arveldada.</value></data>
+  <data name="Every {0} statement has been sent" xml:space="preserve"><value>Kõik aruanded ({0}) on saadetud</value></data>
+  <data name="Example:" xml:space="preserve"><value>Näide:</value></data>
+  <data name="Failed" xml:space="preserve"><value>Ebaõnnestus</value></data>
+  <data name="Filter invoices" xml:space="preserve"><value>Filtreeri arveid</value></data>
+  <data name="Filter statements" xml:space="preserve"><value>Filtreeri aruandeid</value></data>
+  <data name="Finish setting up" xml:space="preserve"><value>Lõpeta seadistamine</value></data>
+  <data name="first." xml:space="preserve"><value>enne.</value></data>
+  <data name="From monthly statements for the same months." xml:space="preserve"><value>Samade kuude igakuiste aruannete põhjal.</value></data>
+  <data name="Full address" xml:space="preserve"><value>Täielik aadress</value></data>
+  <data name="Full name" xml:space="preserve"><value>Täisnimi</value></data>
+  <data name="Generate statements" xml:space="preserve"><value>Genereeri aruanded</value></data>
+  <data name="Generate statements for {0}" xml:space="preserve"><value>Genereeri aruanded: {0}</value></data>
+  <data name="Generated {0} statement for {1}, ready to send." xml:space="preserve"><value>Genereeriti {0} aruanne perioodile {1}, valmis saatmiseks.</value></data>
+  <data name="Generated {0} statements for {1}, ready to send." xml:space="preserve"><value>Genereeriti {0} aruannet perioodile {1}, valmis saatmiseks.</value></data>
+  <data name="Hide past residents" xml:space="preserve"><value>Peida endised elanikud</value></data>
+  <data name="Home" xml:space="preserve"><value>Avaleht</value></data>
+  <data name="import a PDF" xml:space="preserve"><value>impordi PDF</value></data>
+  <data name="Import a provider PDF" xml:space="preserve"><value>Impordi teenusepakkuja PDF</value></data>
+  <data name="import a provider PDF" xml:space="preserve"><value>impordi teenusepakkuja PDF</value></data>
+  <data name="Import another PDF" xml:space="preserve"><value>Impordi veel üks PDF</value></data>
+  <data name="Import failed." xml:space="preserve"><value>Import ebaõnnestus.</value></data>
+  <data name="Import invoice PDF" xml:space="preserve"><value>Impordi arve PDF</value></data>
+  <data name="Import PDF" xml:space="preserve"><value>Impordi PDF</value></data>
+  <data name="import the file" xml:space="preserve"><value>failist importida</value></data>
+  <data name="Import utility invoices, keep address and contact records tidy, split costs, and send monthly statements without leaving the service." xml:space="preserve"><value>Impordi kommunaalarved, hoia aadressid ja kontaktid korras, jaga kulud ja saada igakuised aruanded, ilma et peaksid teenusest lahkuma.</value></data>
+  <data name="Import, split, send" xml:space="preserve"><value>Impordi, jaga, saada</value></data>
+  <data name="Imported {0} invoice from {1}, {2} in total." xml:space="preserve"><value>Imporditi {0} arve teenusepakkujalt {1}, kokku {2}.</value></data>
+  <data name="Imported {0} invoices from {1}, {2} in total." xml:space="preserve"><value>Imporditi {0} arvet teenusepakkujalt {1}, kokku {2}.</value></data>
+  <data name="in progress" xml:space="preserve"><value>pooleli</value></data>
+  <data name="Included in the {0} statement for {1} ({2}). Delete that statement first." xml:space="preserve"><value>Sisaldub perioodi {0} aruandes isikule {1} ({2}). Kustuta enne see aruanne.</value></data>
+  <data name="instead." xml:space="preserve"><value>.</value></data>
+  <data name="Invoice" xml:space="preserve"><value>Arve</value></data>
+  <data name="invoice" xml:space="preserve"><value>arve</value></data>
+  <data name="Invoice allocations" xml:space="preserve"><value>Arvete jaotused</value></data>
+  <data name="Invoice date" xml:space="preserve"><value>Arve kuupäev</value></data>
+  <data name="Invoice deleted." xml:space="preserve"><value>Arve kustutatud.</value></data>
+  <data name="Invoice details" xml:space="preserve"><value>Arve andmed</value></data>
+  <data name="Invoice operations" xml:space="preserve"><value>Arvete haldus</value></data>
+  <data name="Invoice saved for {0} ({1})." xml:space="preserve"><value>Arve salvestatud aadressile {0} ({1}).</value></data>
+  <data name="Invoice saved for {0} ({1}). Add the next one." xml:space="preserve"><value>Arve salvestatud aadressile {0} ({1}). Lisa järgmine.</value></data>
+  <data name="Invoice Service" xml:space="preserve"><value>Invoice Service</value></data>
+  <data name="Invoice Service stores the invoice, address, contact, allocation, and statement data needed to operate the billing workflow." xml:space="preserve"><value>Invoice Service säilitab arvete, aadresside, kontaktide, jaotuste ja aruannete andmeid, mis on arveldamiseks vajalikud.</value></data>
+  <data name="Invoice shares" xml:space="preserve"><value>Arvete osad</value></data>
+  <data name="Invoice total" xml:space="preserve"><value>Arve summa</value></data>
+  <data name="Invoice updated." xml:space="preserve"><value>Arve uuendatud.</value></data>
+  <data name="Invoice updated. Regenerate the statements that include it so they show the new figures." xml:space="preserve"><value>Arve uuendatud. Genereeri seda arvet sisaldavad aruanded uuesti, et need näitaksid uusi summasid.</value></data>
+  <data name="Invoices" xml:space="preserve"><value>Arved</value></data>
+  <data name="Invoices dated from this day on are shared with this person." xml:space="preserve"><value>Sellest päevast alates dateeritud arved jagatakse selle inimesega.</value></data>
+  <data name="Invoices for this address are included in {0} monthly statement. Delete that statement first, or keep the address for history." xml:space="preserve"><value>Selle aadressi arved on {0} igakuises aruandes. Kustuta enne see aruanne või jäta aadress ajaloo jaoks alles.</value></data>
+  <data name="Invoices for this address are included in {0} monthly statements. Delete those statements first, or keep the address for history." xml:space="preserve"><value>Selle aadressi arved on {0} igakuises aruandes. Kustuta enne need aruanded või jäta aadress ajaloo jaoks alles.</value></data>
+  <data name="Invoices for this address are split equally between the people living here on the invoice date." xml:space="preserve"><value>Selle aadressi arved jagatakse võrdselt inimeste vahel, kes elasid siin arve kuupäeval.</value></data>
+  <data name="Invoices for {0} will no longer be split with {1} when statements are regenerated. If they moved out, set a move-out date instead to keep the history." xml:space="preserve"><value>Aruannete uuesti genereerimisel ei jagata aadressi {0} arveid enam isikuga {1}. Kui inimene kolis välja, määra ajaloo säilitamiseks hoopis väljakolimise kuupäev.</value></data>
+  <data name="Invoices in {0}" xml:space="preserve"><value>Arved: {0}</value></data>
+  <data name="It can result in displaying sensitive information from exceptions to end users. For local debugging, enable the" xml:space="preserve"><value>See võib näidata lõppkasutajatele erinditest tundlikku teavet. Kohalikuks silumiseks luba</value></data>
+  <data name="It was already emailed to {0}. Deleting it here doesn't recall that email." xml:space="preserve"><value>See on juba saadetud isikule {0}. Siin kustutamine e-kirja tagasi ei võta.</value></data>
+  <data name="It was already sent once." xml:space="preserve"><value>See on juba korra saadetud.</value></data>
+  <data name="Its {0} invoice share line will be removed. The invoice itself stays." xml:space="preserve"><value>Selle {0} arverida eemaldatakse. Arve ise jääb alles.</value></data>
+  <data name="Its {0} invoice share lines will be removed. The invoices themselves stay." xml:space="preserve"><value>Selle {0} arverida eemaldatakse. Arved ise jäävad alles.</value></data>
+  <data name="Language" xml:space="preserve"><value>Keel</value></data>
+  <data name="Language and formats" xml:space="preserve"><value>Keel ja vormingud</value></data>
+  <data name="Last month you had {0} recurring invoice." xml:space="preserve"><value>Eelmisel kuul oli sul {0} korduv arve.</value></data>
+  <data name="Last month you had {0} recurring invoices." xml:space="preserve"><value>Eelmisel kuul oli sul {0} korduvat arvet.</value></data>
+  <data name="Last {0} months" xml:space="preserve"><value>Viimased {0} kuud</value></data>
+  <data name="Leave empty while they still live here." xml:space="preserve"><value>Jäta tühjaks, kuni inimene siin veel elab.</value></data>
+  <data name="Legend" xml:space="preserve"><value>Legend</value></data>
+  <data name="Link a person to an address" xml:space="preserve"><value>Seo inimene aadressiga</value></data>
+  <data name="Link a person to an address. Each invoice is split equally between everyone living at the address on the invoice date." xml:space="preserve"><value>Seo inimene aadressiga. Iga arve jagatakse võrdselt kõigi vahel, kes elasid aadressil arve kuupäeval.</value></data>
+  <data name="Link residents to addresses" xml:space="preserve"><value>Seo elanikud aadressidega</value></data>
+  <data name="Lives at" xml:space="preserve"><value>Elab aadressil</value></data>
+  <data name="Lives here" xml:space="preserve"><value>Elab siin</value></data>
+  <data name="Log in" xml:space="preserve"><value>Logi sisse</value></data>
+  <data name="Login" xml:space="preserve"><value>Logi sisse</value></data>
+  <data name="Logout" xml:space="preserve"><value>Logi välja</value></data>
+  <data name="Main" xml:space="preserve"><value>Peamenüü</value></data>
+  <data name="Maintain homes, service locations, and contact assignments." xml:space="preserve"><value>Halda kodusid, teeninduskohti ja kontaktide seoseid.</value></data>
+  <data name="Manage the residents and recipients connected to each address." xml:space="preserve"><value>Halda iga aadressiga seotud elanikke ja saajaid.</value></data>
+  <data name="Manual statement" xml:space="preserve"><value>Käsitsi aruanne</value></data>
+  <data name="Month" xml:space="preserve"><value>Kuu</value></data>
+  <data name="Monthly costs by service" xml:space="preserve"><value>Kuu kulud teenuste kaupa</value></data>
+  <data name="Monthly statement" xml:space="preserve"><value>Igakuine aruanne</value></data>
+  <data name="Monthly statements" xml:space="preserve"><value>Igakuised aruanded</value></data>
+  <data name="Monthly statements still reference this service." xml:space="preserve"><value>Igakuised aruanded viitavad veel sellele teenusele.</value></data>
+  <data name="Most expensive month" xml:space="preserve"><value>Kalleim kuu</value></data>
+  <data name="Move-out can't be before move-in." xml:space="preserve"><value>Väljakolimine ei saa olla enne sissekolimist.</value></data>
+  <data name="Moved in" xml:space="preserve"><value>Kolis sisse</value></data>
+  <data name="Moved out" xml:space="preserve"><value>Kolis välja</value></data>
+  <data name="Name" xml:space="preserve"><value>Nimi</value></data>
+  <data name="Needs attention" xml:space="preserve"><value>Vajab tähelepanu</value></data>
+  <data name="Next step" xml:space="preserve"><value>Järgmine samm</value></data>
+  <data name="No addresses match your search." xml:space="preserve"><value>Otsingule vastavaid aadresse ei leitud.</value></data>
+  <data name="No addresses yet." xml:space="preserve"><value>Aadresse veel pole.</value></data>
+  <data name="No allocations yet. They're created automatically when you add an invoice manually." xml:space="preserve"><value>Jaotusi veel pole. Need luuakse automaatselt, kui lisad arve käsitsi.</value></data>
+  <data name="No change" xml:space="preserve"><value>Muutust pole</value></data>
+  <data name="No contacts match your search." xml:space="preserve"><value>Otsingule vastavaid kontakte ei leitud.</value></data>
+  <data name="No contacts yet." xml:space="preserve"><value>Kontakte veel pole.</value></data>
+  <data name="No earlier data" xml:space="preserve"><value>Varasemad andmed puuduvad</value></data>
+  <data name="No invoices for this address yet." xml:space="preserve"><value>Selle aadressi arveid veel pole.</value></data>
+  <data name="No invoices for {0} yet." xml:space="preserve"><value>Perioodi {0} arveid veel pole.</value></data>
+  <data name="No invoices found for {0}. Add or import invoices first." xml:space="preserve"><value>Perioodi {0} arveid ei leitud. Lisa või impordi enne arved.</value></data>
+  <data name="No invoices in the last {0} months" xml:space="preserve"><value>Viimase {0} kuu jooksul arveid pole</value></data>
+  <data name="No invoices match these filters." xml:space="preserve"><value>Nende filtritega arveid ei leitud.</value></data>
+  <data name="No invoices yet." xml:space="preserve"><value>Arveid veel pole.</value></data>
+  <data name="No residents at {0}" xml:space="preserve"><value>Aadressil {0} pole elanikke</value></data>
+  <data name="No residents lived at {0} on {1}, so statement generation will skip this invoice. Add a resident whose move-in date is on or before the invoice date." xml:space="preserve"><value>Aadressil {0} ei elanud kuupäeval {1} kedagi, seega jätab aruannete genereerimine selle arve vahele. Lisa elanik, kelle sissekolimise kuupäev on arve kuupäeval või varem.</value></data>
+  <data name="No residents match your search." xml:space="preserve"><value>Otsingule vastavaid elanikke ei leitud.</value></data>
+  <data name="No residents yet." xml:space="preserve"><value>Elanikke veel pole.</value></data>
+  <data name="No services yet." xml:space="preserve"><value>Teenuseid veel pole.</value></data>
+  <data name="No statements for {0} yet. Use Generate statements above." xml:space="preserve"><value>Perioodi {0} aruandeid veel pole. Kasuta ülal nuppu "Genereeri aruanded".</value></data>
+  <data name="No statements in this range yet." xml:space="preserve"><value>Selles ajavahemikus pole veel aruandeid.</value></data>
+  <data name="No statements were generated for {0}." xml:space="preserve"><value>Perioodi {0} aruandeid ei genereeritud.</value></data>
+  <data name="No statements with this status." xml:space="preserve"><value>Selle olekuga aruandeid pole.</value></data>
+  <data name="No statements yet" xml:space="preserve"><value>Aruandeid veel pole</value></data>
+  <data name="No statements yet." xml:space="preserve"><value>Aruandeid veel pole.</value></data>
+  <data name="Nobody lives here yet, so invoices for this address can't be billed." xml:space="preserve"><value>Siin ei ela veel kedagi, seega ei saa selle aadressi arveid kellelegi arveldada.</value></data>
+  <data name="Nobody to bill" xml:space="preserve"><value>Pole kellele arveldada</value></data>
+  <data name="None" xml:space="preserve"><value>Puudub</value></data>
+  <data name="None of this month's invoices can be split yet, because nobody lived at their addresses on the invoice dates." xml:space="preserve"><value>Ühtegi selle kuu arvet ei saa veel jagada, sest arvete kuupäevadel ei elanud nendel aadressidel kedagi.</value></data>
+  <data name="Not included in any statement yet. Generate statements for {0} to bill it." xml:space="preserve"><value>Pole veel üheski aruandes. Arveldamiseks genereeri perioodi {0} aruanded.</value></data>
+  <data name="Not linked to any address, so {0} won't get statements." xml:space="preserve"><value>Pole seotud ühegi aadressiga, seega {0} aruandeid ei saa.</value></data>
+  <data name="Not listed?" xml:space="preserve"><value>Pole nimekirjas?</value></data>
+  <data name="Not sent yet" xml:space="preserve"><value>Veel saatmata</value></data>
+  <data name="Nothing needs attention" xml:space="preserve"><value>Midagi ei vaja tähelepanu</value></data>
+  <data name="Nothing waiting" xml:space="preserve"><value>Midagi pole ootel</value></data>
+  <data name="Open invoices" xml:space="preserve"><value>Ava arved</value></data>
+  <data name="Optional. The end date fills in automatically." xml:space="preserve"><value>Valikuline. Lõppkuupäev täidetakse automaatselt.</value></data>
+  <data name="or" xml:space="preserve"><value>või</value></data>
+  <data name="Other" xml:space="preserve"><value>Muu</value></data>
+  <data name="Over {0} months" xml:space="preserve"><value>{0} kuu põhjal</value></data>
+  <data name="Overview" xml:space="preserve"><value>Ülevaade</value></data>
+  <data name="Partially sent" xml:space="preserve"><value>Osaliselt saadetud</value></data>
+  <data name="PDF import result" xml:space="preserve"><value>PDF-i impordi tulemus</value></data>
+  <data name="PDF invoice" xml:space="preserve"><value>PDF-arve</value></data>
+  <data name="People" xml:space="preserve"><value>Inimesed</value></data>
+  <data name="People who receive monthly statements. Link them to an address under" xml:space="preserve"><value>Inimesed, kes saavad igakuiseid aruandeid. Seo nad aadressiga jaotises</value></data>
+  <data name="People who receive statements." xml:space="preserve"><value>Inimesed, kes saavad aruandeid.</value></data>
+  <data name="Per month" xml:space="preserve"><value>Kuus</value></data>
+  <data name="Period" xml:space="preserve"><value>Periood</value></data>
+  <data name="Period end" xml:space="preserve"><value>Perioodi lõpp</value></data>
+  <data name="Period end can't be before period start." xml:space="preserve"><value>Perioodi lõpp ei saa olla enne perioodi algust.</value></data>
+  <data name="Period start" xml:space="preserve"><value>Perioodi algus</value></data>
+  <data name="Person" xml:space="preserve"><value>Isik</value></data>
+  <data name="Phone" xml:space="preserve"><value>Telefon</value></data>
+  <data name="Places" xml:space="preserve"><value>Kohad</value></data>
+  <data name="Portfolio" xml:space="preserve"><value>Portfoolio</value></data>
+  <data name="Primary sections" xml:space="preserve"><value>Peamised jaotised</value></data>
+  <data name="Primary workflow" xml:space="preserve"><value>Peamine töövoog</value></data>
+  <data name="Privacy" xml:space="preserve"><value>Privaatsus</value></data>
+  <data name="Profile" xml:space="preserve"><value>Profiil</value></data>
+  <data name="Ready to send" xml:space="preserve"><value>Valmis saatmiseks</value></data>
+  <data name="Reason" xml:space="preserve"><value>Põhjus</value></data>
+  <data name="Recent invoices" xml:space="preserve"><value>Viimased arved</value></data>
+  <data name="Recent statements" xml:space="preserve"><value>Viimased aruanded</value></data>
+  <data name="Regenerate" xml:space="preserve"><value>Genereeri uuesti</value></data>
+  <data name="Regenerate {0}?" xml:space="preserve"><value>Kas genereerida uuesti: {0}?</value></data>
+  <data name="Remove" xml:space="preserve"><value>Eemalda</value></data>
+  <data name="Remove resident" xml:space="preserve"><value>Eemalda elanik</value></data>
+  <data name="Request ID" xml:space="preserve"><value>Päringu ID</value></data>
+  <data name="Resend" xml:space="preserve"><value>Saada uuesti</value></data>
+  <data name="Resident" xml:space="preserve"><value>Elanik</value></data>
+  <data name="resident record" xml:space="preserve"><value>elaniku kirje</value></data>
+  <data name="Resident removed." xml:space="preserve"><value>Elanik eemaldatud.</value></data>
+  <data name="Resident updated. Regenerate statements for affected months to apply the change." xml:space="preserve"><value>Elanik uuendatud. Muudatuse rakendamiseks genereeri mõjutatud kuude aruanded uuesti.</value></data>
+  <data name="Residents" xml:space="preserve"><value>Elanikud</value></data>
+  <data name="Residents now" xml:space="preserve"><value>Praegused elanikud</value></data>
+  <data name="Review failed" xml:space="preserve"><value>Vaata ebaõnnestunuid</value></data>
+  <data name="Review generated statements, inspect invoice shares, and send drafts." xml:space="preserve"><value>Vaata genereeritud aruandeid, kontrolli arvete osasid ja saada mustandid.</value></data>
+  <data name="Review the invoice and split" xml:space="preserve"><value>Vaata üle arve ja jaotus</value></data>
+  <data name="Review the invoices, then generate statements" xml:space="preserve"><value>Vaata arved üle ja genereeri siis aruanded</value></data>
+  <data name="Review them first" xml:space="preserve"><value>Vaata need enne üle</value></data>
+  <data name="Runtime" xml:space="preserve"><value>Käitusaeg</value></data>
+  <data name="Same as language" xml:space="preserve"><value>Sama mis keel</value></data>
+  <data name="Save" xml:space="preserve"><value>Salvesta</value></data>
+  <data name="Save address" xml:space="preserve"><value>Salvesta aadress</value></data>
+  <data name="Save and add another" xml:space="preserve"><value>Salvesta ja lisa järgmine</value></data>
+  <data name="Save changes" xml:space="preserve"><value>Salvesta muudatused</value></data>
+  <data name="Save contact" xml:space="preserve"><value>Salvesta kontakt</value></data>
+  <data name="Save invoice" xml:space="preserve"><value>Salvesta arve</value></data>
+  <data name="Save resident" xml:space="preserve"><value>Salvesta elanik</value></data>
+  <data name="Save service" xml:space="preserve"><value>Salvesta teenus</value></data>
+  <data name="Save settings" xml:space="preserve"><value>Salvesta seaded</value></data>
+  <data name="Saving won't change those statements. Regenerate the period afterwards so the amounts are updated, and let recipients know if a sent statement changes." xml:space="preserve"><value>Salvestamine neid aruandeid ei muuda. Genereeri periood pärast uuesti, et summad uueneksid, ja anna saajatele teada, kui saadetud aruanne muutub.</value></data>
+  <data name="Saving won't change those statements. Regenerate the period afterwards so the amounts are updated." xml:space="preserve"><value>Salvestamine neid aruandeid ei muuda. Genereeri periood pärast uuesti, et summad uueneksid.</value></data>
+  <data name="Search addresses" xml:space="preserve"><value>Otsi aadresse</value></data>
+  <data name="Search by address or person" xml:space="preserve"><value>Otsi aadressi või isiku järgi</value></data>
+  <data name="Search by name, email or phone" xml:space="preserve"><value>Otsi nime, e-posti või telefoni järgi</value></data>
+  <data name="Search contacts" xml:space="preserve"><value>Otsi kontakte</value></data>
+  <data name="Search residents" xml:space="preserve"><value>Otsi elanikke</value></data>
+  <data name="See checklist below" xml:space="preserve"><value>Vaata kontrollnimekirja allpool</value></data>
+  <data name="Select address…" xml:space="preserve"><value>Vali aadress…</value></data>
+  <data name="Select contact…" xml:space="preserve"><value>Vali kontakt…</value></data>
+  <data name="Select invoice…" xml:space="preserve"><value>Vali arve…</value></data>
+  <data name="Select person…" xml:space="preserve"><value>Vali isik…</value></data>
+  <data name="Select service…" xml:space="preserve"><value>Vali teenus…</value></data>
+  <data name="Selected address or contact was not found." xml:space="preserve"><value>Valitud aadressi või kontakti ei leitud.</value></data>
+  <data name="Selected address or service was not found." xml:space="preserve"><value>Valitud aadressi või teenust ei leitud.</value></data>
+  <data name="Selected invoice or contact was not found." xml:space="preserve"><value>Valitud arvet või kontakti ei leitud.</value></data>
+  <data name="Selected person was not found." xml:space="preserve"><value>Valitud isikut ei leitud.</value></data>
+  <data name="Send" xml:space="preserve"><value>Saada</value></data>
+  <data name="Send action completed." xml:space="preserve"><value>Saatmine lõpetatud.</value></data>
+  <data name="Send again" xml:space="preserve"><value>Saada uuesti</value></data>
+  <data name="Send again?" xml:space="preserve"><value>Kas saata uuesti?</value></data>
+  <data name="Send all" xml:space="preserve"><value>Saada kõik</value></data>
+  <data name="Send person-level statements" xml:space="preserve"><value>Saada isiklikud aruanded</value></data>
+  <data name="Send statement?" xml:space="preserve"><value>Kas saata aruanne?</value></data>
+  <data name="Send {0}" xml:space="preserve"><value>Saada {0}</value></data>
+  <data name="Send {0} statement" xml:space="preserve"><value>Saada {0} aruanne</value></data>
+  <data name="Send {0} statements" xml:space="preserve"><value>Saada {0} aruannet</value></data>
+  <data name="Send {0} statements?" xml:space="preserve"><value>Kas saata aruanded: {0}?</value></data>
+  <data name="Send {0} unsent" xml:space="preserve"><value>Saada {0} saatmata</value></data>
+  <data name="Sending didn't go through." xml:space="preserve"><value>Saatmine ebaõnnestus.</value></data>
+  <data name="Sent" xml:space="preserve"><value>Saadetud</value></data>
+  <data name="Sent at" xml:space="preserve"><value>Saadetud</value></data>
+  <data name="Service" xml:space="preserve"><value>Teenus</value></data>
+  <data name="service" xml:space="preserve"><value>teenus</value></data>
+  <data name="Service &quot;{0}&quot; added." xml:space="preserve"><value>Teenus "{0}" lisatud.</value></data>
+  <data name="Service &quot;{0}&quot; deleted." xml:space="preserve"><value>Teenus "{0}" kustutatud.</value></data>
+  <data name="Service updated." xml:space="preserve"><value>Teenus uuendatud.</value></data>
+  <data name="Services" xml:space="preserve"><value>Teenused</value></data>
+  <data name="Set a move-out date instead" xml:space="preserve"><value>Määra hoopis väljakolimise kuupäev</value></data>
+  <data name="Set move-out" xml:space="preserve"><value>Määra väljakolimine</value></data>
+  <data name="Settings" xml:space="preserve"><value>Seaded</value></data>
+  <data name="Share" xml:space="preserve"><value>Osa</value></data>
+  <data name="Show" xml:space="preserve"><value>Näita</value></data>
+  <data name="Show all statuses" xml:space="preserve"><value>Näita kõiki olekuid</value></data>
+  <data name="Show as table" xml:space="preserve"><value>Näita tabelina</value></data>
+  <data name="Show {0} past resident" xml:space="preserve"><value>Näita {0} endist elanikku</value></data>
+  <data name="Show {0} past residents" xml:space="preserve"><value>Näita {0} endist elanikku</value></data>
+  <data name="Shown as the payee on statements." xml:space="preserve"><value>Kuvatakse aruannetel makse saajana.</value></data>
+  <data name="Skipped rows" xml:space="preserve"><value>Vahele jäetud read</value></data>
+  <data name="so invoices can be split." xml:space="preserve"><value>, et arveid saaks jagada.</value></data>
+  <data name="Some setup is missing" xml:space="preserve"><value>Osa seadistusest on puudu</value></data>
+  <data name="Source" xml:space="preserve"><value>Lähtekood</value></data>
+  <data name="Split" xml:space="preserve"><value>Jaotus</value></data>
+  <data name="Split equally between the residents living at {0} on {1}. Statement generation uses this split." xml:space="preserve"><value>Jagatakse võrdselt elanike vahel, kes elasid aadressil {0} kuupäeval {1}. Aruannete genereerimine kasutab seda jaotust.</value></data>
+  <data name="statement" xml:space="preserve"><value>aruanne</value></data>
+  <data name="Statement created." xml:space="preserve"><value>Aruanne loodud.</value></data>
+  <data name="Statement deleted." xml:space="preserve"><value>Aruanne kustutatud.</value></data>
+  <data name="Statement emailed to {0}." xml:space="preserve"><value>Aruanne saadeti isikule {0}.</value></data>
+  <data name="Statement updated." xml:space="preserve"><value>Aruanne uuendatud.</value></data>
+  <data name="Statements" xml:space="preserve"><value>Aruanded</value></data>
+  <data name="Statements are built from invoices, split between the residents of each address. Add these once and you're ready for monthly billing." xml:space="preserve"><value>Aruanded koostatakse arvetest, mis jagatakse iga aadressi elanike vahel. Lisa need üks kord ja igakuine arveldus on valmis.</value></data>
+  <data name="Statements are out of date" xml:space="preserve"><value>Aruanded on aegunud</value></data>
+  <data name="Statements include the invoice in this month and in every month its billed period covers." xml:space="preserve"><value>Aruanded arvestavad arvet selles kuus ja igas kuus, mida arveldusperiood katab.</value></data>
+  <data name="statements page" xml:space="preserve"><value>aruanded</value></data>
+  <data name="Statistics" xml:space="preserve"><value>Statistika</value></data>
+  <data name="Statistics appear as soon as there are invoices to count." xml:space="preserve"><value>Statistika ilmub kohe, kui on arveid, mida kokku lugeda.</value></data>
+  <data name="Status" xml:space="preserve"><value>Olek</value></data>
+  <data name="Swapping to" xml:space="preserve"><value>Lülitudes keskkonda</value></data>
+  <data name="Telia or Enefit invoice · PDF · Maximum file size: 10 MB." xml:space="preserve"><value>Telia või Enefiti arve · PDF · Maksimaalne failisuurus: 10 MB.</value></data>
+  <data name="The currency your invoices are in. Amounts are shown with it and sent in statement emails; nothing is converted." xml:space="preserve"><value>Valuuta, milles sinu arved on. Summad kuvatakse ja saadetakse aruannete e-kirjades selles valuutas, midagi ei konverteerita.</value></data>
+  <data name="The Development environment shouldn't be enabled for deployed applications." xml:space="preserve"><value>Development-keskkonda ei tohiks avaldatud rakendustes lubada.</value></data>
+  <data name="The field must be a number." xml:space="preserve"><value>Väli peab olema number.</value></data>
+  <data name="The field {0} must be a number." xml:space="preserve"><value>Väli {0} peab olema number.</value></data>
+  <data name="The homes or locations that receive invoices." xml:space="preserve"><value>Kodud või kohad, kuhu arved tulevad.</value></data>
+  <data name="The kinds of invoices you receive, e.g. electricity, internet or water." xml:space="preserve"><value>Arvete liigid, mida saad, nt elekter, internet või vesi.</value></data>
+  <data name="The statement couldn't be sent: {0}" xml:space="preserve"><value>Aruannet ei õnnestunud saata: {0}</value></data>
+  <data name="The statement for {0} couldn't be sent. Check the messaging (RabbitMQ) configuration and try again." xml:space="preserve"><value>Isiku {0} aruannet ei õnnestunud saata. Kontrolli sõnumside (RabbitMQ) seadistust ja proovi uuesti.</value></data>
+  <data name="The value '{0}' is invalid." xml:space="preserve"><value>Väärtus '{0}' on vigane.</value></data>
+  <data name="The value '{0}' is not valid for {1}." xml:space="preserve"><value>Väärtus '{0}' ei sobi väljale {1}.</value></data>
+  <data name="The {0} field can be at most {1} characters long." xml:space="preserve"><value>Väli "{0}" võib olla kuni {1} märki pikk.</value></data>
+  <data name="The {0} field is not a valid email address." xml:space="preserve"><value>Väli "{0}" ei ole korrektne e-posti aadress.</value></data>
+  <data name="The {0} field is required." xml:space="preserve"><value>Väli "{0}" on kohustuslik.</value></data>
+  <data name="The {0} field must be between {1} and {2}." xml:space="preserve"><value>Väli "{0}" peab olema vahemikus {1} kuni {2}.</value></data>
+  <data name="The {0} field must be between {2} and {1} characters long." xml:space="preserve"><value>Väli "{0}" peab olema {2} kuni {1} märki pikk.</value></data>
+  <data name="There are no statements for {0} to send." xml:space="preserve"><value>Perioodil {0} pole saadetavaid aruandeid.</value></data>
+  <data name="This action cannot be undone." xml:space="preserve"><value>Seda toimingut ei saa tagasi võtta.</value></data>
+  <data name="This address appears on monthly statements and can't be deleted." xml:space="preserve"><value>See aadress on igakuistes aruannetes ja seda ei saa kustutada.</value></data>
+  <data name="This contact still has statements or allocations and can't be deleted." xml:space="preserve"><value>Sellel kontaktil on veel aruandeid või jaotusi ja seda ei saa kustutada.</value></data>
+  <data name="This field is required." xml:space="preserve"><value>See väli on kohustuslik.</value></data>
+  <data name="This invoice is already part of {0} statement(s), {1} of them sent." xml:space="preserve"><value>See arve on juba aruannetes ({0}), neist {1} on saadetud.</value></data>
+  <data name="This invoice is already part of {0} statement." xml:space="preserve"><value>See arve on juba {0} aruandes.</value></data>
+  <data name="This invoice is already part of {0} statements." xml:space="preserve"><value>See arve on juba {0} aruandes.</value></data>
+  <data name="This invoice is part of a monthly statement and can't be deleted." xml:space="preserve"><value>See arve on igakuises aruandes ja seda ei saa kustutada.</value></data>
+  <data name="This person already has a statement for that month. Edit the existing one instead." xml:space="preserve"><value>Sellel isikul on selle kuu aruanne juba olemas. Muuda hoopis olemasolevat.</value></data>
+  <data name="This person already lives at this address during these dates. Edit the existing entry instead." xml:space="preserve"><value>See inimene elab nendel kuupäevadel sellel aadressil juba. Muuda hoopis olemasolevat kirjet.</value></data>
+  <data name="This recalculates the statements for {1} from {0} invoice and the residents on each invoice date." xml:space="preserve"><value>See arvutab perioodi {1} aruanded ümber {0} arve ja arve kuupäeval elanud elanike põhjal.</value></data>
+  <data name="This recalculates the statements for {1} from {0} invoices and the residents on each invoice date." xml:space="preserve"><value>See arvutab perioodi {1} aruanded ümber {0} arve ja iga arve kuupäeval elanud elanike põhjal.</value></data>
+  <data name="This service is still used by invoices and can't be deleted." xml:space="preserve"><value>Seda teenust kasutavad veel arved ja seda ei saa kustutada.</value></data>
+  <data name="This statement has no invoice lines. It was probably created manually." xml:space="preserve"><value>Sellel aruandel pole arveridu. Tõenäoliselt loodi see käsitsi.</value></data>
+  <data name="This {0} can't be deleted yet" xml:space="preserve"><value>Seda kirjet ({0}) ei saa veel kustutada</value></data>
+  <data name="Time range" xml:space="preserve"><value>Ajavahemik</value></data>
+  <data name="Time zone" xml:space="preserve"><value>Ajavöönd</value></data>
+  <data name="to see who pays what." xml:space="preserve"><value>et näha, kes mida maksab.</value></data>
+  <data name="Toggle navigation" xml:space="preserve"><value>Ava või sulge menüü</value></data>
+  <data name="Total" xml:space="preserve"><value>Kokku</value></data>
+  <data name="Total invoiced" xml:space="preserve"><value>Arveid kokku</value></data>
+  <data name="Totals for the last {0} months" xml:space="preserve"><value>Viimase {0} kuu kokkuvõte</value></data>
+  <data name="Track invoices, residents, allocations, and monthly statements from one workspace." xml:space="preserve"><value>Halda arveid, elanikke, jaotusi ja igakuiseid aruandeid ühest kohast.</value></data>
+  <data name="Update statements for {0}" xml:space="preserve"><value>Uuenda aruandeid: {0}</value></data>
+  <data name="Upload a Telia or Enefit invoice PDF. The importer will match service and address records before creating invoices." xml:space="preserve"><value>Laadi üles Telia või Enefiti arve PDF. Importija seob teenused ja aadressid enne arvete loomist.</value></data>
+  <data name="Used for times such as when a statement was sent." xml:space="preserve"><value>Kasutatakse kellaaegade jaoks, näiteks millal aruanne saadeti.</value></data>
+  <data name="Username" xml:space="preserve"><value>Kasutajanimi</value></data>
+  <data name="Usually statements are generated from invoices on the" xml:space="preserve"><value>Tavaliselt genereeritakse aruanded arvetest lehel</value></data>
+  <data name="View addresses" xml:space="preserve"><value>Vaata aadresse</value></data>
+  <data name="View all {0} invoices" xml:space="preserve"><value>Vaata kõiki arveid ({0})</value></data>
+  <data name="View contacts" xml:space="preserve"><value>Vaata kontakte</value></data>
+  <data name="View invoices" xml:space="preserve"><value>Vaata arveid</value></data>
+  <data name="View statements" xml:space="preserve"><value>Vaata aruandeid</value></data>
+  <data name="vs previous {0} months" xml:space="preserve"><value>võrreldes eelmise {0} kuuga</value></data>
+  <data name="Warnings" xml:space="preserve"><value>Hoiatused</value></data>
+  <data name="Where the money goes: invoice costs by month, service, address and person. Invoices count in the month of their invoice date." xml:space="preserve"><value>Kuhu raha läheb: arvete kulud kuude, teenuste, aadresside ja inimeste kaupa. Arve läheb arvesse selle kuu all, kuhu jääb arve kuupäev.</value></data>
+  <data name="Who lives where. Invoices are split equally between the residents of an address on the invoice date." xml:space="preserve"><value>Kes kus elab. Arved jagatakse võrdselt aadressi elanike vahel, kes elasid seal arve kuupäeval.</value></data>
+  <data name="Who pays" xml:space="preserve"><value>Kes maksab</value></data>
+  <data name="Year" xml:space="preserve"><value>Aasta</value></data>
+  <data name="Your settings were saved." xml:space="preserve"><value>Sinu seaded salvestati.</value></data>
+  <data name="{0} ({1}) won't be billed to anyone." xml:space="preserve"><value>{0} ({1}) jääb kellelegi arveldamata.</value></data>
+  <data name="{0} added." xml:space="preserve"><value>{0} lisatud.</value></data>
+  <data name="{0} added. Add the next contact." xml:space="preserve"><value>{0} lisatud. Lisa järgmine kontakt.</value></data>
+  <data name="{0} allocation record for this invoice will also be deleted." xml:space="preserve"><value>Kustutatakse ka selle arve {0} jaotuse kirje.</value></data>
+  <data name="{0} allocation records for this invoice will also be deleted." xml:space="preserve"><value>Kustutatakse ka selle arve {0} jaotuse kirjet.</value></data>
+  <data name="{0} deleted." xml:space="preserve"><value>{0} kustutatud.</value></data>
+  <data name="{0} failed statement" xml:space="preserve"><value>{0} ebaõnnestunud aruanne</value></data>
+  <data name="{0} failed statements" xml:space="preserve"><value>{0} ebaõnnestunud aruannet</value></data>
+  <data name="{0} in total for {1}." xml:space="preserve"><value>Kokku {0} perioodil {1}.</value></data>
+  <data name="{0} invoice" xml:space="preserve"><value>{0} arve</value></data>
+  <data name="{0} invoice changed since the statements were generated." xml:space="preserve"><value>Pärast aruannete genereerimist muutus {0} arve.</value></data>
+  <data name="{0} invoice for this address will also be deleted." xml:space="preserve"><value>Kustutatakse ka selle aadressi {0} arve.</value></data>
+  <data name="{0} invoice has nobody to bill" xml:space="preserve"><value>{0} arvel pole kellele arveldada</value></data>
+  <data name="{0} invoice totalling {1} is ready to be split between residents." xml:space="preserve"><value>{0} arve kogusummas {1} on valmis elanike vahel jagamiseks.</value></data>
+  <data name="{0} invoice uses this service. Delete or change it first." xml:space="preserve"><value>{0} arve kasutab seda teenust. Kustuta või muuda see enne.</value></data>
+  <data name="{0} invoice was added or changed after these statements were generated. Regenerate before sending." xml:space="preserve"><value>Pärast nende aruannete genereerimist lisati või muudeti {0} arve. Genereeri enne saatmist uuesti.</value></data>
+  <data name="{0} invoice was skipped because nobody lived at the address on the invoice date." xml:space="preserve"><value>{0} arve jäeti vahele, sest arve kuupäeval ei elanud aadressil kedagi.</value></data>
+  <data name="{0} invoices" xml:space="preserve"><value>{0} arvet</value></data>
+  <data name="{0} invoices changed since the statements were generated." xml:space="preserve"><value>Pärast aruannete genereerimist muutus {0} arvet.</value></data>
+  <data name="{0} invoices for this address will also be deleted." xml:space="preserve"><value>Kustutatakse ka selle aadressi {0} arvet.</value></data>
+  <data name="{0} invoices have nobody to bill" xml:space="preserve"><value>{0} arvel pole kellele arveldada</value></data>
+  <data name="{0} invoices totalling {1} are ready to be split between residents." xml:space="preserve"><value>{0} arvet kogusummas {1} on valmis elanike vahel jagamiseks.</value></data>
+  <data name="{0} invoices use this service. Delete or change them first." xml:space="preserve"><value>{0} arvet kasutab seda teenust. Kustuta või muuda need enne.</value></data>
+  <data name="{0} invoices were added or changed after these statements were generated. Regenerate before sending." xml:space="preserve"><value>Pärast nende aruannete genereerimist lisati või muudeti {0} arvet. Genereeri enne saatmist uuesti.</value></data>
+  <data name="{0} invoices were skipped because nobody lived at the address on the invoice date." xml:space="preserve"><value>{0} arvet jäeti vahele, sest arve kuupäeval ei elanud aadressil kedagi.</value></data>
+  <data name="{0} is still in progress" xml:space="preserve"><value>{0} on veel pooleli</value></data>
+  <data name="{0} now lives at {1}." xml:space="preserve"><value>{0} elab nüüd aadressil {1}.</value></data>
+  <data name="{0} of total" xml:space="preserve"><value>{0} kogusummast</value></data>
+  <data name="{0} of {1} sent" xml:space="preserve"><value>{0}/{1} saadetud</value></data>
+  <data name="{0} on average" xml:space="preserve"><value>keskmiselt {0}</value></data>
+  <data name="{0} per month" xml:space="preserve"><value>{0} kuus</value></data>
+  <data name="{0} resident record at an address will also be deleted." xml:space="preserve"><value>Kustutatakse ka {0} elaniku kirje aadressil.</value></data>
+  <data name="{0} resident record will also be deleted. The contact itself stays." xml:space="preserve"><value>Kustutatakse ka {0} elaniku kirje. Kontakt ise jääb alles.</value></data>
+  <data name="{0} resident records at addresses will also be deleted." xml:space="preserve"><value>Kustutatakse ka {0} elaniku kirjet aadressidel.</value></data>
+  <data name="{0} resident records will also be deleted. The contacts themselves stay." xml:space="preserve"><value>Kustutatakse ka {0} elaniku kirjet. Kontaktid ise jäävad alles.</value></data>
+  <data name="{0} statement failed to send" xml:space="preserve"><value>{0} aruande saatmine ebaõnnestus</value></data>
+  <data name="{0} statement for {1} was already sent. Regenerating marks every statement for the month as &quot;Ready to send&quot; again." xml:space="preserve"><value>Perioodi {1} {0} aruanne on juba saadetud. Uuesti genereerimine märgib kõik selle kuu aruanded jälle olekusse "Valmis saatmiseks".</value></data>
+  <data name="{0} statement for {1} was already sent. Regenerating recalculates every statement for the month and marks them all &quot;Ready to send&quot; again, so it would be emailed again on the next &quot;Send all&quot;." xml:space="preserve"><value>Perioodi {1} {0} aruanne on juba saadetud. Uuesti genereerimine arvutab kõik selle kuu aruanded ümber ja märgib need olekusse "Valmis saatmiseks", nii et järgmisel "Saada kõik" vajutusel saadetaks see uuesti.</value></data>
+  <data name="{0} statement totalling {1} will be emailed to the recipient. Already sent statements are skipped." xml:space="preserve"><value>{0} aruanne kogusummas {1} saadetakse saajale e-postiga. Juba saadetud aruanded jäetakse vahele.</value></data>
+  <data name="{0} statement, {1} in total." xml:space="preserve"><value>{0} aruanne, kokku {1}.</value></data>
+  <data name="{0} statements" xml:space="preserve"><value>{0} aruanded</value></data>
+  <data name="{0} statements failed to send" xml:space="preserve"><value>{0} aruande saatmine ebaõnnestus</value></data>
+  <data name="{0} statements for {1} were already sent. Regenerating marks every statement for the month as &quot;Ready to send&quot; again." xml:space="preserve"><value>Perioodi {1} {0} aruannet on juba saadetud. Uuesti genereerimine märgib kõik selle kuu aruanded jälle olekusse "Valmis saatmiseks".</value></data>
+  <data name="{0} statements for {1} were already sent. Regenerating recalculates every statement for the month and marks them all &quot;Ready to send&quot; again, so they would be emailed again on the next &quot;Send all&quot;." xml:space="preserve"><value>Perioodi {1} {0} aruannet on juba saadetud. Uuesti genereerimine arvutab kõik selle kuu aruanded ümber ja märgib need olekusse "Valmis saatmiseks", nii et järgmisel "Saada kõik" vajutusel saadetaks need uuesti.</value></data>
+  <data name="{0} statements totalling {1} will be emailed to the recipients. Already sent statements are skipped." xml:space="preserve"><value>{0} aruannet kogusummas {1} saadetakse saajatele e-postiga. Juba saadetud aruanded jäetakse vahele.</value></data>
+  <data name="{0} statements, {1} in total." xml:space="preserve"><value>{0} aruannet, kokku {1}.</value></data>
+  <data name="{0} summary" xml:space="preserve"><value>{0} kokkuvõte</value></data>
+  <data name="{0} waiting" xml:space="preserve"><value>{0} ootel</value></data>
+  <data name="{0} · dated {1}" xml:space="preserve"><value>{0} · kuupäev {1}</value></data>
+  <data name="{0}: sent {1}, {2} failed, {3} were already sent. Retry the failed ones from the list." xml:space="preserve"><value>{0}: saadeti {1}, ebaõnnestus {2}, juba saadetud {3}. Proovi ebaõnnestunuid nimekirjast uuesti saata.</value></data>
+  <data name="{0}: sent {1}, {2} were already sent." xml:space="preserve"><value>{0}: saadeti {1}, juba saadetud {2}.</value></data>
+  <data name="{1} has {0} invoice allocation. Delete it first." xml:space="preserve"><value>Isikul {1} on {0} arve jaotus. Kustuta see enne.</value></data>
+  <data name="{1} has {0} invoice allocations. Delete them first." xml:space="preserve"><value>Isikul {1} on {0} arve jaotust. Kustuta need enne.</value></data>
+  <data name="{1} has {0} monthly statement. Delete it first, or keep the contact for history." xml:space="preserve"><value>Isikul {1} on {0} igakuine aruanne. Kustuta see enne või jäta kontakt ajaloo jaoks alles.</value></data>
+  <data name="{1} has {0} monthly statements. Delete them first, or keep the contact for history." xml:space="preserve"><value>Isikul {1} on {0} igakuist aruannet. Kustuta need enne või jäta kontakt ajaloo jaoks alles.</value></data>
+  <data name="{1}: sent {0} statement." xml:space="preserve"><value>{1}: saadeti {0} aruanne.</value></data>
+  <data name="{1}: sent {0} statements." xml:space="preserve"><value>{1}: saadeti {0} aruannet.</value></data>
+</root>

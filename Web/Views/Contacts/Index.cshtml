@@ -1,27 +1,27 @@
 @model IReadOnlyList<ContactDto>
 @{
-    ViewData["Title"] = "Contacts";
+    ViewData["Title"] = T["Contacts"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Directory</p>
-        <h1>Contacts</h1>
-        <p class="page-header__lede">People who receive monthly statements. Link them to an address under <a asp-controller="AddressContacts" asp-action="Index" class="link">Residents</a>.</p>
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Contacts"]</h1>
+        <p class="page-header__lede">@T["People who receive monthly statements. Link them to an address under"] <a asp-controller="AddressContacts" asp-action="Index" class="link">@T["Residents"]</a>.</p>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add contact</a>
+        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add contact"]</a>
     </div>
 </header>
 
 @if (Model.Count > 5)
 {
-    <div class="search-field"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg><input type="search" class="input" placeholder="Search by name, email or phone" aria-label="Search contacts" data-table-filter="#contactsTable" /></div>
+    <div class="search-field"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg><input type="search" class="input" placeholder="@T["Search by name, email or phone"]" aria-label="@T["Search contacts"]" data-table-filter="#contactsTable" /></div>
 }
 
 <div class="card table-card">
     <table class="data-table" id="contactsTable">
-        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <thead><tr><th>@T["Name"]</th><th>@T["Email"]</th><th>@T["Phone"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
         <tbody>
         @foreach (var item in Model)
         {
@@ -30,15 +30,15 @@
                 <td>@item.Email</td>
                 <td class="nowrap">@(string.IsNullOrEmpty(item.Phone) ? "—" : item.Phone)</td>
                 <td class="actions-col"><div class="row-actions">
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="@T["Edit"]" title="@T["Edit"]"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="@T["Delete"]" title="@T["Delete"]"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
                 </div></td>
             </tr>
         }
-        <tr class="no-match-row" hidden><td colspan="4" class="empty">No contacts match your search.</td></tr>
+        <tr class="no-match-row" hidden><td colspan="4" class="empty">@T["No contacts match your search."]</td></tr>
         @if (!Model.Any())
         {
-            <tr class="empty-row"><td colspan="4" class="empty">No contacts yet. <a asp-action="Create" class="link">Add the first one</a>.</td></tr>
+            <tr class="empty-row"><td colspan="4" class="empty">@T["No contacts yet."] <a asp-action="Create" class="link">@T["Add the first one"]</a>.</td></tr>
         }
         </tbody>
     </table>

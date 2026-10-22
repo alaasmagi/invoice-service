@@ -1,22 +1,22 @@
 @model InvoiceDto
 @{
-    ViewData["Title"] = "Add invoice";
+    ViewData["Title"] = T["Add invoice"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Billing</p>
-        <h1>Add invoice</h1>
-        <p class="page-header__lede">Enter an invoice by hand. For Telia or Enefit PDFs you can <a asp-controller="InvoiceImports" asp-action="Upload" class="link">import the file</a> instead.</p>
+        <p class="kicker">@T["Billing"]</p>
+        <h1>@T["Add invoice"]</h1>
+        <p class="page-header__lede">@T["Enter an invoice by hand. For Telia or Enefit PDFs you can"] <a asp-controller="InvoiceImports" asp-action="Upload" class="link">@T["import the file"]</a> @T["instead."]</p>
     </div>
 </header>
 
 <form asp-action="Create" method="post" class="card form narrow">
     <partial name="_InvoiceFields" model="Model" />
     <div class="form-actions">
-        <button type="submit" class="btn btn--primary">Save invoice</button>
-        <button type="submit" name="next" value="another" class="btn btn--secondary">Save and add another</button>
-        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+        <button type="submit" class="btn btn--primary">@T["Save invoice"]</button>
+        <button type="submit" name="next" value="another" class="btn btn--secondary">@T["Save and add another"]</button>
+        <a asp-action="Index" class="btn btn--ghost">@T["Cancel"]</a>
     </div>
 </form>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

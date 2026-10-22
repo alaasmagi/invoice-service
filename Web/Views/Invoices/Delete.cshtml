@@ -1,30 +1,30 @@
 @model DeleteViewModel<InvoiceDto>
 @{
-    ViewData["Title"] = "Delete invoice";
+    ViewData["Title"] = T["Delete invoice"];
     var invoice = Model.Item;
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Billing</p>
-        <h1>Delete invoice</h1>
+        <p class="kicker">@T["Billing"]</p>
+        <h1>@T["Delete invoice"]</h1>
     </div>
 </header>
 
 <div class="section medium">
-    <partial name="_DeleteNotice" model='Model.Notice("invoice")' />
+    <partial name="_DeleteNotice" model='Model.Notice(T["invoice"])' />
     <dl class="card details">
-        <div class="details__row"><dt>Invoice date</dt><dd>@Fmt.Date(invoice.InvoiceDate)</dd></div>
-        <div class="details__row"><dt>Address</dt><dd><div class="stack-cell"><span>@invoice.Address.Name</span><span>@invoice.Address.FullAddress</span></div></dd></div>
-        <div class="details__row"><dt>Service</dt><dd>@invoice.Service.Name</dd></div>
-        <div class="details__row"><dt>Total</dt><dd>@Fmt.Money(invoice.TotalSum)</dd></div>
+        <div class="details__row"><dt>@T["Invoice date"]</dt><dd>@Fmt.Date(invoice.InvoiceDate)</dd></div>
+        <div class="details__row"><dt>@T["Address"]</dt><dd><div class="stack-cell"><span>@invoice.Address.Name</span><span>@invoice.Address.FullAddress</span></div></dd></div>
+        <div class="details__row"><dt>@T["Service"]</dt><dd>@invoice.Service.Name</dd></div>
+        <div class="details__row"><dt>@T["Total"]</dt><dd>@Fmt.Money(invoice.TotalSum)</dd></div>
     </dl>
     <form asp-action="Delete" method="post" class="form-actions">
         <input type="hidden" name="Id" value="@invoice.Id" />
         @if (!Model.Blockers.Any())
         {
-            <button type="submit" class="btn btn--danger">Delete invoice</button>
+            <button type="submit" class="btn btn--danger">@T["Delete invoice"]</button>
         }
-        <a asp-action="Details" asp-route-id="@invoice.Id" class="btn btn--ghost">Cancel</a>
+        <a asp-action="Details" asp-route-id="@invoice.Id" class="btn btn--ghost">@T["Cancel"]</a>
     </form>
 </div>

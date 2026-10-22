@@ -8,10 +8,10 @@
     if (!(form instanceof HTMLFormElement) || !form.dataset.confirm || form.dataset.confirmed === "1" || !dialog) return;
     event.preventDefault();
     pending = { form, submitter: event.submitter };
-    dialog.querySelector("[data-confirm-title]").textContent = form.dataset.confirmTitle || "Are you sure?";
+    dialog.querySelector("[data-confirm-title]").textContent = form.dataset.confirmTitle || dialog.dataset.defaultTitle || "Are you sure?";
     dialog.querySelector("[data-confirm-message]").textContent = form.dataset.confirm;
     const ok = dialog.querySelector("[data-confirm-ok]");
-    ok.textContent = form.dataset.confirmAction || "Confirm";
+    ok.textContent = form.dataset.confirmAction || dialog.dataset.defaultAction || "Confirm";
     ok.classList.toggle("btn--danger", form.dataset.confirmTone === "danger");
     ok.classList.toggle("btn--primary", form.dataset.confirmTone !== "danger");
     dialog.returnValue = "";
@@ -127,6 +127,14 @@
       col.addEventListener("focus", () => show(col));
       col.addEventListener("pointerleave", hide);
       col.addEventListener("blur", hide);
+    });
+  });
+  // ----- Select previews: show the chosen option's data-sample text elsewhere on the page. -----
+  document.querySelectorAll("select[data-preview]").forEach((select) => {
+    const target = document.querySelector(select.dataset.preview);
+    if (!target) return;
+    select.addEventListener("change", () => {
+      target.textContent = select.selectedOptions[0]?.dataset.sample ?? "";
     });
   });
 })();

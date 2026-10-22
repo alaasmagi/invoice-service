@@ -42,7 +42,7 @@ public class InvoiceAllocationsController(AppDbContext context, WebDtoMapper map
         var userId = CurrentUserId();
         ClearServerManagedModelState(dto);
         ClearNavigationModelState(nameof(dto.Invoice), nameof(dto.Contact));
-        if (!await OwnsInvoiceAndContact(userId, dto.InvoiceId, dto.ContactId)) ModelState.AddModelError(string.Empty, "Selected invoice or contact was not found.");
+        if (!await OwnsInvoiceAndContact(userId, dto.InvoiceId, dto.ContactId)) ModelState.AddModelError(string.Empty, T["Selected invoice or contact was not found."]);
         if (!ModelState.IsValid)
         {
             await PopulateSelectLists(userId);
@@ -53,7 +53,7 @@ public class InvoiceAllocationsController(AppDbContext context, WebDtoMapper map
         entity.CreatedAt = DateTime.UtcNow;
         context.Add(entity);
         await context.SaveChangesAsync();
-        Flash("Allocation saved.");
+        Flash(T["Allocation saved."]);
         return RedirectToAction(nameof(Index));
     }
 
@@ -75,7 +75,7 @@ public class InvoiceAllocationsController(AppDbContext context, WebDtoMapper map
         var userId = CurrentUserId();
         ClearServerManagedModelState(dto);
         ClearNavigationModelState(nameof(dto.Invoice), nameof(dto.Contact));
-        if (!await OwnsInvoiceAndContact(userId, dto.InvoiceId, dto.ContactId)) ModelState.AddModelError(string.Empty, "Selected invoice or contact was not found.");
+        if (!await OwnsInvoiceAndContact(userId, dto.InvoiceId, dto.ContactId)) ModelState.AddModelError(string.Empty, T["Selected invoice or contact was not found."]);
         if (!ModelState.IsValid)
         {
             await PopulateSelectLists(userId);
@@ -88,7 +88,7 @@ public class InvoiceAllocationsController(AppDbContext context, WebDtoMapper map
         entity.CreatedAt = existing.CreatedAt;
         context.Update(entity);
         await context.SaveChangesAsync();
-        Flash("Allocation updated.");
+        Flash(T["Allocation updated."]);
         return RedirectToAction(nameof(Index));
     }
 
@@ -111,7 +111,7 @@ public class InvoiceAllocationsController(AppDbContext context, WebDtoMapper map
         {
             context.InvoiceAllocations.Remove(entity);
             await context.SaveChangesAsync();
-            Flash("Allocation deleted.");
+            Flash(T["Allocation deleted."]);
         }
         return RedirectToAction(nameof(Index));
     }

@@ -1,12 +1,29 @@
 @model Web.Models.AppUserEditViewModel
+@using System.Globalization
 @{
-    ViewData["Title"] = "User information";
+    ViewData["Title"] = T["Settings"];
+    var accountUrl = ViewData["AccountUrl"] as string;
+    var language = LocalizationSettings.LanguageFor(Model.Locale);
+    var languageName = Formatter.Capitalize(CultureInfo.GetCultureInfo(language).NativeName);
+    var sampleDate = new DateTime(2026, 10, 22, 14, 30, 0);
+    const decimal sampleAmount = 1234.56m;
+    string Sample(string cultureName)
+    {
+        var culture = CultureInfo.GetCultureInfo(cultureName);
+        return $"{sampleDate.ToString("d", culture)} {sampleDate.ToString("t", culture)} · {sampleAmount.ToString("N2", culture)}";
+    }
+    var defaultFormat = LocalizationSettings.FormatCultureFor(null, language);
+    var zones = TimeZoneInfo.GetSystemTimeZones()
+        .Where(z => z.HasIanaId || z.Id.Contains('/'))
+        .OrderBy(z => z.BaseUtcOffset).ThenBy(z => z.Id)
+        .ToList();
+    string Offset(TimeSpan o) => (o < TimeSpan.Zero ? "−" : "+") + o.Duration().ToString(@"hh\:mm");
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Account</p>
-        <h1>User information</h1>
+        <p class="kicker">@T["Account"]</p>
+        <h1>@T["Settings"]</h1>
     </div>
 </header>
 
@@ -17,6 +34,7 @@
 
     <div asp-validation-summary="ModelOnly"></div>
 
+    <h2 class="section-title">@T["Profile"]</h2>
     <div class="form-row">
         <div class="field">
             <label asp-for="Email" class="field__label"></label>
@@ -28,28 +46,84 @@
         </div>
     </div>
 
-    <div class="field">
-        <label asp-for="FullName" class="field__label"></label>
-        <input asp-for="FullName" class="input" autocomplete="name" />
-        <span asp-validation-for="FullName"></span>
-    </div>
-
     <div class="form-row">
         <div class="field">
-            <label asp-for="Locale" class="field__label"></label>
-            <input asp-for="Locale" class="input" autocomplete="language" placeholder="e.g. et-EE" />
-            <span asp-validation-for="Locale"></span>
+            <label asp-for="FullName" class="field__label"></label>
+            <input asp-for="FullName" class="input" autocomplete="name" />
+            <span class="field__help">@T["Shown as the payee on statements."]</span>
+            <span asp-validation-for="FullName"></span>
         </div>
         <div class="field">
             <label asp-for="BankIban" class="field__label"></label>
-            <input asp-for="BankIban" class="input mono" autocomplete="off" placeholder="e.g. EE38 2200 2210 2014 5685" />
+            <input asp-for="BankIban" class="input mono" autocomplete="off" placeholder="@T["e.g. {0}", "EE38 2200 2210 2014 5685"]" />
             <span asp-validation-for="BankIban"></span>
         </div>
     </div>
 
+    <h2 class="section-title">@T["Language and formats"]</h2>
+    <div class="form-row">
+        <div class="field">
+            <label asp-for="Locale" class="field__label"></label>
+            <input id="Locale" class="input" value="@languageName" disabled />
+            <span class="field__help">
+                @T["Comes from your account. It also sets the language of statement emails."]
+                @if (accountUrl != null)
+                {
+                    <a href="@accountUrl" target="_blank" rel="noopener noreferrer" class="link">@T["Change it in your account"]</a>
+                }
+            </span>
+        </div>
+        <div class="field">
+            <label asp-for="FormatCulture" class="field__label"></label>
+            <div class="field__control">
+                <select asp-for="FormatCulture" class="input" data-preview="#formatPreview">
+                    <option value="" data-sample="@Sample(defaultFormat)">@T["Same as language"] (@Sample(defaultFormat))</option>
+                    @foreach (var name in LocalizationSettings.FormatCultures)
+                    {
+                        var culture = CultureInfo.GetCultureInfo(name);
+                        <option value="@name" data-sample="@Sample(name)" selected="@(Model.FormatCulture == name)">@Formatter.Capitalize(culture.NativeName) (@Sample(name))</option>
+                    }
+                </select>
+                <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+            </div>
+            <span class="field__help">@T["Example:"] <span id="formatPreview" class="mono">@Sample(LocalizationSettings.FormatCultureFor(Model.FormatCulture, language))</span></span>
+            <span asp-validation-for="FormatCulture"></span>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="field">
+            <label asp-for="Currency" class="field__label"></label>
+            <div class="field__control">
+                <select asp-for="Currency" class="input">
+                    @foreach (var code in LocalizationSettings.Currencies)
+                    {
+                        <option value="@code" selected="@(Model.Currency == code)">@code · @LocalizationSettings.CurrencySymbol(code)</option>
+                    }
+                </select>
+                <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+            </div>
+            <span class="field__help">@T["The currency your invoices are in. Amounts are shown with it and sent in statement emails; nothing is converted."]</span>
+            <span asp-validation-for="Currency"></span>
+        </div>
+        <div class="field">
+            <label asp-for="TimeZone" class="field__label"></label>
+            <div class="field__control">
+                <select asp-for="TimeZone" class="input">
+                    @foreach (var zone in zones)
+                    {
+                        <option value="@zone.Id" selected="@(Model.TimeZone == zone.Id)">(UTC@(Offset(zone.BaseUtcOffset))) @zone.Id.Replace('_', ' ')</option>
+                    }
+                </select>
+                <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+            </div>
+            <span class="field__help">@T["Used for times such as when a statement was sent."]</span>
+            <span asp-validation-for="TimeZone"></span>
+        </div>
+    </div>
+
     <div class="form-actions">
-        <button type="submit" class="btn btn--primary">Save</button>
-        <a asp-controller="Home" asp-action="Index" class="btn btn--ghost">Back</a>
+        <button type="submit" class="btn btn--primary">@T["Save settings"]</button>
+        <a asp-controller="Home" asp-action="Index" class="btn btn--ghost">@T["Back"]</a>
     </div>
 </form>
 

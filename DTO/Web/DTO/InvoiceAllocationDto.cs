@@ -15,7 +15,7 @@ public class InvoiceAllocationDto : BaseEntityUserWithConcurrency
 
     public ContactDto Contact { get; set; } = default!;
 
-    [Display(Name = "Amount (€)")]
+    [Display(Name = "Amount")]
     public decimal AllocatedSum { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
