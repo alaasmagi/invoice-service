@@ -1,4 +1,4 @@
-@model DTO.DataAccess.DataAccess.DTO.ContactEntity
+@model DeleteViewModel<ContactDto>
 @{
     ViewData["Title"] = "Delete contact";
 }
@@ -11,18 +11,18 @@
 </header>
 
 <div class="section medium">
-    <div class="alert alert--danger" role="alert">
-        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
-        <div class="alert__body"><span class="alert__title">Delete this contact?</span><span>This action cannot be undone.</span></div>
-    </div>
+    <partial name="_DeleteNotice" model='Model.Notice("contact")' />
     <dl class="card details">
-    <div class="details__row"><dt>Name</dt><dd>@Model.FullName</dd></div>
-    <div class="details__row"><dt>Email</dt><dd>@Model.Email</dd></div>
-    <div class="details__row"><dt>Phone</dt><dd>@Model.Phone</dd></div>
-</dl>
+        <div class="details__row"><dt>Name</dt><dd>@Model.Item.FullName</dd></div>
+        <div class="details__row"><dt>Email</dt><dd>@Model.Item.Email</dd></div>
+        <div class="details__row"><dt>Phone</dt><dd>@(string.IsNullOrEmpty(Model.Item.Phone) ? "—" : Model.Item.Phone)</dd></div>
+    </dl>
     <form asp-action="Delete" method="post" class="form-actions">
-        <input type="hidden" asp-for="Id" />
-        <button type="submit" class="btn btn--danger">Delete contact</button>
-        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+        <input type="hidden" name="Id" value="@Model.Item.Id" />
+        @if (!Model.Blockers.Any())
+        {
+            <button type="submit" class="btn btn--danger">Delete contact</button>
+        }
+        <a asp-action="Details" asp-route-id="@Model.Item.Id" class="btn btn--ghost">Cancel</a>
     </form>
 </div>

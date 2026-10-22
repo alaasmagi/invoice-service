@@ -1,12 +1,14 @@
 using DataAccess.Context;
-using DTO.DataAccess.DataAccess.DTO;
+using DTO.DataAccess.Web.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Web.Helpers;
+using Web.Mapping;
 
 namespace Web.Controllers;
 
-public class InvoiceAllocationsController(AppDbContext context) : UserScopedControllerBase
+public class InvoiceAllocationsController(AppDbContext context, WebDtoMapper mapper) : UserScopedControllerBase
 {
     public async Task<IActionResult> Index()
     {
@@ -15,7 +17,7 @@ public class InvoiceAllocationsController(AppDbContext context) : UserScopedCont
             .Where(e => e.UserId == userId)
             .OrderByDescending(e => e.CreatedAt)
             .ToListAsync();
-        return View(entities);
+        return View(entities.Select(mapper.ToDto).ToList());
     }
 
     public async Task<IActionResult> Details(Guid? id)
@@ -24,33 +26,34 @@ public class InvoiceAllocationsController(AppDbContext context) : UserScopedCont
         var userId = CurrentUserId();
         var entity = await context.InvoiceAllocations.Include(e => e.Invoice).ThenInclude(e => e.Address).Include(e => e.Contact)
             .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
-        return entity == null ? NotFound() : View(entity);
+        return entity == null ? NotFound() : View(mapper.ToDto(entity));
     }
 
     public async Task<IActionResult> Create()
     {
         await PopulateSelectLists(CurrentUserId());
-        return View(new InvoiceAllocationEntity());
+        return View(new InvoiceAllocationDto());
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("InvoiceId,ContactId,AllocatedSum")] InvoiceAllocationEntity entity)
+    public async Task<IActionResult> Create([Bind("InvoiceId,ContactId,AllocatedSum")] InvoiceAllocationDto dto)
     {
         var userId = CurrentUserId();
-        ClearServerManagedModelState(entity);
-        ModelState.Remove(nameof(entity.Invoice));
-        ModelState.Remove(nameof(entity.Contact));
-        if (!await OwnsInvoiceAndContact(userId, entity.InvoiceId, entity.ContactId)) ModelState.AddModelError(string.Empty, "Selected invoice or contact was not found.");
+        ClearServerManagedModelState(dto);
+        ClearNavigationModelState(nameof(dto.Invoice), nameof(dto.Contact));
+        if (!await OwnsInvoiceAndContact(userId, dto.InvoiceId, dto.ContactId)) ModelState.AddModelError(string.Empty, "Selected invoice or contact was not found.");
         if (!ModelState.IsValid)
         {
             await PopulateSelectLists(userId);
-            return View(entity);
+            return View(dto);
         }
+        var entity = mapper.ToEntity(dto);
         StampNew(entity, userId);
         entity.CreatedAt = DateTime.UtcNow;
         context.Add(entity);
         await context.SaveChangesAsync();
+        Flash("Allocation saved.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -61,30 +64,31 @@ public class InvoiceAllocationsController(AppDbContext context) : UserScopedCont
         var entity = await context.InvoiceAllocations.FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
         if (entity == null) return NotFound();
         await PopulateSelectLists(userId);
-        return View(entity);
+        return View(mapper.ToDto(entity));
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, [Bind("Id,InvoiceId,ContactId,AllocatedSum,CreatedAt")] InvoiceAllocationEntity entity)
+    public async Task<IActionResult> Edit(Guid id, [Bind("Id,InvoiceId,ContactId,AllocatedSum")] InvoiceAllocationDto dto)
     {
-        if (id != entity.Id) return NotFound();
+        if (id != dto.Id) return NotFound();
         var userId = CurrentUserId();
-        ClearServerManagedModelState(entity);
-        ModelState.Remove(nameof(entity.Invoice));
-        ModelState.Remove(nameof(entity.Contact));
-        if (!await OwnsInvoiceAndContact(userId, entity.InvoiceId, entity.ContactId)) ModelState.AddModelError(string.Empty, "Selected invoice or contact was not found.");
+        ClearServerManagedModelState(dto);
+        ClearNavigationModelState(nameof(dto.Invoice), nameof(dto.Contact));
+        if (!await OwnsInvoiceAndContact(userId, dto.InvoiceId, dto.ContactId)) ModelState.AddModelError(string.Empty, "Selected invoice or contact was not found.");
         if (!ModelState.IsValid)
         {
             await PopulateSelectLists(userId);
-            return View(entity);
+            return View(dto);
         }
         var existing = await context.InvoiceAllocations.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
         if (existing == null) return NotFound();
+        var entity = mapper.ToEntity(dto);
         StampExisting(entity, userId, existing);
         entity.CreatedAt = existing.CreatedAt;
         context.Update(entity);
         await context.SaveChangesAsync();
+        Flash("Allocation updated.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -94,7 +98,7 @@ public class InvoiceAllocationsController(AppDbContext context) : UserScopedCont
         var userId = CurrentUserId();
         var entity = await context.InvoiceAllocations.Include(e => e.Invoice).ThenInclude(e => e.Address).Include(e => e.Contact)
             .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
-        return entity == null ? NotFound() : View(entity);
+        return entity == null ? NotFound() : View(mapper.ToDto(entity));
     }
 
     [HttpPost, ActionName("Delete")]
@@ -107,6 +111,7 @@ public class InvoiceAllocationsController(AppDbContext context) : UserScopedCont
         {
             context.InvoiceAllocations.Remove(entity);
             await context.SaveChangesAsync();
+            Flash("Allocation deleted.");
         }
         return RedirectToAction(nameof(Index));
     }
@@ -114,7 +119,7 @@ public class InvoiceAllocationsController(AppDbContext context) : UserScopedCont
     private async Task PopulateSelectLists(Guid userId)
     {
         var invoices = await context.Invoices.Include(e => e.Address).Where(e => e.UserId == userId).OrderByDescending(e => e.InvoiceDate).ToListAsync();
-        ViewData["InvoiceId"] = new SelectList(invoices.Select(e => new { e.Id, Label = $"{e.InvoiceDate}: {e.Address.Name} ({e.TotalSum:C})" }), "Id", "Label");
+        ViewData["InvoiceId"] = new SelectList(invoices.Select(e => new { e.Id, Label = $"{Fmt.Date(e.InvoiceDate)} · {e.Address.Name} · {Fmt.Money(e.TotalSum)}" }), "Id", "Label");
         ViewData["ContactId"] = new SelectList(await context.Contacts.Where(e => e.UserId == userId).OrderBy(e => e.FullName).ToListAsync(), "Id", "FullName");
     }
 

@@ -1,39 +1,57 @@
-@model IEnumerable<DTO.DataAccess.DataAccess.DTO.AddressContactEntity>
+@model IReadOnlyList<AddressContactDto>
 @{
-    ViewData["Title"] = "Address contacts";
+    ViewData["Title"] = "Residents";
+    var showPast = ViewData["ShowPast"] as bool? ?? false;
+    var pastCount = ViewData["PastCount"] as int? ?? 0;
 }
 
 <header class="page-header">
     <div class="page-header__title">
         <p class="kicker">Directory</p>
-        <h1>Address contacts</h1>
+        <h1>Residents</h1>
+        <p class="page-header__lede">Who lives where. Invoices are split equally between the residents of an address on the invoice date.</p>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Create address contact</a>
+        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add resident</a>
     </div>
 </header>
 
+<div class="section-head">
+    @if (Model.Count > 5)
+    {
+        <div class="search-field"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg><input type="search" class="input" placeholder="Search by address or person" aria-label="Search residents" data-table-filter="#residentsTable" /></div>
+    }
+    else
+    {
+        <span></span>
+    }
+    @if (pastCount > 0)
+    {
+        <a asp-action="Index" asp-route-showPast="@(!showPast)" class="btn btn--ghost btn--sm">@(showPast ? "Hide past residents" : $"Show {pastCount} past resident(s)")</a>
+    }
+</div>
+
 <div class="card table-card">
-    <table class="data-table">
-        <thead><tr><th>Address</th><th>Contact</th><th>Start</th><th>End</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+    <table class="data-table" id="residentsTable">
+        <thead><tr><th>Address</th><th>Person</th><th>Moved in</th><th>Moved out</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
         <tbody>
         @foreach (var item in Model)
         {
             <tr>
-                <td><div class="stack-cell"><span>@item.Address.Name</span><span>@item.Address.FullAddress</span></div></td>
-                <td>@item.Contact.FullName</td>
-                <td class="nowrap">@item.StartDate</td>
-                <td>@if (item.EndDate == null) { <span class="badge badge--success">Current</span> } else { <span class="nowrap">@item.EndDate</span> }</td>
+                <td><div class="stack-cell"><a asp-controller="Addresses" asp-action="Details" asp-route-id="@item.AddressId" class="link">@item.Address.Name</a><span>@item.Address.FullAddress</span></div></td>
+                <td><a asp-controller="Contacts" asp-action="Details" asp-route-id="@item.ContactId" class="link">@item.Contact.FullName</a></td>
+                <td class="nowrap">@Fmt.Date(item.StartDate)</td>
+                <td>@if (item.EndDate == null) { <span class="badge badge--success">Lives here</span> } else { <span class="nowrap">@Fmt.Date(item.EndDate)</span> }</td>
                 <td class="actions-col"><div class="row-actions">
-                    <a asp-action="Details" asp-route-id="@item.Id" class="icon-btn" aria-label="Details" title="Details"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></a>
                     <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Remove" title="Remove"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
                 </div></td>
             </tr>
         }
+        <tr class="no-match-row" hidden><td colspan="5" class="empty">No residents match your search.</td></tr>
         @if (!Model.Any())
         {
-            <tr><td colspan="5" class="empty">No address contacts yet.</td></tr>
+            <tr class="empty-row"><td colspan="5" class="empty">No residents yet. <a asp-action="Create" class="link">Link a person to an address</a> so invoices can be split.</td></tr>
         }
         </tbody>
     </table>

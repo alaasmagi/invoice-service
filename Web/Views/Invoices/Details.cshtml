@@ -1,24 +1,95 @@
-@model DTO.DataAccess.DataAccess.DTO.InvoiceEntity
+@model InvoiceDetailsViewModel
 @{
     ViewData["Title"] = "Invoice details";
+    var invoice = Model.Invoice;
+    var period = BillingPeriod.From(invoice.InvoiceDate);
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Billing</p>
-        <h1>Invoice details</h1>
+        <p class="kicker">Invoice</p>
+        <h1>@invoice.Service.Name · @invoice.Address.Name</h1>
+        <p class="page-header__lede">@Fmt.Money(invoice.TotalSum) · dated @Fmt.Date(invoice.InvoiceDate)</p>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>Edit</a>
+        <a asp-action="Edit" asp-route-id="@invoice.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>Edit</a>
+        <a asp-action="Delete" asp-route-id="@invoice.Id" class="btn btn--ghost"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>Delete</a>
     </div>
 </header>
 
-<div class="section medium">
-    <dl class="card details">
-    <div class="details__row"><dt>Date</dt><dd>@Model.InvoiceDate</dd></div>
-    <div class="details__row"><dt>Address</dt><dd><div class="stack-cell"><span>@Model.Address.Name</span><span>@Model.Address.FullAddress</span></div></dd></div>
-    <div class="details__row"><dt>Service</dt><dd>@Model.Service.Name</dd></div>
-    <div class="details__row"><dt>Total</dt><dd>@Model.TotalSum €</dd></div>
+<dl class="card details medium">
+    <div class="details__row"><dt>Address</dt><dd><div class="stack-cell"><a asp-controller="Addresses" asp-action="Details" asp-route-id="@invoice.AddressId" class="link">@invoice.Address.Name</a><span>@invoice.Address.FullAddress</span></div></dd></div>
+    <div class="details__row"><dt>Service</dt><dd>@invoice.Service.Name</dd></div>
+    <div class="details__row"><dt>Invoice date</dt><dd>@Fmt.Date(invoice.InvoiceDate)</dd></div>
+    <div class="details__row"><dt>Billed period</dt><dd>@Fmt.Range(invoice.PeriodStart, invoice.PeriodEnd)</dd></div>
+    <div class="details__row"><dt>Total</dt><dd><strong>@Fmt.Money(invoice.TotalSum)</strong></dd></div>
 </dl>
-    <div><a asp-action="Index" class="btn btn--ghost">Back to invoices</a></div>
+
+<section class="section medium">
+    <div class="section-head">
+        <h2 class="section-title">Who pays</h2>
+        <a asp-controller="AddressContacts" asp-action="Create" asp-route-addressId="@invoice.AddressId" asp-route-returnUrl="@(Context.Request.Path)" class="btn btn--ghost btn--sm"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add resident</a>
+    </div>
+    @if (Model.Split.Any())
+    {
+        <p class="secondary">Split equally between the residents living at @invoice.Address.Name on @Fmt.Date(invoice.InvoiceDate). Statement generation uses this split.</p>
+        <div class="card table-card">
+            <table class="data-table">
+                <thead><tr><th>Resident</th><th class="num">Share</th></tr></thead>
+                <tbody>
+                @foreach (var share in Model.Split)
+                {
+                    <tr>
+                        <td><a asp-controller="Contacts" asp-action="Details" asp-route-id="@share.ContactId" class="link">@share.ContactName</a></td>
+                        <td class="num">@Fmt.Money(share.Amount)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert--warning">
+            <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+            <div class="alert__body">
+                <span class="alert__title">Nobody to bill</span>
+                <span>No residents lived at @invoice.Address.Name on @Fmt.Date(invoice.InvoiceDate), so statement generation will skip this invoice. Add a resident whose move-in date is on or before the invoice date.</span>
+            </div>
+        </div>
+    }
+</section>
+
+<section class="section medium">
+    <div class="section-head">
+        <h2 class="section-title">Statements</h2>
+        <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="btn btn--ghost btn--sm">@period.Label statements <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a>
+    </div>
+    @if (Model.StatementLines.Any())
+    {
+        <div class="card table-card">
+            <table class="data-table">
+                <thead><tr><th>Person</th><th>Month</th><th>Status</th><th class="num">Share</th></tr></thead>
+                <tbody>
+                @foreach (var line in Model.StatementLines)
+                {
+                    <tr>
+                        <td><a asp-controller="MonthlyStatements" asp-action="Details" asp-route-id="@line.MonthlyStatementId" class="link">@line.MonthlyStatement.Contact.FullName</a></td>
+                        <td class="nowrap">@(new BillingPeriod(line.MonthlyStatement.Year, line.MonthlyStatement.Month).Label)</td>
+                        <td><partial name="_StatementStatus" model="line.MonthlyStatement.Status" /></td>
+                        <td class="num">@Fmt.Money(line.AllocatedAmount)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="secondary">Not included in any statement yet. Generate statements for @period.Label to bill it.</p>
+    }
+</section>
+
+<div class="actions">
+    <a asp-action="Index" class="btn btn--ghost">Back to invoices</a>
 </div>

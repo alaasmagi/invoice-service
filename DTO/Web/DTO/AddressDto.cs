@@ -1,10 +1,13 @@
+using System.ComponentModel.DataAnnotations;
 using Base.Domain;
 
 namespace DTO.DataAccess.Web.DTO;
 
 public class AddressDto : BaseEntityUserWithConcurrency
 {
+    [Display(Name = "Name")]
     public string Name { get; set; } = default!;
+    [Display(Name = "Full address")]
     public string FullAddress { get; set; } = default!;
     
     public ICollection<AddressContactDto> AddressContacts { get; set; }

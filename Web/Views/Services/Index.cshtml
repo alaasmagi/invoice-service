@@ -1,28 +1,31 @@
-@model IEnumerable<DTO.DataAccess.DataAccess.DTO.ServiceEntity>
+@model IReadOnlyList<ServiceDto>
 @{
     ViewData["Title"] = "Services";
+    var invoiceCounts = ViewData["InvoiceCounts"] as Dictionary<Guid, int> ?? new();
 }
 
 <header class="page-header">
     <div class="page-header__title">
         <p class="kicker">Directory</p>
         <h1>Services</h1>
+        <p class="page-header__lede">The kinds of invoices you receive, e.g. electricity, internet or water.</p>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Create service</a>
+        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add service</a>
     </div>
 </header>
 
 <div class="card table-card">
     <table class="data-table">
-        <thead><tr><th>Name</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <thead><tr><th>Name</th><th class="num">Invoices</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
         <tbody>
         @foreach (var item in Model)
         {
+            var count = invoiceCounts.GetValueOrDefault(item.Id);
             <tr>
                 <td>@item.Name</td>
+                <td class="num">@if (count > 0) { <a asp-controller="Invoices" asp-action="Index" asp-route-serviceId="@item.Id" class="link">@count</a> } else { <span class="secondary">0</span> }</td>
                 <td class="actions-col"><div class="row-actions">
-                    <a asp-action="Details" asp-route-id="@item.Id" class="icon-btn" aria-label="Details" title="Details"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></a>
                     <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
                     <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
                 </div></td>
@@ -30,7 +33,7 @@
         }
         @if (!Model.Any())
         {
-            <tr><td colspan="2" class="empty">No services yet.</td></tr>
+            <tr><td colspan="3" class="empty">No services yet. <a asp-action="Create" class="link">Add the first one</a>.</td></tr>
         }
         </tbody>
     </table>

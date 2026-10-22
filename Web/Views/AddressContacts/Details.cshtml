@@ -1,12 +1,12 @@
-@model DTO.DataAccess.DataAccess.DTO.AddressContactEntity
+@model AddressContactDto
 @{
-    ViewData["Title"] = "Address contact details";
+    ViewData["Title"] = "Resident";
 }
 
 <header class="page-header">
     <div class="page-header__title">
-        <p class="kicker">Directory</p>
-        <h1>Address contact details</h1>
+        <p class="kicker">Resident</p>
+        <h1>@Model.Contact.FullName at @Model.Address.Name</h1>
     </div>
     <div class="page-header__actions">
         <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>Edit</a>
@@ -15,10 +15,10 @@
 
 <div class="section medium">
     <dl class="card details">
-    <div class="details__row"><dt>Address</dt><dd><div class="stack-cell"><span>@Model.Address.Name</span><span>@Model.Address.FullAddress</span></div></dd></div>
-    <div class="details__row"><dt>Contact</dt><dd>@Model.Contact.FullName</dd></div>
-    <div class="details__row"><dt>Start</dt><dd>@Model.StartDate</dd></div>
-    <div class="details__row"><dt>End</dt><dd>@if (Model.EndDate == null) { <span class="badge badge--success">Current</span> } else { <text>@Model.EndDate</text> }</dd></div>
-</dl>
-    <div><a asp-action="Index" class="btn btn--ghost">Back to address contacts</a></div>
+        <div class="details__row"><dt>Address</dt><dd><div class="stack-cell"><a asp-controller="Addresses" asp-action="Details" asp-route-id="@Model.AddressId" class="link">@Model.Address.Name</a><span>@Model.Address.FullAddress</span></div></dd></div>
+        <div class="details__row"><dt>Person</dt><dd><a asp-controller="Contacts" asp-action="Details" asp-route-id="@Model.ContactId" class="link">@Model.Contact.FullName</a></dd></div>
+        <div class="details__row"><dt>Moved in</dt><dd>@Fmt.Date(Model.StartDate)</dd></div>
+        <div class="details__row"><dt>Moved out</dt><dd>@if (Model.EndDate == null) { <span class="badge badge--success">Lives here</span> } else { @Fmt.Date(Model.EndDate) }</dd></div>
+    </dl>
+    <div><a asp-action="Index" class="btn btn--ghost">Back to residents</a></div>
 </div>

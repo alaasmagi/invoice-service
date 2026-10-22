@@ -1,0 +1,70 @@
+@model InvoiceDto
+@{
+    var form = ViewData["Form"] as InvoiceFormViewModel ?? new InvoiceFormViewModel();
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+@if (!form.HasAddresses || !form.HasServices)
+{
+    <div class="alert alert--warning">
+        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+        <div class="alert__body">
+            <span class="alert__title">Some setup is missing</span>
+            <span>
+                An invoice needs an address and a service.
+                @if (!form.HasAddresses) { <a asp-controller="Addresses" asp-action="Create" asp-route-returnUrl="@returnUrl" class="link">Add an address</a> }
+                @if (!form.HasAddresses && !form.HasServices) { <span>and</span> }
+                @if (!form.HasServices) { <a asp-controller="Services" asp-action="Create" asp-route-returnUrl="@returnUrl" class="link">add a service</a> }
+                first.
+            </span>
+        </div>
+    </div>
+}
+<div asp-validation-summary="ModelOnly"></div>
+<div class="form-row">
+    <div class="field">
+        <label asp-for="AddressId" class="field__label"></label>
+        <div class="field__control">
+            <select asp-for="AddressId" class="input" asp-items="ViewBag.AddressId">
+                <option value="">Select address…</option>
+            </select>
+            <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </div>
+        <span asp-validation-for="AddressId"></span>
+    </div>
+    <div class="field">
+        <label asp-for="ServiceId" class="field__label"></label>
+        <div class="field__control">
+            <select asp-for="ServiceId" class="input" asp-items="ViewBag.ServiceId">
+                <option value="">Select service…</option>
+            </select>
+            <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </div>
+        <span asp-validation-for="ServiceId"></span>
+    </div>
+</div>
+<div class="form-row">
+    <div class="field">
+        <label asp-for="InvoiceDate" class="field__label"></label>
+        <div class="field__control has-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg><input asp-for="InvoiceDate" class="input" type="date" /></div>
+        <span class="field__help">Statements include the invoice in this month and in every month its billed period covers.</span>
+        <span asp-validation-for="InvoiceDate"></span>
+    </div>
+    <div class="field">
+        <label asp-for="TotalSum" class="field__label"></label>
+        <input asp-for="TotalSum" class="input" type="number" step="0.01" min="0" inputmode="decimal" placeholder="e.g. 84.12" value="@(Model.TotalSum == 0 ? "" : Model.TotalSum.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))" />
+        <span asp-validation-for="TotalSum"></span>
+    </div>
+</div>
+<div class="form-row">
+    <div class="field">
+        <label asp-for="PeriodStart" class="field__label"></label>
+        <div class="field__control has-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg><input asp-for="PeriodStart" class="input" type="date" data-period-start /></div>
+        <span class="field__help">Optional. The end date fills in automatically.</span>
+        <span asp-validation-for="PeriodStart"></span>
+    </div>
+    <div class="field">
+        <label asp-for="PeriodEnd" class="field__label"></label>
+        <div class="field__control has-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg><input asp-for="PeriodEnd" class="input" type="date" data-period-end /></div>
+        <span asp-validation-for="PeriodEnd"></span>
+    </div>
+</div>

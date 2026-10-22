@@ -1,6 +1,7 @@
 @model Contracts.Application.PdfInvoiceImportResult
 @{
     ViewData["Title"] = "PDF import result";
+    var periods = Model.CreatedInvoices.Select(e => BillingPeriod.From(e.InvoiceDate)).Distinct().OrderDescending().ToList();
 }
 
 <header class="page-header">
@@ -32,8 +33,25 @@ else
 {
     <div class="alert alert--success" role="status">
         <svg class="icon" aria-hidden="true"><use href="#i-circle-check"></use></svg>
-        <div class="alert__body">Imported @Model.CreatedInvoices.Count invoice(s) from @Model.ProviderName.</div>
+        <div class="alert__body">Imported @Model.CreatedInvoices.Count invoice(s) from @Model.ProviderName, @Fmt.Money(Model.CreatedInvoices.Sum(e => e.TotalSum)) in total.</div>
     </div>
+
+    @if (periods.Any())
+    {
+        <section class="card next-step">
+            <div class="next-step__copy">
+                <span class="kicker">Next step</span>
+                <h2 class="next-step__title">Review the invoices, then generate statements</h2>
+                <p>Check the amounts below. When every invoice for the month is in, generate the statements so they can be sent.</p>
+            </div>
+            <div class="actions">
+                @foreach (var period in periods)
+                {
+                    <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="btn btn--primary">@period.Label statements <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a>
+                }
+            </div>
+        </section>
+    }
 }
 
 @if (Model.Warnings.Count > 0)
@@ -63,11 +81,11 @@ else
                 @foreach (var invoice in Model.CreatedInvoices)
                 {
                     <tr>
-                        <td class="nowrap">@invoice.InvoiceDate</td>
+                        <td class="nowrap">@Fmt.Date(invoice.InvoiceDate)</td>
                         <td>@invoice.AddressName</td>
                         <td>@invoice.ServiceName</td>
-                        <td class="nowrap">@invoice.PeriodStart – @invoice.PeriodEnd</td>
-                        <td class="num">@invoice.TotalSum €</td>
+                        <td class="nowrap secondary">@Fmt.Range(invoice.PeriodStart, invoice.PeriodEnd)</td>
+                        <td class="num">@Fmt.Money(invoice.TotalSum)</td>
                         <td class="actions-col"><a asp-controller="Invoices" asp-action="Details" asp-route-id="@invoice.InvoiceId" class="btn btn--ghost btn--sm">Details</a></td>
                     </tr>
                 }
@@ -89,7 +107,7 @@ else
                 {
                     <tr>
                         <td>@row.AddressText</td>
-                        <td class="num">@row.Amount €</td>
+                        <td class="num">@(row.Amount is { } amount ? Fmt.Money(amount) : "—")</td>
                         <td>@row.Reason</td>
                         <td class="mono secondary">@row.SourceText</td>
                     </tr>

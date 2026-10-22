@@ -10,14 +10,6 @@
     </div>
 </header>
 
-@if (TempData["StatusMessage"] is string message)
-{
-    <div class="alert alert--success narrow" role="status">
-        <svg class="icon" aria-hidden="true"><use href="#i-circle-check"></use></svg>
-        <div class="alert__body">@message</div>
-    </div>
-}
-
 <form asp-action="Edit" method="post" class="card form narrow">
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="Email" />

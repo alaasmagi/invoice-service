@@ -1,13 +1,12 @@
 @model Domain.EMonthlyStatementStatus
 @{
-    var (tone, label) = Model switch
+    var tone = Model switch
     {
-        Domain.EMonthlyStatementStatus.Draft => ("neutral", "Draft"),
-        Domain.EMonthlyStatementStatus.ReadyToSend => ("accent", "Ready to send"),
-        Domain.EMonthlyStatementStatus.PartiallySent => ("warning", "Partially sent"),
-        Domain.EMonthlyStatementStatus.Sent => ("success", "Sent"),
-        Domain.EMonthlyStatementStatus.Failed => ("danger", "Failed"),
-        _ => ("neutral", Model.ToString())
+        Domain.EMonthlyStatementStatus.ReadyToSend => "accent",
+        Domain.EMonthlyStatementStatus.PartiallySent => "warning",
+        Domain.EMonthlyStatementStatus.Sent => "success",
+        Domain.EMonthlyStatementStatus.Failed => "danger",
+        _ => "neutral"
     };
 }
-<span class="badge badge--@tone">@label</span>
+<span class="badge badge--@tone">@Fmt.StatusLabel(Model)</span>

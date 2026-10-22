@@ -21,6 +21,8 @@ using Serilog;
 using Serilog.Events;
 using System.Net;
 using Web.Filters;
+using Web.Mapping;
+using Web.Services;
 using IPNetwork = System.Net.IPNetwork;
 
 namespace Web.Configuration;
@@ -136,9 +138,16 @@ public static class InvoiceServiceApplication
         builder.Services.AddRepositories();
         builder.Services.AddApplicationServices();
 
+        builder.Services.AddScoped<WebDtoMapper>();
+        builder.Services.AddScoped<PeriodOverviewService>();
+
         builder.Services.AddScoped<CurrentAppUserViewDataFilter>();
         builder.Services.AddControllersWithViews(options =>
-            options.Filters.Add<CurrentAppUserViewDataFilter>());
+        {
+            options.Filters.Add<CurrentAppUserViewDataFilter>();
+            // Empty "Select …" placeholder options post an empty value for non-nullable ids and amounts.
+            options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "This field is required.");
+        });
         builder.Services.ConfigureForwardedHeaders();
     }
 

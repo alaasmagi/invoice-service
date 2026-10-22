@@ -1,4 +1,4 @@
-@model DTO.DataAccess.DataAccess.DTO.InvoiceAllocationEntity
+@model InvoiceAllocationDto
 @{
     ViewData["Title"] = "Create allocation";
 }
@@ -14,13 +14,13 @@
     <div asp-validation-summary="ModelOnly"></div>
     <div class="field">
         <label asp-for="InvoiceId" class="field__label"></label>
-        <div class="field__control"><select asp-for="InvoiceId" class="input" asp-items="ViewBag.InvoiceId"></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+        <div class="field__control"><select asp-for="InvoiceId" class="input" asp-items="ViewBag.InvoiceId"><option value="">Select invoice…</option></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
         <span asp-validation-for="InvoiceId"></span>
     </div>
     <div class="form-row">
         <div class="field">
             <label asp-for="ContactId" class="field__label"></label>
-            <div class="field__control"><select asp-for="ContactId" class="input" asp-items="ViewBag.ContactId"></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+            <div class="field__control"><select asp-for="ContactId" class="input" asp-items="ViewBag.ContactId"><option value="">Select contact…</option></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
             <span asp-validation-for="ContactId"></span>
         </div>
         <div class="field">

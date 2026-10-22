@@ -63,7 +63,7 @@ public sealed class AppUsersController(AppDbContext context) : UserScopedControl
         entity.BankIban = string.IsNullOrWhiteSpace(model.BankIban) ? null : model.BankIban.Trim();
 
         await context.SaveChangesAsync(HttpContext.RequestAborted);
-        TempData["StatusMessage"] = "AppUser information was updated.";
+        Flash("Your details were saved.");
 
         return RedirectToAction(nameof(Edit));
     }

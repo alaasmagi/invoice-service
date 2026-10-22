@@ -1,0 +1,51 @@
+@model AddressContactDto
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    var returnUrl = ViewData["ReturnUrl"] as string;
+    var here = Context.Request.Path + Context.Request.QueryString;
+    var noContacts = !(ViewData["ContactId"] as SelectList)?.Any() ?? true;
+    var noAddresses = !(ViewData["AddressId"] as SelectList)?.Any() ?? true;
+}
+<input type="hidden" name="returnUrl" value="@returnUrl" />
+@if (noContacts || noAddresses)
+{
+    <div class="alert alert--warning">
+        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+        <div class="alert__body">
+            <span>
+                @if (noAddresses) { <a asp-controller="Addresses" asp-action="Create" asp-route-returnUrl="@here" class="link">Add an address</a> }
+                @if (noAddresses && noContacts) { <span>and</span> }
+                @if (noContacts) { <a asp-controller="Contacts" asp-action="Create" asp-route-returnUrl="@here" class="link">add a contact</a> }
+                first.
+            </span>
+        </div>
+    </div>
+}
+<div asp-validation-summary="ModelOnly"></div>
+<div class="form-row">
+    <div class="field">
+        <label asp-for="AddressId" class="field__label"></label>
+        <div class="field__control"><select asp-for="AddressId" class="input" asp-items="ViewBag.AddressId"><option value="">Select address…</option></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+        <span asp-validation-for="AddressId"></span>
+    </div>
+    <div class="field">
+        <label asp-for="ContactId" class="field__label"></label>
+        <div class="field__control"><select asp-for="ContactId" class="input" asp-items="ViewBag.ContactId"><option value="">Select person…</option></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+        <span class="field__help">Not listed? <a asp-controller="Contacts" asp-action="Create" asp-route-returnUrl="@here" class="link">Add a new contact</a></span>
+        <span asp-validation-for="ContactId"></span>
+    </div>
+</div>
+<div class="form-row">
+    <div class="field">
+        <label asp-for="StartDate" class="field__label"></label>
+        <div class="field__control has-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg><input asp-for="StartDate" class="input" type="date" /></div>
+        <span class="field__help">Invoices dated from this day on are shared with this person.</span>
+        <span asp-validation-for="StartDate"></span>
+    </div>
+    <div class="field">
+        <label asp-for="EndDate" class="field__label"></label>
+        <div class="field__control has-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg><input asp-for="EndDate" class="input" type="date" /></div>
+        <span class="field__help">Leave empty while they still live here.</span>
+        <span asp-validation-for="EndDate"></span>
+    </div>
+</div>

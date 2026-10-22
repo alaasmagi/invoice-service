@@ -49,7 +49,7 @@
 
         <nav class="nav" id="mainNavigation" aria-label="Main">
             <a class="nav-item" asp-area="" asp-controller="Home" asp-action="Index" aria-current="@Current("Home")">
-                <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>Home
+                <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>Overview
             </a>
 
             <div class="nav__group">Billing</div>
@@ -71,7 +71,7 @@
                 <svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg>Contacts
             </a>
             <a class="nav-item" asp-area="" asp-controller="AddressContacts" asp-action="Index" aria-current="@Current("AddressContacts")">
-                <svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg>Address contacts
+                <svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg>Residents
             </a>
             <a class="nav-item" asp-area="" asp-controller="Services" asp-action="Index" aria-current="@Current("Services")">
                 <svg class="icon" aria-hidden="true"><use href="#i-zap"></use></svg>Services
@@ -93,6 +93,19 @@
         <main role="main" class="content">
             @RenderBody()
         </main>
+
+        @if (TempData["StatusMessage"] is string statusMessage)
+        {
+            var statusKind = TempData["StatusKind"] as string ?? "info";
+            var statusIcon = statusKind switch { "success" => "i-circle-check", "danger" => "i-circle-x", "warning" => "i-triangle-alert", _ => "i-info" };
+            <div class="toast-region">
+                <div class="alert alert--@statusKind toast" role="@(statusKind is "danger" or "warning" ? "alert" : "status")" data-toast="@statusKind">
+                    <svg class="icon" aria-hidden="true"><use href="#@statusIcon"></use></svg>
+                    <div class="alert__body">@statusMessage</div>
+                    <button type="button" class="icon-btn toast__close" aria-label="Dismiss" data-toast-close><svg class="icon icon--sm" aria-hidden="true"><use href="#i-x"></use></svg></button>
+                </div>
+            </div>
+        }
 
         <footer class="app-footer">
             <span>&copy; Aleksander Laasmägi @DateTime.Now.Year</span>
@@ -129,7 +142,22 @@
         });
     })();
 </script>
+<dialog id="confirmDialog" class="dialog" aria-labelledby="confirmDialogTitle">
+    <form method="dialog" class="dialog__body">
+        <div class="dialog__header">
+            <h2 id="confirmDialogTitle" class="dialog__title" data-confirm-title>Are you sure?</h2>
+            <button type="submit" value="cancel" class="icon-btn" aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg></button>
+        </div>
+        <p class="dialog__message" data-confirm-message></p>
+        <div class="dialog__actions">
+            <button type="submit" value="cancel" class="btn btn--ghost" autofocus>Cancel</button>
+            <button type="submit" value="ok" class="btn btn--primary" data-confirm-ok>Confirm</button>
+        </div>
+    </form>
+</dialog>
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 @await RenderSectionAsync("Scripts", required: false)
+<script src="~/js/app.js" asp-append-version="true"></script>
 </body>
 </html>

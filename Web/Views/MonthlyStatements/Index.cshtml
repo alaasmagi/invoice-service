@@ -1,87 +1,176 @@
-@model IEnumerable<DTO.DataAccess.DataAccess.DTO.MonthlyStatementEntity>
+@model StatementsIndexViewModel
 @{
     ViewData["Title"] = "Monthly statements";
-    var currentMonth = DateTime.UtcNow.Month;
+    var overview = Model.Overview;
+    var statuses = Enum.GetValues<Domain.EMonthlyStatementStatus>();
+    var groups = Model.Statements
+        .GroupBy(e => new BillingPeriod(e.Year, e.Month))
+        .OrderByDescending(g => g.Key)
+        .ToList();
 }
 
 <header class="page-header">
     <div class="page-header__title">
         <p class="kicker">Billing</p>
         <h1>Monthly statements</h1>
+        <p class="page-header__lede">Each person gets one statement per month with their share of every invoice at the addresses they live at.</p>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Create" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Create statement</a>
-        <a asp-action="Generate" class="btn btn--primary">Generate statements</a>
+        <a asp-action="Create" class="btn btn--ghost"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Manual statement</a>
     </div>
 </header>
 
-@if (TempData["StatusMessage"] is string message)
-{
-    <div class="alert alert--info" role="status">
-        <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
-        <div class="alert__body">@message</div>
-    </div>
-}
-
-<form asp-action="SendPeriod" method="post" class="card period-bar">
-    <div class="period-bar__text">
-        <strong>Send all for period</strong>
-        <span>Sends all unsent statements for the selected month.</span>
-    </div>
+<form method="get" asp-action="Index" class="card filter-bar" role="search" aria-label="Filter statements">
     <div class="field">
-        <label for="sendYear" class="field__label">Year</label>
-        <input id="sendYear" type="number" name="Year" value="@DateTime.UtcNow.Year" class="input" />
-    </div>
-    <div class="field field--month">
-        <label for="sendMonth" class="field__label">Month</label>
+        <label for="filterPeriod" class="field__label">Month</label>
         <div class="field__control">
-            <select id="sendMonth" name="Month" class="input">
-                @for (var m = 1; m <= 12; m++)
+            <select id="filterPeriod" name="period" class="input" data-autosubmit>
+                <option value="all" selected="@(Model.Period == null)">All months</option>
+                @foreach (var option in Model.PeriodOptions)
                 {
-                    <option value="@m" selected="@(m == currentMonth)">@System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(m)</option>
+                    <option value="@option.Key" selected="@(option == Model.Period)">@option.Label</option>
                 }
             </select>
             <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
         </div>
     </div>
-    <button type="submit" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg>Send all for period</button>
+    <div class="field">
+        <label for="filterStatus" class="field__label">Status</label>
+        <div class="field__control">
+            <select id="filterStatus" name="status" class="input" data-autosubmit>
+                <option value="">Any status</option>
+                @foreach (var s in statuses)
+                {
+                    <option value="@s" selected="@(s.ToString() == Model.Status)">@Fmt.StatusLabel(s)</option>
+                }
+            </select>
+            <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </div>
+    </div>
+    <noscript><button type="submit" class="btn btn--secondary">Apply</button></noscript>
 </form>
+
+@if (overview != null)
+{
+    var period = overview.Period;
+    var generateLabel = overview.Statements.Any() ? "Regenerate" : "Generate statements";
+    var generateConfirm = overview.SentCount > 0
+        ? $"{overview.SentCount} statement(s) for {period.Label} were already sent. Regenerating recalculates every statement for the month and marks them all \"Ready to send\" again, so they would be emailed again on the next \"Send all\"."
+        : $"This recalculates the statements for {period.Label} from {overview.Invoices.Count} invoice(s) and the residents on each invoice date.";
+
+    <section class="card period-summary" aria-label="@period.Label summary">
+        <div class="period-summary__facts">
+            <div class="fact"><span class="fact__label">Invoices</span><span class="fact__value">@overview.Invoices.Count <small>@Fmt.Money(overview.InvoiceTotal)</small></span></div>
+            <div class="fact"><span class="fact__label">Statements</span><span class="fact__value">@overview.Statements.Count <small>@Fmt.Money(overview.StatementTotal)</small></span></div>
+            <div class="fact"><span class="fact__label">Sent</span><span class="fact__value">@overview.SentCount / @overview.Statements.Count</span></div>
+            @if (overview.FailedCount > 0)
+            {
+                <div class="fact"><span class="fact__label">Failed</span><span class="fact__value fact__value--danger">@overview.FailedCount</span></div>
+            }
+        </div>
+        <div class="actions">
+            @if (overview.Invoices.Any())
+            {
+                <form asp-action="Generate" method="post" data-confirm="@(overview.Statements.Any() ? generateConfirm : null)" data-confirm-title="Regenerate @period.Label?" data-confirm-action="Regenerate" data-confirm-tone="@(overview.SentCount > 0 ? "danger" : null)">
+                    <input type="hidden" name="year" value="@period.Year" />
+                    <input type="hidden" name="month" value="@period.Month" />
+                    <button type="submit" class="btn @(overview.NeedsGeneration ? "btn--primary" : "btn--secondary")"><svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>@generateLabel</button>
+                </form>
+            }
+            @if (overview.UnsentCount > 0)
+            {
+                <form asp-action="SendPeriod" method="post"
+                      data-confirm="@($"{overview.UnsentCount} statement(s) totalling {Fmt.Money(overview.UnsentTotal)} will be emailed to the recipients. Already sent statements are skipped.")"
+                      data-confirm-title="Send @period.Label statements?" data-confirm-action="Send @overview.UnsentCount">
+                    <input type="hidden" name="year" value="@period.Year" />
+                    <input type="hidden" name="month" value="@period.Month" />
+                    <button type="submit" class="btn @(overview.NeedsGeneration ? "btn--secondary" : "btn--primary")"><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg>Send @overview.UnsentCount unsent</button>
+                </form>
+            }
+        </div>
+    </section>
+
+    @if (overview.NeedsGeneration && overview.Statements.Any())
+    {
+        <div class="alert alert--warning">
+            <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+            <div class="alert__body">
+                <span class="alert__title">Statements are out of date</span>
+                <span>@overview.PendingInvoiceCount invoice(s) were added or changed after these statements were generated. Regenerate before sending.</span>
+            </div>
+        </div>
+    }
+    @if (overview.InvoicesWithoutResidents.Any())
+    {
+        <div class="alert alert--warning">
+            <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+            <div class="alert__body">
+                <span class="alert__title">@overview.InvoicesWithoutResidents.Count invoice(s) have nobody to bill</span>
+                <ul>
+                    @foreach (var invoice in overview.InvoicesWithoutResidents)
+                    {
+                        <li><a asp-controller="Invoices" asp-action="Details" asp-route-id="@invoice.Id" class="link">@invoice.Service.Name · @invoice.Address.Name (@Fmt.Date(invoice.InvoiceDate))</a>: no resident lived there on the invoice date.</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+}
 
 <div class="card table-card">
     <table class="data-table">
-        <thead><tr><th>Person</th><th>Period</th><th class="num">Total</th><th>Status</th><th>Sent at</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <thead><tr><th>Person</th><th>Month</th><th class="num">Total</th><th>Status</th><th>Sent at</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
         <tbody>
-        @foreach (var item in Model)
+        @foreach (var group in groups)
         {
-            var canSend = item.Status is Domain.EMonthlyStatementStatus.Draft
-                or Domain.EMonthlyStatementStatus.ReadyToSend
-                or Domain.EMonthlyStatementStatus.PartiallySent
-                or Domain.EMonthlyStatementStatus.Failed;
-            <tr>
-                <td>@item.Contact.FullName</td>
-                <td class="nowrap">@item.Period</td>
-                <td class="num">@item.TotalSum €</td>
-                <td><partial name="_StatementStatus" model="item.Status" /></td>
-                <td class="nowrap secondary">@(item.SentAt == null ? "—" : item.SentAt.ToString())</td>
-                <td class="actions-col">
-                    <div class="row-actions">
-                        @if (canSend)
-                        {
-                            <form asp-action="Send" asp-route-id="@item.Id" method="post">
+            if (Model.Period == null)
+            {
+                <tr class="group-row"><td colspan="2">@group.Key.Label · @group.Count(e => e.Status == Domain.EMonthlyStatementStatus.Sent) of @group.Count() sent</td><td class="num">@Fmt.Money(group.Sum(e => e.TotalSum))</td><td colspan="3"></td></tr>
+            }
+            foreach (var item in group)
+            {
+                var isSent = item.Status == Domain.EMonthlyStatementStatus.Sent;
+                <tr class="@(item.Status == Domain.EMonthlyStatementStatus.Failed ? "is-warning" : null)">
+                    <td><div class="stack-cell"><a asp-action="Details" asp-route-id="@item.Id" class="link">@item.Contact.FullName</a><span>@item.Contact.Email</span></div></td>
+                    <td class="nowrap">@group.Key.Label</td>
+                    <td class="num">@Fmt.Money(item.TotalSum)</td>
+                    <td><partial name="_StatementStatus" model="item.Status" /></td>
+                    <td class="nowrap secondary">@Fmt.Timestamp(item.SentAt)</td>
+                    <td class="actions-col">
+                        <div class="row-actions">
+                            <form asp-action="Send" asp-route-id="@item.Id" method="post"
+                                  data-confirm="@($"Email the {group.Key.Label} statement ({Fmt.Money(item.TotalSum)}) to {item.Contact.FullName} <{item.Contact.Email}>?" + (isSent ? " It was already sent once." : ""))"
+                                  data-confirm-title="@(isSent ? "Send again?" : "Send statement?")" data-confirm-action="@(isSent ? "Send again" : "Send")">
                                 <input type="hidden" name="returnTo" value="Index" />
-                                <button type="submit" class="btn btn--secondary btn--sm">Send</button>
+                                <button type="submit" class="btn @(isSent ? "btn--ghost" : "btn--secondary") btn--sm">@(isSent ? "Resend" : "Send")</button>
                             </form>
-                        }
-                        <a asp-action="Details" asp-route-id="@item.Id" class="icon-btn" aria-label="Details" title="Details"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></a>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
-                    </div>
-                </td>
-            </tr>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+                        </div>
+                    </td>
+                </tr>
+            }
         }
-        @if (!Model.Any())
+        @if (!Model.Statements.Any())
         {
-            <tr><td colspan="6" class="empty">No statements yet. Generate them for a month to get started.</td></tr>
+            <tr><td colspan="6" class="empty">
+                @if (Model.Status != null)
+                {
+                    <span>No statements with this status. <a asp-action="Index" asp-route-period="@(Model.Period?.Key ?? "all")" class="link">Show all statuses</a></span>
+                }
+                else if (overview != null && overview.Invoices.Any())
+                {
+                    <span>No statements for @overview.Period.Label yet. Use <strong>Generate statements</strong> above.</span>
+                }
+                else if (overview != null)
+                {
+                    <span>No invoices for @overview.Period.Label yet. <a asp-controller="Invoices" asp-action="Create" class="link">Add an invoice</a> or <a asp-controller="InvoiceImports" asp-action="Upload" class="link">import a PDF</a> first.</span>
+                }
+                else
+                {
+                    <span>No statements yet.</span>
+                }
+            </td></tr>
         }
         </tbody>
     </table>

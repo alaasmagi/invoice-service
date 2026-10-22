@@ -1,6 +1,11 @@
-@model IEnumerable<DTO.DataAccess.DataAccess.DTO.InvoiceEntity>
+@model InvoicesIndexViewModel
 @{
     ViewData["Title"] = "Invoices";
+    var groups = Model.Invoices
+        .GroupBy(e => BillingPeriod.From(e.InvoiceDate))
+        .OrderByDescending(g => g.Key)
+        .ToList();
+    var showGroups = Model.Period == null && groups.Count > 1;
 }
 
 <header class="page-header">
@@ -10,32 +15,91 @@
     </div>
     <div class="page-header__actions">
         <a asp-controller="InvoiceImports" asp-action="Upload" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>Import PDF</a>
-        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Create invoice</a>
+        <a asp-action="Create" asp-route-addressId="@Model.AddressId" asp-route-serviceId="@Model.ServiceId" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add invoice</a>
     </div>
 </header>
 
+<form method="get" asp-action="Index" class="card filter-bar" role="search" aria-label="Filter invoices">
+    <div class="field">
+        <label for="filterPeriod" class="field__label">Month</label>
+        <div class="field__control">
+            <select id="filterPeriod" name="period" class="input" data-autosubmit>
+                <option value="">All months</option>
+                @foreach (var option in Model.PeriodOptions)
+                {
+                    <option value="@option.Key" selected="@(option.Key == Model.Period)">@option.Label</option>
+                }
+            </select>
+            <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </div>
+    </div>
+    <div class="field">
+        <label for="filterAddress" class="field__label">Address</label>
+        <div class="field__control">
+            <select id="filterAddress" name="addressId" class="input" asp-items="Model.AddressOptions" data-autosubmit>
+                <option value="">All addresses</option>
+            </select>
+            <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </div>
+    </div>
+    <div class="field">
+        <label for="filterService" class="field__label">Service</label>
+        <div class="field__control">
+            <select id="filterService" name="serviceId" class="input" asp-items="Model.ServiceOptions" data-autosubmit>
+                <option value="">All services</option>
+            </select>
+            <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </div>
+    </div>
+    <noscript><button type="submit" class="btn btn--secondary">Apply</button></noscript>
+    @if (Model.IsFiltered)
+    {
+        <a asp-action="Index" class="btn btn--ghost btn--sm filter-bar__reset">Clear filters</a>
+    }
+</form>
+
 <div class="card table-card">
     <table class="data-table">
-        <thead><tr><th>Date</th><th>Address</th><th>Service</th><th class="num">Total</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
+        <thead><tr><th>Invoice date</th><th>Address</th><th>Service</th><th>Billed period</th><th class="num">Total</th><th class="actions-col"><span class="visually-hidden">Actions</span></th></tr></thead>
         <tbody>
-        @foreach (var item in Model)
+        @foreach (var group in groups)
         {
-            <tr>
-                <td class="nowrap">@item.InvoiceDate</td>
-                <td><div class="stack-cell"><span>@item.Address.Name</span><span>@item.Address.FullAddress</span></div></td>
-                <td>@item.Service.Name</td>
-                <td class="num">@item.TotalSum €</td>
-                <td class="actions-col"><div class="row-actions">
-                    <a asp-action="Details" asp-route-id="@item.Id" class="icon-btn" aria-label="Details" title="Details"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
-                </div></td>
-            </tr>
+            if (showGroups)
+            {
+                <tr class="group-row"><td colspan="4">@group.Key.Label · @group.Count() invoice(s)</td><td class="num">@Fmt.Money(group.Sum(e => e.TotalSum))</td><td></td></tr>
+            }
+            foreach (var item in group)
+            {
+                <tr>
+                    <td class="nowrap"><a asp-action="Details" asp-route-id="@item.Id" class="link">@Fmt.Date(item.InvoiceDate)</a></td>
+                    <td><div class="stack-cell"><span>@item.Address.Name</span><span>@item.Address.FullAddress</span></div></td>
+                    <td>@item.Service.Name</td>
+                    <td class="nowrap secondary">@Fmt.Range(item.PeriodStart, item.PeriodEnd)</td>
+                    <td class="num">@Fmt.Money(item.TotalSum)</td>
+                    <td class="actions-col"><div class="row-actions">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+                    </div></td>
+                </tr>
+            }
         }
-        @if (!Model.Any())
+        @if (!Model.Invoices.Any())
         {
-            <tr><td colspan="5" class="empty">No invoices yet. Create one or import a provider PDF.</td></tr>
+            <tr><td colspan="6" class="empty">
+                @if (Model.IsFiltered)
+                {
+                    <span>No invoices match these filters. <a asp-action="Index" class="link">Clear filters</a></span>
+                }
+                else
+                {
+                    <span>No invoices yet. <a asp-action="Create" class="link">Add one manually</a> or <a asp-controller="InvoiceImports" asp-action="Upload" class="link">import a provider PDF</a>.</span>
+                }
+            </td></tr>
         }
         </tbody>
+        @if (Model.Invoices.Any())
+        {
+            <tfoot><tr><td colspan="4">@Model.Invoices.Count invoice(s)</td><td class="num">@Fmt.Money(Model.Invoices.Sum(e => e.TotalSum))</td><td></td></tr></tfoot>
+        }
     </table>
 </div>

@@ -1,6 +1,7 @@
-@model DTO.DataAccess.DataAccess.DTO.InvoiceEntity
+@model DeleteViewModel<InvoiceDto>
 @{
     ViewData["Title"] = "Delete invoice";
+    var invoice = Model.Item;
 }
 
 <header class="page-header">
@@ -11,19 +12,19 @@
 </header>
 
 <div class="section medium">
-    <div class="alert alert--danger" role="alert">
-        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
-        <div class="alert__body"><span class="alert__title">Delete this invoice?</span><span>This action cannot be undone.</span></div>
-    </div>
+    <partial name="_DeleteNotice" model='Model.Notice("invoice")' />
     <dl class="card details">
-    <div class="details__row"><dt>Date</dt><dd>@Model.InvoiceDate</dd></div>
-    <div class="details__row"><dt>Address</dt><dd><div class="stack-cell"><span>@Model.Address.Name</span><span>@Model.Address.FullAddress</span></div></dd></div>
-    <div class="details__row"><dt>Service</dt><dd>@Model.Service.Name</dd></div>
-    <div class="details__row"><dt>Total</dt><dd>@Model.TotalSum €</dd></div>
-</dl>
+        <div class="details__row"><dt>Invoice date</dt><dd>@Fmt.Date(invoice.InvoiceDate)</dd></div>
+        <div class="details__row"><dt>Address</dt><dd><div class="stack-cell"><span>@invoice.Address.Name</span><span>@invoice.Address.FullAddress</span></div></dd></div>
+        <div class="details__row"><dt>Service</dt><dd>@invoice.Service.Name</dd></div>
+        <div class="details__row"><dt>Total</dt><dd>@Fmt.Money(invoice.TotalSum)</dd></div>
+    </dl>
     <form asp-action="Delete" method="post" class="form-actions">
-        <input type="hidden" asp-for="Id" />
-        <button type="submit" class="btn btn--danger">Delete invoice</button>
-        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+        <input type="hidden" name="Id" value="@invoice.Id" />
+        @if (!Model.Blockers.Any())
+        {
+            <button type="submit" class="btn btn--danger">Delete invoice</button>
+        }
+        <a asp-action="Details" asp-route-id="@invoice.Id" class="btn btn--ghost">Cancel</a>
     </form>
 </div>

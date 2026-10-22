@@ -1,29 +1,31 @@
-@model DTO.DataAccess.DataAccess.DTO.AddressContactEntity
+@model DeleteViewModel<AddressContactDto>
 @{
-    ViewData["Title"] = "Delete address contact";
+    ViewData["Title"] = "Remove resident";
+    var item = Model.Item;
 }
 
 <header class="page-header">
     <div class="page-header__title">
         <p class="kicker">Directory</p>
-        <h1>Delete address contact</h1>
+        <h1>Remove resident</h1>
     </div>
 </header>
 
 <div class="section medium">
-    <div class="alert alert--danger" role="alert">
-        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
-        <div class="alert__body"><span class="alert__title">Delete this address contact?</span><span>This action cannot be undone.</span></div>
-    </div>
+    <partial name="_DeleteNotice" model='Model.Notice("resident record")' />
     <dl class="card details">
-    <div class="details__row"><dt>Address</dt><dd><div class="stack-cell"><span>@Model.Address.Name</span><span>@Model.Address.FullAddress</span></div></dd></div>
-    <div class="details__row"><dt>Contact</dt><dd>@Model.Contact.FullName</dd></div>
-    <div class="details__row"><dt>Start</dt><dd>@Model.StartDate</dd></div>
-    <div class="details__row"><dt>End</dt><dd>@if (Model.EndDate == null) { <span class="badge badge--success">Current</span> } else { <text>@Model.EndDate</text> }</dd></div>
-</dl>
+        <div class="details__row"><dt>Address</dt><dd><div class="stack-cell"><span>@item.Address.Name</span><span>@item.Address.FullAddress</span></div></dd></div>
+        <div class="details__row"><dt>Person</dt><dd>@item.Contact.FullName</dd></div>
+        <div class="details__row"><dt>Moved in</dt><dd>@Fmt.Date(item.StartDate)</dd></div>
+        <div class="details__row"><dt>Moved out</dt><dd>@if (item.EndDate == null) { <span class="badge badge--success">Lives here</span> } else { @Fmt.Date(item.EndDate) }</dd></div>
+    </dl>
     <form asp-action="Delete" method="post" class="form-actions">
-        <input type="hidden" asp-for="Id" />
-        <button type="submit" class="btn btn--danger">Delete address contact</button>
+        <input type="hidden" name="Id" value="@item.Id" />
+        <button type="submit" class="btn btn--danger">Remove resident</button>
+        @if (item.EndDate == null)
+        {
+            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn--secondary">Set a move-out date instead</a>
+        }
         <a asp-action="Index" class="btn btn--ghost">Cancel</a>
     </form>
 </div>

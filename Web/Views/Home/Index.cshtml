@@ -1,63 +1,211 @@
+@model OverviewViewModel
 @{
-    ViewData["Title"] = "Home";
+    var o = Model.Overview;
+    var period = o.Period;
+    ViewData["Title"] = "Overview";
+    var attention = o.FailedCount + o.InvoicesWithoutResidents.Count + o.MissingInvoices.Count;
 }
 
-<section class="hero">
-    <div class="hero__copy">
-        <p class="kicker">Invoice operations</p>
-        <h1>Track invoices, residents, allocations, and monthly statements from one workspace.</h1>
-        <p>Import utility invoices, keep address and contact records tidy, split costs, and send monthly statements without leaving the service.</p>
-        <div class="actions">
-            <a asp-controller="Invoices" asp-action="Index" class="btn btn--primary">Open invoices</a>
-            <a asp-controller="MonthlyStatements" asp-action="Generate" class="btn btn--secondary">Generate statements</a>
-        </div>
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">Overview</p>
+        <h1>@period.Label</h1>
     </div>
-    <aside class="card workflow" aria-label="Primary workflow">
-        <p class="kicker">Primary workflow</p>
-        <p class="workflow__title">Import, split, send</p>
-        <ol>
-            <li class="step"><span class="step__n">1</span>Import a provider PDF</li>
-            <li class="step"><span class="step__n">2</span>Review the invoice and split</li>
-            <li class="step"><span class="step__n">3</span>Send person-level statements</li>
-        </ol>
-    </aside>
+    <form method="get" asp-action="Index" class="page-header__actions" aria-label="Choose month">
+        <div class="field">
+            <label for="overviewPeriod" class="visually-hidden">Month</label>
+            <div class="field__control">
+                <select id="overviewPeriod" name="period" class="input" data-autosubmit>
+                    @foreach (var option in Model.PeriodOptions)
+                    {
+                        <option value="@option.Key" selected="@(option == period)">@option.Label</option>
+                    }
+                </select>
+                <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+            </div>
+        </div>
+        <noscript><button type="submit" class="btn btn--secondary">Show</button></noscript>
+    </form>
+</header>
+
+@* ----- The one thing to do next ----- *@
+@if (!Model.SetupComplete)
+{
+    <section class="card next-step">
+        <div class="next-step__copy">
+            <span class="kicker">Next step</span>
+            <h2 class="next-step__title">Finish setting up</h2>
+            <p>Statements are built from invoices, split between the residents of each address. Add these once and you're ready for monthly billing.</p>
+        </div>
+    </section>
+}
+else if (!o.Invoices.Any())
+{
+    <section class="card next-step">
+        <div class="next-step__copy">
+            <span class="kicker">Next step</span>
+            <h2 class="next-step__title">Add invoices for @period.Label</h2>
+            <p>Enter invoices manually or import Telia and Enefit PDFs.@(o.MissingInvoices.Any() ? $" Last month you had {o.MissingInvoices.Count} recurring invoice(s)." : "")</p>
+        </div>
+        <div class="actions">
+            <a asp-controller="InvoiceImports" asp-action="Upload" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>Import PDF</a>
+            <a asp-controller="Invoices" asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add invoice</a>
+        </div>
+    </section>
+}
+else if (o.NeedsGeneration)
+{
+    var regenerate = o.Statements.Any();
+    <section class="card next-step">
+        <div class="next-step__copy">
+            <span class="kicker">Next step</span>
+            <h2 class="next-step__title">@(regenerate ? "Update" : "Generate") statements for @period.Label</h2>
+            <p>@(regenerate
+                   ? $"{o.PendingInvoiceCount} invoice(s) changed since the statements were generated."
+                   : $"{o.AllocatableInvoiceCount} invoice(s) totalling {Fmt.Money(o.InvoiceTotal)} are ready to be split between residents.")
+               @(o.MissingInvoices.Any() ? $" Check the {o.MissingInvoices.Count} invoice(s) that may still be missing first." : "")</p>
+        </div>
+        <form asp-controller="MonthlyStatements" asp-action="Generate" method="post"
+              data-confirm="@(o.SentCount > 0 ? $"{o.SentCount} statement(s) for {period.Label} were already sent. Regenerating marks every statement for the month as \"Ready to send\" again." : null)"
+              data-confirm-title="Regenerate @period.Label?" data-confirm-action="Regenerate" data-confirm-tone="danger">
+            <input type="hidden" name="year" value="@period.Year" />
+            <input type="hidden" name="month" value="@period.Month" />
+            <button type="submit" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>@(regenerate ? "Regenerate" : "Generate statements")</button>
+        </form>
+    </section>
+}
+else if (o.FailedCount > 0)
+{
+    <section class="card next-step">
+        <div class="next-step__copy">
+            <span class="kicker">Next step</span>
+            <h2 class="next-step__title">@o.FailedCount statement(s) failed to send</h2>
+            <p>Check the recipients' email addresses and send them again.</p>
+        </div>
+        <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" asp-route-status="Failed" class="btn btn--primary">Review failed</a>
+    </section>
+}
+else if (o.UnsentCount > 0)
+{
+    <section class="card next-step">
+        <div class="next-step__copy">
+            <span class="kicker">Next step</span>
+            <h2 class="next-step__title">Send @o.UnsentCount statement(s)</h2>
+            <p>@Fmt.Money(o.UnsentTotal) in total for @period.Label. <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="link">Review them first</a></p>
+        </div>
+        <form asp-controller="MonthlyStatements" asp-action="SendPeriod" method="post"
+              data-confirm="@($"{o.UnsentCount} statement(s) totalling {Fmt.Money(o.UnsentTotal)} will be emailed to the recipients. Already sent statements are skipped.")"
+              data-confirm-title="Send @period.Label statements?" data-confirm-action="Send @o.UnsentCount">
+            <input type="hidden" name="year" value="@period.Year" />
+            <input type="hidden" name="month" value="@period.Month" />
+            <button type="submit" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-send"></use></svg>Send all</button>
+        </form>
+    </section>
+}
+else if (o.AllSent)
+{
+    <section class="card next-step next-step--done">
+        <div class="next-step__copy">
+            <span class="kicker">All done</span>
+            <h2 class="next-step__title">Every @period.Label statement has been sent</h2>
+            <p>@o.SentCount statement(s), @Fmt.Money(o.StatementTotal) in total.</p>
+        </div>
+        <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="btn btn--secondary">View statements</a>
+    </section>
+}
+else
+{
+    <section class="card next-step">
+        <div class="next-step__copy">
+            <span class="kicker">Next step</span>
+            <h2 class="next-step__title">Add residents to bill</h2>
+            <p>None of this month's invoices can be split yet, because nobody lived at their addresses on the invoice dates.</p>
+        </div>
+        <a asp-controller="AddressContacts" asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add resident</a>
+    </section>
+}
+
+<section class="stat-grid" aria-label="@period.Label at a glance">
+    <a asp-controller="Invoices" asp-action="Index" asp-route-period="@period.Key" class="card stat">
+        <span class="stat__label">Invoices</span>
+        <span class="stat__value">@o.Invoices.Count</span>
+        <span class="stat__hint">@Fmt.Money(o.InvoiceTotal)</span>
+    </a>
+    <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="card stat">
+        <span class="stat__label">Statements</span>
+        <span class="stat__value">@o.Statements.Count</span>
+        <span class="stat__hint">@Fmt.Money(o.StatementTotal)</span>
+    </a>
+    <a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" class="card stat">
+        <span class="stat__label">Sent</span>
+        <span class="stat__value">@o.SentCount<span class="secondary"> / @o.Statements.Count</span></span>
+        <span class="stat__hint">@(o.UnsentCount > 0 ? $"{o.UnsentCount} waiting" : o.Statements.Any() ? "Nothing waiting" : "No statements yet")</span>
+    </a>
+    <div class="card stat">
+        <span class="stat__label">Needs attention</span>
+        <span class="stat__value">@attention</span>
+        <span class="stat__hint">@(attention == 0 ? "All clear" : "See checklist below")</span>
+    </div>
 </section>
 
-<section class="quick-grid" aria-label="Primary sections">
-    <a asp-controller="Invoices" asp-action="Index" class="card quick-card">
-        <span class="quick-card__top">
-            <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-file-text"></use></svg></span>
-            <span class="badge badge--accent">Billing</span>
-        </span>
-        <h2>Invoices</h2>
-        <p>Create invoices manually or import provider PDFs for Telia and Enefit.</p>
-        <span class="quick-card__link">View invoices <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
-    </a>
-    <a asp-controller="MonthlyStatements" asp-action="Index" class="card quick-card">
-        <span class="quick-card__top">
-            <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-receipt"></use></svg></span>
-            <span class="badge badge--accent">Statements</span>
-        </span>
-        <h2>Monthly statements</h2>
-        <p>Review generated statements, inspect invoice shares, and send drafts.</p>
-        <span class="quick-card__link">View statements <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
-    </a>
-    <a asp-controller="Contacts" asp-action="Index" class="card quick-card">
-        <span class="quick-card__top">
-            <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg></span>
-            <span class="badge badge--neutral">People</span>
-        </span>
-        <h2>Contacts</h2>
-        <p>Manage the residents and recipients connected to each address.</p>
-        <span class="quick-card__link">View contacts <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
-    </a>
-    <a asp-controller="Addresses" asp-action="Index" class="card quick-card">
-        <span class="quick-card__top">
-            <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-map-pin"></use></svg></span>
-            <span class="badge badge--neutral">Places</span>
-        </span>
-        <h2>Addresses</h2>
-        <p>Maintain homes, service locations, and contact assignments.</p>
-        <span class="quick-card__link">View addresses <svg class="icon icon--sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
-    </a>
-</section>
+<div class="overview-grid">
+    <section class="section">
+        <div class="section-head">
+            <h2 class="section-title">Invoices in @period.Label</h2>
+            <a asp-controller="Invoices" asp-action="Create" class="btn btn--ghost btn--sm"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Add invoice</a>
+        </div>
+        <div class="card table-card">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Address</th><th>Service</th><th class="num">Total</th></tr></thead>
+                <tbody>
+                @foreach (var invoice in o.Invoices.Take(8))
+                {
+                    <tr class="@(o.InvoicesWithoutResidents.Any(e => e.Id == invoice.Id) ? "is-warning" : null)">
+                        <td class="nowrap"><a asp-controller="Invoices" asp-action="Details" asp-route-id="@invoice.Id" class="link">@Fmt.Date(invoice.InvoiceDate)</a></td>
+                        <td>@invoice.Address.Name</td>
+                        <td>@invoice.Service.Name</td>
+                        <td class="num">@Fmt.Money(invoice.TotalSum)</td>
+                    </tr>
+                }
+                @if (!o.Invoices.Any())
+                {
+                    <tr><td colspan="4" class="empty">No invoices for @period.Label yet.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        @if (o.Invoices.Count > 8)
+        {
+            <a asp-controller="Invoices" asp-action="Index" asp-route-period="@period.Key" class="link">View all @o.Invoices.Count invoices</a>
+        }
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Checklist</h2>
+        <ul class="card checklist">
+            @if (!Model.SetupComplete)
+            {
+                <li class="@(Model.HasAddresses ? "is-done" : null)"><svg class="icon" aria-hidden="true"><use href="#@(Model.HasAddresses ? "i-circle-check" : "i-circle")"></use></svg><span class="checklist__text"><a asp-controller="Addresses" asp-action="Create" class="link">Add an address</a><span>The homes or locations that receive invoices.</span></span></li>
+                <li class="@(Model.HasServices ? "is-done" : null)"><svg class="icon" aria-hidden="true"><use href="#@(Model.HasServices ? "i-circle-check" : "i-circle")"></use></svg><span class="checklist__text"><a asp-controller="Services" asp-action="Create" class="link">Add a service</a><span>e.g. electricity, internet, water.</span></span></li>
+                <li class="@(Model.HasContacts ? "is-done" : null)"><svg class="icon" aria-hidden="true"><use href="#@(Model.HasContacts ? "i-circle-check" : "i-circle")"></use></svg><span class="checklist__text"><a asp-controller="Contacts" asp-action="Create" class="link">Add a contact</a><span>People who receive statements.</span></span></li>
+                <li class="@(Model.HasResidents ? "is-done" : null)"><svg class="icon" aria-hidden="true"><use href="#@(Model.HasResidents ? "i-circle-check" : "i-circle")"></use></svg><span class="checklist__text"><a asp-controller="AddressContacts" asp-action="Create" class="link">Link residents to addresses</a><span>Decides who shares each invoice.</span></span></li>
+            }
+            @foreach (var missing in o.MissingInvoices)
+            {
+                <li class="is-warning"><svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg><span class="checklist__text"><a asp-controller="Invoices" asp-action="Create" asp-route-addressId="@missing.Address.Id" asp-route-serviceId="@missing.Service.Id" class="link">@missing.Service.Name · @missing.Address.Name</a><span>Billed in @period.Previous.Label but not yet in @period.Label.</span></span></li>
+            }
+            @foreach (var invoice in o.InvoicesWithoutResidents)
+            {
+                <li class="is-warning"><svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg><span class="checklist__text"><a asp-controller="Addresses" asp-action="Details" asp-route-id="@invoice.AddressId" class="link">No residents at @invoice.Address.Name</a><span>@invoice.Service.Name (@Fmt.Date(invoice.InvoiceDate)) won't be billed to anyone.</span></span></li>
+            }
+            @if (o.FailedCount > 0)
+            {
+                <li class="is-warning"><svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg><span class="checklist__text"><a asp-controller="MonthlyStatements" asp-action="Index" asp-route-period="@period.Key" asp-route-status="Failed" class="link">@o.FailedCount failed statement(s)</a><span>Sending didn't go through.</span></span></li>
+            }
+            @if (Model.SetupComplete && attention == 0)
+            {
+                <li class="is-done"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"></use></svg><span class="checklist__text"><span>Nothing needs attention</span><span>Every recurring invoice is in and every invoice has someone to bill.</span></span></li>
+            }
+        </ul>
+    </section>
+</div>

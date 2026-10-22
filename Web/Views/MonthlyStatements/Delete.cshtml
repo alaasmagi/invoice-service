@@ -1,6 +1,7 @@
-@model DTO.DataAccess.DataAccess.DTO.MonthlyStatementEntity
+@model DeleteViewModel<MonthlyStatementDto>
 @{
     ViewData["Title"] = "Delete statement";
+    var statement = Model.Item;
 }
 
 <header class="page-header">
@@ -11,19 +12,16 @@
 </header>
 
 <div class="section medium">
-    <div class="alert alert--danger" role="alert">
-        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
-        <div class="alert__body"><span class="alert__title">Delete this statement?</span><span>This action cannot be undone.</span></div>
-    </div>
+    <partial name="_DeleteNotice" model='Model.Notice("statement")' />
     <dl class="card details">
-    <div class="details__row"><dt>Person</dt><dd>@Model.Contact.FullName</dd></div>
-    <div class="details__row"><dt>Period</dt><dd>@Model.Period</dd></div>
-    <div class="details__row"><dt>Total</dt><dd>@Model.TotalSum €</dd></div>
-    <div class="details__row"><dt>Status</dt><dd><partial name="_StatementStatus" model="Model.Status" /></dd></div>
-</dl>
+        <div class="details__row"><dt>Person</dt><dd>@statement.Contact.FullName</dd></div>
+        <div class="details__row"><dt>Month</dt><dd>@(new BillingPeriod(statement.Year, statement.Month).Label)</dd></div>
+        <div class="details__row"><dt>Total</dt><dd>@Fmt.Money(statement.TotalSum)</dd></div>
+        <div class="details__row"><dt>Status</dt><dd><partial name="_StatementStatus" model="statement.Status" /></dd></div>
+    </dl>
     <form asp-action="Delete" method="post" class="form-actions">
-        <input type="hidden" asp-for="Id" />
+        <input type="hidden" name="Id" value="@statement.Id" />
         <button type="submit" class="btn btn--danger">Delete statement</button>
-        <a asp-action="Index" class="btn btn--ghost">Cancel</a>
+        <a asp-action="Details" asp-route-id="@statement.Id" class="btn btn--ghost">Cancel</a>
     </form>
 </div>

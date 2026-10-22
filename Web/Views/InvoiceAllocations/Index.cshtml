@@ -1,4 +1,4 @@
-@model IEnumerable<DTO.DataAccess.DataAccess.DTO.InvoiceAllocationEntity>
+@model IReadOnlyList<InvoiceAllocationDto>
 @{
     ViewData["Title"] = "Invoice allocations";
 }
@@ -7,6 +7,7 @@
     <div class="page-header__title">
         <p class="kicker">Billing</p>
         <h1>Invoice allocations</h1>
+        <p class="page-header__lede">A record of how manually added invoices were split when they were created. Monthly statements don't read these. They split each invoice equally between the residents on the invoice date, so editing an allocation doesn't change any statement.</p>
     </div>
     <div class="page-header__actions">
         <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Create allocation</a>
@@ -20,11 +21,10 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td><div class="stack-cell"><span>@item.Invoice.InvoiceDate</span><span>@item.Invoice.Address.Name</span></div></td>
+                <td><div class="stack-cell"><a asp-controller="Invoices" asp-action="Details" asp-route-id="@item.InvoiceId" class="link">@Fmt.Date(item.Invoice.InvoiceDate)</a><span>@item.Invoice.Address.Name</span></div></td>
                 <td>@item.Contact.FullName</td>
-                <td class="num">@item.AllocatedSum €</td>
+                <td class="num">@Fmt.Money(item.AllocatedSum)</td>
                 <td class="actions-col"><div class="row-actions">
-                    <a asp-action="Details" asp-route-id="@item.Id" class="icon-btn" aria-label="Details" title="Details"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></a>
                     <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="Edit" title="Edit"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
                     <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
                 </div></td>
@@ -32,7 +32,7 @@
         }
         @if (!Model.Any())
         {
-            <tr><td colspan="4" class="empty">No allocations yet.</td></tr>
+            <tr><td colspan="4" class="empty">No allocations yet. They're created automatically when you add an invoice manually.</td></tr>
         }
         </tbody>
     </table>

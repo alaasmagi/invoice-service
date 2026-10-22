@@ -30,6 +30,33 @@ public abstract class UserScopedControllerBase : Controller
         ModelState.Remove(nameof(entity.ConcurrencyToken));
     }
 
+    protected void ClearServerManagedModelState(BaseEntityUserWithConcurrency dto)
+    {
+        ModelState.Remove(nameof(dto.Id));
+        ModelState.Remove(nameof(dto.UserId));
+        ModelState.Remove(nameof(dto.ConcurrencyToken));
+    }
+
+    /// <summary>Removes navigation and collection properties, which are display-only on Web DTOs.</summary>
+    protected void ClearNavigationModelState(params string[] keys)
+    {
+        foreach (var key in keys) ModelState.Remove(key);
+    }
+
+    /// <summary>Shows a one-time status toast on the next page. Kind: success, info, warning or danger.</summary>
+    protected void Flash(string message, string kind = "success")
+    {
+        TempData["StatusMessage"] = message;
+        TempData["StatusKind"] = kind;
+    }
+
+    protected IActionResult RedirectToLocalOr(string? returnUrl, string action, object? routeValues = null)
+    {
+        return !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)
+            ? LocalRedirect(returnUrl)
+            : RedirectToAction(action, routeValues);
+    }
+
     protected void StampNew(BaseEntityUserWithMetaConcurrency entity, Guid userId)
     {
         var now = DateTime.UtcNow;

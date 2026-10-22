@@ -1,55 +1,21 @@
-@model DTO.DataAccess.DataAccess.DTO.InvoiceEntity
+@model InvoiceDto
 @{
-    ViewData["Title"] = "Create invoice";
+    ViewData["Title"] = "Add invoice";
 }
 
 <header class="page-header">
     <div class="page-header__title">
         <p class="kicker">Billing</p>
-        <h1>Create invoice</h1>
+        <h1>Add invoice</h1>
+        <p class="page-header__lede">Enter an invoice by hand. For Telia or Enefit PDFs you can <a asp-controller="InvoiceImports" asp-action="Upload" class="link">import the file</a> instead.</p>
     </div>
 </header>
 
 <form asp-action="Create" method="post" class="card form narrow">
-    <div asp-validation-summary="ModelOnly"></div>
-    <div class="form-row">
-        <div class="field">
-            <label asp-for="AddressId" class="field__label"></label>
-            <div class="field__control"><select asp-for="AddressId" class="input" asp-items="ViewBag.AddressId"></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
-            <span asp-validation-for="AddressId"></span>
-        </div>
-        <div class="field">
-            <label asp-for="ServiceId" class="field__label"></label>
-            <div class="field__control"><select asp-for="ServiceId" class="input" asp-items="ViewBag.ServiceId"></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
-            <span asp-validation-for="ServiceId"></span>
-        </div>
-    </div>
-    <div class="form-row">
-        <div class="field">
-            <label asp-for="PeriodStart" class="field__label"></label>
-            <div class="field__control has-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg><input asp-for="PeriodStart" class="input" type="date" /></div>
-            <span asp-validation-for="PeriodStart"></span>
-        </div>
-        <div class="field">
-            <label asp-for="PeriodEnd" class="field__label"></label>
-            <div class="field__control has-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg><input asp-for="PeriodEnd" class="input" type="date" /></div>
-            <span asp-validation-for="PeriodEnd"></span>
-        </div>
-    </div>
-    <div class="form-row">
-        <div class="field">
-            <label asp-for="InvoiceDate" class="field__label"></label>
-            <div class="field__control has-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg><input asp-for="InvoiceDate" class="input" type="date" /></div>
-            <span asp-validation-for="InvoiceDate"></span>
-        </div>
-        <div class="field">
-            <label asp-for="TotalSum" class="field__label"></label>
-            <input asp-for="TotalSum" class="input" type="number" step="0.01" placeholder="e.g. 84.12" />
-            <span asp-validation-for="TotalSum"></span>
-        </div>
-    </div>
+    <partial name="_InvoiceFields" model="Model" />
     <div class="form-actions">
-        <button type="submit" class="btn btn--primary">Create invoice</button>
+        <button type="submit" class="btn btn--primary">Save invoice</button>
+        <button type="submit" name="next" value="another" class="btn btn--secondary">Save and add another</button>
         <a asp-action="Index" class="btn btn--ghost">Cancel</a>
     </div>
 </form>

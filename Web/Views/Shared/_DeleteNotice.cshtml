@@ -1,0 +1,29 @@
+@model DeleteNotice
+@{
+    var consequences = Model.Consequences;
+    var noun = Model.Noun;
+}
+@if (Model.Blockers.Any())
+{
+    <div class="alert alert--warning" role="alert">
+        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+        <div class="alert__body">
+            <span class="alert__title">This @noun can't be deleted yet</span>
+            <ul>@foreach (var blocker in Model.Blockers) { <li>@blocker</li> }</ul>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert--danger" role="alert">
+        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+        <div class="alert__body">
+            <span class="alert__title">Delete this @noun?</span>
+            <span>This action cannot be undone.</span>
+            @if (consequences.Any())
+            {
+                <ul>@foreach (var consequence in consequences) { <li>@consequence</li> }</ul>
+            }
+        </div>
+    </div>
+}

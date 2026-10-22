@@ -1,11 +1,14 @@
 using Contracts.Application;
 using DataAccess.Context;
 using Domain;
-using DTO.DataAccess.DataAccess.DTO;
+using DTO.DataAccess.Web.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Web.Helpers;
+using Web.Mapping;
 using Web.Models;
+using Web.Services;
 
 namespace Web.Controllers;
 
@@ -13,18 +16,47 @@ public class MonthlyStatementsController(
     AppDbContext context,
     IGenerateMonthlyStatementService generateMonthlyStatementService,
     ISendMonthlyStatementService sendMonthlyStatementService,
-    ISendPeriodInvoiceEmailsService sendPeriodInvoiceEmailsService) : UserScopedControllerBase
+    ISendPeriodInvoiceEmailsService sendPeriodInvoiceEmailsService,
+    PeriodOverviewService periodOverviewService,
+    WebDtoMapper mapper) : UserScopedControllerBase
 {
-    public async Task<IActionResult> Index()
+    private const string AllPeriods = "all";
+
+    public async Task<IActionResult> Index(string? period, string? status)
     {
         var userId = CurrentUserId();
-        var entities = await context.MonthlyStatements.Include(e => e.Contact)
-            .Where(e => e.UserId == userId)
+        var periodsWithData = (await context.MonthlyStatements.Where(e => e.UserId == userId)
+                .Select(e => new { e.Year, e.Month })
+                .Distinct()
+                .ToListAsync())
+            .Select(e => new BillingPeriod(e.Year, e.Month))
+            .ToList();
+
+        BillingPeriod? selected = period == AllPeriods
+            ? null
+            : BillingPeriod.TryParse(period, out var parsed)
+                ? parsed
+                : periodsWithData.Count > 0 ? periodsWithData.Max() : BillingPeriod.Current;
+
+        var query = context.MonthlyStatements.Include(e => e.Contact).Where(e => e.UserId == userId);
+        if (selected is { } p) query = query.Where(e => e.Year == p.Year && e.Month == p.Month);
+        var hasStatus = Enum.TryParse<EMonthlyStatementStatus>(status, out var statusFilter);
+        if (hasStatus) query = query.Where(e => e.Status == statusFilter);
+
+        var statements = await query
             .OrderByDescending(e => e.Year)
             .ThenByDescending(e => e.Month)
             .ThenBy(e => e.Contact.FullName)
             .ToListAsync();
-        return View(entities);
+
+        return View(new StatementsIndexViewModel
+        {
+            Period = selected,
+            Status = hasStatus ? statusFilter.ToString() : null,
+            PeriodOptions = BillingPeriod.Options(periodsWithData),
+            Statements = statements.Select(mapper.ToDto).ToList(),
+            Overview = selected is { } overviewPeriod ? await periodOverviewService.GetAsync(overviewPeriod, userId) : null
+        });
     }
 
     public async Task<IActionResult> Details(Guid? id)
@@ -44,41 +76,43 @@ public class MonthlyStatementsController(
 
         return View(new MonthlyStatementDetailViewModel
         {
-            Statement = statement,
-            Lines = lines,
+            Statement = mapper.ToDto(statement),
+            Lines = lines.Select(mapper.ToDto).ToList(),
             AddressNames = lines.Select(line => line.AddressName).Distinct().OrderBy(name => name).ToList(),
-            CanSend = statement.Status is EMonthlyStatementStatus.Draft
-                or EMonthlyStatementStatus.ReadyToSend
-                or EMonthlyStatementStatus.PartiallySent
-                or EMonthlyStatementStatus.Failed
-                or EMonthlyStatementStatus.Sent
+            CanSend = true
         });
     }
 
     public async Task<IActionResult> Create()
     {
         await PopulateSelectLists(CurrentUserId());
-        return View(new MonthlyStatementEntity { Year = DateTime.UtcNow.Year, Month = DateTime.UtcNow.Month });
+        return View(new MonthlyStatementDto { Year = DateTime.UtcNow.Year, Month = DateTime.UtcNow.Month });
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("ContactId,Year,Month,TotalSum,Status,SentAt")] MonthlyStatementEntity entity)
+    public async Task<IActionResult> Create([Bind("ContactId,Year,Month,TotalSum,Status,SentAt")] MonthlyStatementDto dto)
     {
         var userId = CurrentUserId();
-        ClearServerManagedModelState(entity);
-        ModelState.Remove(nameof(entity.Contact));
-        if (!await context.Contacts.AnyAsync(e => e.Id == entity.ContactId && e.UserId == userId)) ModelState.AddModelError(nameof(entity.ContactId), "Selected contact was not found.");
+        ClearServerManagedModelState(dto);
+        ClearNavigationModelState(nameof(dto.Contact), nameof(dto.Lines));
+        if (!await context.Contacts.AnyAsync(e => e.Id == dto.ContactId && e.UserId == userId)) ModelState.AddModelError(nameof(dto.ContactId), "Selected person was not found.");
+        if (await context.MonthlyStatements.AnyAsync(e => e.UserId == userId && e.ContactId == dto.ContactId && e.Year == dto.Year && e.Month == dto.Month))
+        {
+            ModelState.AddModelError(string.Empty, "This person already has a statement for that month. Edit the existing one instead.");
+        }
         if (!ModelState.IsValid)
         {
             await PopulateSelectLists(userId);
-            return View(entity);
+            return View(dto);
         }
+        var entity = mapper.ToEntity(dto);
         StampNew(entity, userId);
         entity.CreatedAt = DateTime.UtcNow;
         context.Add(entity);
         await context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
+        Flash("Statement created.");
+        return RedirectToAction(nameof(Details), new { id = entity.Id });
     }
 
     public async Task<IActionResult> Edit(Guid? id)
@@ -88,30 +122,32 @@ public class MonthlyStatementsController(
         var entity = await context.MonthlyStatements.FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
         if (entity == null) return NotFound();
         await PopulateSelectLists(userId);
-        return View(entity);
+        return View(mapper.ToDto(entity));
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, [Bind("Id,ContactId,Year,Month,TotalSum,Status,CreatedAt,SentAt")] MonthlyStatementEntity entity)
+    public async Task<IActionResult> Edit(Guid id, [Bind("Id,ContactId,Year,Month,TotalSum,Status,SentAt")] MonthlyStatementDto dto)
     {
-        if (id != entity.Id) return NotFound();
+        if (id != dto.Id) return NotFound();
         var userId = CurrentUserId();
-        ClearServerManagedModelState(entity);
-        ModelState.Remove(nameof(entity.Contact));
-        if (!await context.Contacts.AnyAsync(e => e.Id == entity.ContactId && e.UserId == userId)) ModelState.AddModelError(nameof(entity.ContactId), "Selected contact was not found.");
+        ClearServerManagedModelState(dto);
+        ClearNavigationModelState(nameof(dto.Contact), nameof(dto.Lines));
+        if (!await context.Contacts.AnyAsync(e => e.Id == dto.ContactId && e.UserId == userId)) ModelState.AddModelError(nameof(dto.ContactId), "Selected person was not found.");
         if (!ModelState.IsValid)
         {
             await PopulateSelectLists(userId);
-            return View(entity);
+            return View(dto);
         }
         var existing = await context.MonthlyStatements.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
         if (existing == null) return NotFound();
+        var entity = mapper.ToEntity(dto);
         StampExisting(entity, userId, existing);
         entity.CreatedAt = existing.CreatedAt;
         context.Update(entity);
         await context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
+        Flash("Statement updated.");
+        return RedirectToAction(nameof(Details), new { id });
     }
 
     public async Task<IActionResult> Delete(Guid? id)
@@ -119,7 +155,14 @@ public class MonthlyStatementsController(
         if (id == null) return NotFound();
         var userId = CurrentUserId();
         var entity = await context.MonthlyStatements.Include(e => e.Contact).FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
-        return entity == null ? NotFound() : View(entity);
+        if (entity == null) return NotFound();
+
+        var consequences = new List<string>();
+        var lineCount = await context.MonthlyStatementLines.CountAsync(e => e.UserId == userId && e.MonthlyStatementId == entity.Id);
+        if (lineCount > 0) consequences.Add($"Its {lineCount} invoice share line(s) will be removed. The invoices themselves stay.");
+        if (entity.Status == EMonthlyStatementStatus.Sent) consequences.Add($"It was already emailed to {entity.Contact.FullName}. Deleting it here doesn't recall that email.");
+
+        return View(new DeleteViewModel<MonthlyStatementDto> { Item = mapper.ToDto(entity), Consequences = consequences });
     }
 
     [HttpPost, ActionName("Delete")]
@@ -128,107 +171,121 @@ public class MonthlyStatementsController(
     {
         var userId = CurrentUserId();
         var entity = await context.MonthlyStatements.FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
-        if (entity != null)
-        {
-            context.MonthlyStatements.Remove(entity);
-            await context.SaveChangesAsync();
-        }
-        return RedirectToAction(nameof(Index));
+        if (entity == null) return RedirectToAction(nameof(Index));
+
+        var period = new BillingPeriod(entity.Year, entity.Month);
+        context.MonthlyStatements.Remove(entity);
+        await context.SaveChangesAsync();
+        Flash("Statement deleted.");
+        return RedirectToAction(nameof(Index), new { period = period.Key });
     }
 
-    public IActionResult Generate()
-    {
-        return View(new MonthlyStatementEntity { Year = DateTime.UtcNow.Year, Month = DateTime.UtcNow.Month });
-    }
+    /// <summary>Generation now lives on the statements page; keep old links working.</summary>
+    [HttpGet]
+    public IActionResult Generate(string? period) => RedirectToAction(nameof(Index), new { period });
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Generate([Bind("Year,Month")] MonthlyStatementEntity input)
+    public async Task<IActionResult> Generate(int year, int month)
     {
-        var userId = CurrentUserId();
-        ClearServerManagedModelState(input);
-        ModelState.Remove(nameof(input.Contact));
-        if (!ModelState.IsValid)
+        if (month is < 1 or > 12 || year is < 2000 or > 2100)
         {
-            return View(input);
-        }
-
-        var statements = await generateMonthlyStatementService.GenerateAsync(input.Year, input.Month, userId);
-        if (statements.Count == 0)
-        {
-            var hasInvoicesInPeriod = await HasInvoicesInPeriod(input.Year, input.Month, userId);
-            TempData["StatusMessage"] = hasInvoicesInPeriod
-                ? "Invoices were found for the selected period, but none could be allocated. Check that the invoice addresses have active contacts on the invoice date."
-                : "No invoices were found for the selected period. Generation matches invoices by Invoice Date or overlapping Period Start/End.";
+            Flash("Choose a valid month to generate statements for.", "danger");
             return RedirectToAction(nameof(Index));
         }
 
-        TempData["StatusMessage"] = $"Generated {statements.Count} person monthly statement(s) for {input.Year:D4}-{input.Month:D2}.";
-        return RedirectToAction(nameof(Index));
+        var userId = CurrentUserId();
+        var period = new BillingPeriod(year, month);
+        var statements = await generateMonthlyStatementService.GenerateAsync(year, month, userId);
+        var overview = await periodOverviewService.GetAsync(period, userId);
+        var skipped = overview.InvoicesWithoutResidents.Count;
+        var skippedNote = skipped > 0
+            ? $" {skipped} invoice(s) were skipped because nobody lived at the address on the invoice date."
+            : "";
+
+        if (statements.Count == 0)
+        {
+            Flash(overview.Invoices.Count > 0
+                ? $"No statements were generated for {period.Label}.{skippedNote}"
+                : $"No invoices found for {period.Label}. Add or import invoices first.", "warning");
+        }
+        else
+        {
+            Flash($"Generated {statements.Count} statement(s) for {period.Label}, ready to send.{skippedNote}", skipped > 0 ? "warning" : "success");
+        }
+
+        return RedirectToAction(nameof(Index), new { period = period.Key });
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Send(Guid id, string? returnTo = null)
     {
+        var userId = CurrentUserId();
         try
         {
             // Explicit single-statement action is always a deliberate human click, so allow resend:
             // clicking "Send again" on an already-sent statement publishes a fresh attempt.
-            await sendMonthlyStatementService.SendAsync(id, CurrentUserId(), allowResend: true);
-            var userId = CurrentUserId();
-            var status = await context.MonthlyStatements
+            await sendMonthlyStatementService.SendAsync(id, userId, allowResend: true);
+            var statement = await context.MonthlyStatements.Include(e => e.Contact)
                 .Where(e => e.Id == id && e.UserId == userId)
-                .Select(e => e.Status)
+                .Select(e => new { e.Status, e.Contact.FullName })
                 .FirstOrDefaultAsync();
 
-            TempData["StatusMessage"] = status switch
+            switch (statement?.Status)
             {
-                EMonthlyStatementStatus.Sent => "Monthly statement email command was published.",
-                EMonthlyStatementStatus.Failed => "Monthly statement email command could not be published. Check RabbitMQ configuration.",
-                _ => "Monthly statement send action completed."
-            };
+                case EMonthlyStatementStatus.Sent:
+                    Flash($"Statement emailed to {statement.FullName}.");
+                    break;
+                case EMonthlyStatementStatus.Failed:
+                    Flash($"The statement for {statement.FullName} couldn't be sent. Check the messaging (RabbitMQ) configuration and try again.", "danger");
+                    break;
+                default:
+                    Flash("Send action completed.", "info");
+                    break;
+            }
         }
         catch (Exception ex)
         {
-            TempData["StatusMessage"] = $"Monthly statement could not be sent: {ex.Message}";
+            Flash($"The statement couldn't be sent: {ex.Message}", "danger");
         }
 
-        return returnTo == nameof(Index)
-            ? RedirectToAction(nameof(Index))
-            : RedirectToAction(nameof(Details), new { id });
+        if (returnTo == nameof(Index))
+        {
+            var period = await context.MonthlyStatements.Where(e => e.Id == id && e.UserId == userId)
+                .Select(e => new { e.Year, e.Month }).FirstOrDefaultAsync();
+            return RedirectToAction(nameof(Index), new { period = period == null ? null : new BillingPeriod(period.Year, period.Month).Key });
+        }
+
+        return RedirectToAction(nameof(Details), new { id });
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SendPeriod([Bind("Year,Month")] MonthlyStatementEntity input)
+    public async Task<IActionResult> SendPeriod(int year, int month)
     {
         var userId = CurrentUserId();
-        var result = await sendPeriodInvoiceEmailsService.SendPeriodAsync(input.Year, input.Month, userId);
+        var period = new BillingPeriod(year, month);
+        var result = await sendPeriodInvoiceEmailsService.SendPeriodAsync(year, month, userId);
 
-        TempData["StatusMessage"] = result.Total == 0
-            ? $"No monthly statements were found for {input.Year:D4}-{input.Month:D2}."
-            : $"Period {input.Year:D4}-{input.Month:D2}: published {result.Published}, already sent {result.Skipped}, failed {result.Failed} of {result.Total}.";
+        if (result.Total == 0)
+        {
+            Flash($"There are no statements for {period.Label} to send.", "warning");
+        }
+        else if (result.Failed > 0)
+        {
+            Flash($"{period.Label}: sent {result.Published}, {result.Failed} failed, {result.Skipped} were already sent. Retry the failed ones from the list.", "danger");
+        }
+        else
+        {
+            Flash($"{period.Label}: sent {result.Published} statement(s)" + (result.Skipped > 0 ? $", {result.Skipped} were already sent." : "."));
+        }
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Index), new { period = period.Key });
     }
 
     private async Task PopulateSelectLists(Guid userId)
     {
         ViewData["ContactId"] = new SelectList(await context.Contacts.Where(e => e.UserId == userId).OrderBy(e => e.FullName).ToListAsync(), "Id", "FullName");
-    }
-
-    private async Task<bool> HasInvoicesInPeriod(int year, int month, Guid userId)
-    {
-        var monthStart = new DateOnly(year, month, 1);
-        var monthEnd = monthStart.AddMonths(1).AddDays(-1);
-
-        return await context.Invoices
-            .Where(e => e.UserId == userId)
-            .AnyAsync(e =>
-                (e.InvoiceDate >= monthStart && e.InvoiceDate <= monthEnd)
-                || (e.PeriodStart != null && e.PeriodEnd != null && e.PeriodStart.Value <= monthEnd && e.PeriodEnd.Value >= monthStart)
-                || (e.PeriodStart != null && e.PeriodEnd == null && e.PeriodStart.Value >= monthStart && e.PeriodStart.Value <= monthEnd)
-                || (e.PeriodStart == null && e.PeriodEnd != null && e.PeriodEnd.Value >= monthStart && e.PeriodEnd.Value <= monthEnd));
     }
 }
