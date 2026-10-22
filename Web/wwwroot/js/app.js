@@ -104,4 +104,29 @@
       if (!end.value || end.value < start.value) end.value = endOfMonth;
     });
   });
+  // ----- Charts: one tooltip per column listing every series, on hover and keyboard focus. -----
+  document.querySelectorAll(".viz-plot").forEach((plot) => {
+    const tooltip = plot.querySelector(".viz-tooltip");
+    if (!tooltip) return;
+    const show = (col) => {
+      const data = col.querySelector(".viz-tip-data");
+      if (!data) return;
+      tooltip.replaceChildren(...[...data.children].map((node) => node.cloneNode(true)));
+      tooltip.hidden = false;
+      const plotBox = plot.getBoundingClientRect();
+      const colBox = col.getBoundingClientRect();
+      const center = colBox.left - plotBox.left + colBox.width / 2;
+      const width = tooltip.offsetWidth;
+      const left = center + width + 16 > plotBox.width ? center - width - 12 : center + 12;
+      tooltip.style.left = `${Math.max(0, left)}px`;
+      tooltip.style.top = `${Math.max(0, colBox.height - tooltip.offsetHeight) / 3}px`;
+    };
+    const hide = () => { tooltip.hidden = true; };
+    plot.querySelectorAll(".viz-col").forEach((col) => {
+      col.addEventListener("pointerenter", () => show(col));
+      col.addEventListener("focus", () => show(col));
+      col.addEventListener("pointerleave", hide);
+      col.addEventListener("blur", hide);
+    });
+  });
 })();

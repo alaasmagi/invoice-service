@@ -140,6 +140,7 @@ public static class InvoiceServiceApplication
 
         builder.Services.AddScoped<WebDtoMapper>();
         builder.Services.AddScoped<PeriodOverviewService>();
+        builder.Services.AddScoped<StatisticsService>();
 
         builder.Services.AddScoped<CurrentAppUserViewDataFilter>();
         builder.Services.AddControllersWithViews(options =>
