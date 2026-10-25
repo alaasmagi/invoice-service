@@ -23,7 +23,7 @@
         <h2 class="section-title">@T["Residents"]</h2>
         <a asp-controller="AddressContacts" asp-action="Create" asp-route-addressId="@address.Id" asp-route-returnUrl="@here" class="btn btn--secondary btn--sm"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add resident"]</a>
     </div>
-    <p class="secondary">@T["Invoices for this address are split equally between the people living here on the invoice date."]</p>
+    <p class="secondary">@(Model.SplitRules.Any() ? T["Invoices for this address are split by the split rules below. Services without a rule are split equally between the people living here on the invoice date."] : T["Invoices for this address are split equally between the people living here on the invoice date."])</p>
     <div class="card table-card">
         <table class="data-table">
             <thead><tr><th>@T["Person"]</th><th>@T["Moved in"]</th><th>@T["Moved out"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
@@ -43,6 +43,46 @@
             @if (!Model.Residents.Any())
             {
                 <tr><td colspan="4" class="empty">@T["Nobody lives here yet, so invoices for this address can't be billed."] <a asp-controller="AddressContacts" asp-action="Create" asp-route-addressId="@address.Id" asp-route-returnUrl="@here" class="link">@T["Add a resident"]</a>.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section medium">
+    <div class="section-head">
+        <h2 class="section-title">@T["Split rules"]</h2>
+        <a asp-controller="AllocationRules" asp-action="Create" asp-route-addressId="@address.Id" asp-route-returnUrl="@here" class="btn btn--secondary btn--sm"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add split rule"]</a>
+    </div>
+    @foreach (var (ruleId, names) in Model.UnlistedResidents)
+    {
+        <div class="alert alert--warning">
+            <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+            <div class="alert__body">
+                <span>@T["{0} lives here but isn't part of a percentage rule, so they pay nothing for the invoices it covers.", string.Join(", ", names)]</span>
+                <span class="actions"><a asp-controller="AllocationRules" asp-action="Edit" asp-route-id="@ruleId" asp-route-returnUrl="@here" class="link">@T["Edit split rule"]</a></span>
+            </div>
+        </div>
+    }
+    <div class="card table-card">
+        <table class="data-table">
+            <thead><tr><th>@T["Applies to"]</th><th>@T["Split method"]</th><th>@T["Shares"]</th><th>@T["Valid"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
+            <tbody>
+            @foreach (var rule in Model.SplitRules)
+            {
+                <tr>
+                    <td>@if (rule.Service == null) { <span class="badge badge--neutral">@T["All services"]</span> } else { @rule.Service.Name }</td>
+                    <td><partial name="~/Views/AllocationRules/_MethodBadge.cshtml" model="rule.Method" /></td>
+                    <td><a asp-controller="AllocationRules" asp-action="Details" asp-route-id="@rule.Id" class="link"><partial name="~/Views/AllocationRules/_SharesSummary.cshtml" model="rule" /></a></td>
+                    <td class="nowrap">@if (rule.ValidTo == null) { @T["From {0}", Fmt.Date(rule.ValidFrom)] } else { @Fmt.Range(rule.ValidFrom, rule.ValidTo) }</td>
+                    <td class="actions-col"><div class="row-actions">
+                        <a asp-controller="AllocationRules" asp-action="Edit" asp-route-id="@rule.Id" asp-route-returnUrl="@here" class="icon-btn" aria-label="@T["Edit"]" title="@T["Edit"]"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
+                    </div></td>
+                </tr>
+            }
+            @if (!Model.SplitRules.Any())
+            {
+                <tr><td colspan="5" class="empty">@T["No split rules, so every invoice here is split equally."] <a asp-controller="AllocationRules" asp-action="Create" asp-route-addressId="@address.Id" asp-route-returnUrl="@here" class="link">@T["Split differently"]</a></td></tr>
             }
             </tbody>
         </table>

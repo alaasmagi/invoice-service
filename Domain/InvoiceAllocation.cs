@@ -14,5 +14,9 @@ public class InvoiceAllocation : BaseEntityUser
 
     public decimal AllocatedSum { get; set; }
 
+    /// <summary>True for manual splits saved by the user; these override split rules for the invoice.
+    /// Older rows written automatically on invoice creation are records only.</summary>
+    public bool IsOverride { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

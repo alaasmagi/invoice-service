@@ -14,5 +14,7 @@ public class InvoiceAllocationEntity : BaseEntityUserWithMetaConcurrency
 
     public decimal AllocatedSum { get; set; }
 
+    public bool IsOverride { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

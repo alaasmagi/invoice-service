@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Contracts.Application;
 using DataAccess.Context;
 using Domain;
@@ -56,7 +57,8 @@ public class MonthlyStatementsController(
             Status = hasStatus ? statusFilter.ToString() : null,
             PeriodOptions = BillingPeriod.Options(periodsWithData),
             Statements = statements.Select(mapper.ToDto).ToList(),
-            Overview = selected is { } overviewPeriod ? await periodOverviewService.GetAsync(overviewPeriod, userId) : null
+            Overview = selected is { } overviewPeriod ? await periodOverviewService.GetAsync(overviewPeriod, userId) : null,
+            AllocationWarnings = ReadAllocationWarnings()
         });
     }
 
@@ -197,12 +199,19 @@ public class MonthlyStatementsController(
 
         var userId = CurrentUserId();
         var period = new BillingPeriod(year, month);
-        var statements = await generateMonthlyStatementService.GenerateAsync(year, month, userId);
+        var result = await generateMonthlyStatementService.GenerateAsync(year, month, userId);
+        var statements = result.Statements;
         var overview = await periodOverviewService.GetAsync(period, userId);
-        var skipped = overview.InvoicesWithoutResidents.Count;
+        var billedInvoiceIds = await context.MonthlyStatementLines
+            .Where(e => e.UserId == userId && e.MonthlyStatement.Year == year && e.MonthlyStatement.Month == month)
+            .Select(e => e.InvoiceId)
+            .Distinct()
+            .ToListAsync();
+        var skipped = result.Warnings.Select(e => e.InvoiceId).Distinct().Count(id => !billedInvoiceIds.Contains(id));
         var skippedNote = skipped > 0
-            ? " " + T.Plural(skipped, "{0} invoice was skipped because nobody lived at the address on the invoice date.", "{0} invoices were skipped because nobody lived at the address on the invoice date.")
+            ? " " + T.Plural(skipped, "{0} invoice could not be billed. See the details below.", "{0} invoices could not be billed. See the details below.")
             : "";
+        StoreAllocationWarnings(result.Warnings);
 
         if (statements.Count == 0)
         {
@@ -212,7 +221,7 @@ public class MonthlyStatementsController(
         }
         else
         {
-            Flash(T.Plural(statements.Count, "Generated {0} statement for {1}, ready to send.", "Generated {0} statements for {1}, ready to send.", period.Label) + skippedNote, skipped > 0 ? "warning" : "success");
+            Flash(T.Plural(statements.Count, "Generated {0} statement for {1}, ready to send.", "Generated {0} statements for {1}, ready to send.", period.Label) + skippedNote, result.Warnings.Count > 0 ? "warning" : "success");
         }
 
         return RedirectToAction(nameof(Index), new { period = period.Key });
@@ -290,5 +299,19 @@ public class MonthlyStatementsController(
     private async Task PopulateSelectLists(Guid userId)
     {
         ViewData["ContactId"] = new SelectList(await context.Contacts.Where(e => e.UserId == userId).OrderBy(e => e.FullName).ToListAsync(), "Id", "FullName");
+    }
+
+    private const string AllocationWarningsKey = "AllocationWarnings";
+
+    private void StoreAllocationWarnings(IReadOnlyList<AllocationWarning> warnings)
+    {
+        if (warnings.Count > 0) TempData[AllocationWarningsKey] = JsonSerializer.Serialize(warnings);
+    }
+
+    private IReadOnlyList<AllocationWarning> ReadAllocationWarnings()
+    {
+        return TempData[AllocationWarningsKey] is string json
+            ? JsonSerializer.Deserialize<List<AllocationWarning>>(json) ?? []
+            : [];
     }
 }

@@ -1,4 +1,7 @@
-## ADDED Requirements
+## Purpose
+Define how monthly statement emails are delivered through Brevo.
+
+## Requirements
 
 ### Requirement: Monthly statement emails are sent through Brevo
 The application SHALL provide a Brevo-backed implementation of `IEmailSender` that sends monthly statement emails through Brevo's transactional email API.

@@ -21,4 +21,7 @@ public class ContactEntity : BaseEntityUserWithMetaConcurrency
 
     public ICollection<MonthlyStatementEntity> MonthlyStatements { get; set; }
         = new List<MonthlyStatementEntity>();
+
+    public ICollection<AllocationRuleShareEntity> AllocationRuleShares { get; set; }
+        = new List<AllocationRuleShareEntity>();
 }

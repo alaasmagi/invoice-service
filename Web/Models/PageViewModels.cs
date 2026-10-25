@@ -1,3 +1,4 @@
+using Contracts.Application;
 using DTO.DataAccess.Web.DTO;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Web.Helpers;
@@ -40,14 +41,24 @@ public class InvoiceFormViewModel
     public IReadOnlyList<MonthlyStatementDto> IncludedInStatements { get; init; } = [];
 }
 
-public record ShareRow(Guid ContactId, string ContactName, decimal Amount);
+public class ShareRow
+{
+    public Guid ContactId { get; set; }
+    public string ContactName { get; set; } = default!;
+    public decimal Amount { get; set; }
+    /// <summary>How the amount was calculated, e.g. "÷ 3" or "60%".</summary>
+    public string SplitLabel { get; set; } = "";
+}
 
 public class InvoiceDetailsViewModel
 {
     public InvoiceDto Invoice { get; init; } = default!;
 
-    /// <summary>How the next statement generation splits this invoice: residents active on the invoice date.</summary>
+    /// <summary>How the next statement generation splits this invoice (manual split, split rule or equal split).</summary>
     public IReadOnlyList<ShareRow> Split { get; init; } = [];
+    public Domain.EAllocationMethod SplitMethod { get; init; }
+    public Guid? SplitRuleId { get; init; }
+    public IReadOnlyList<AllocationWarning> SplitWarnings { get; init; } = [];
 
     public IReadOnlyList<MonthlyStatementLineDto> StatementLines { get; init; } = [];
 }
@@ -58,6 +69,9 @@ public class AddressDetailsViewModel
     public IReadOnlyList<AddressContactDto> Residents { get; init; } = [];
     public IReadOnlyList<InvoiceDto> RecentInvoices { get; init; } = [];
     public int InvoiceCount { get; init; }
+    public IReadOnlyList<AllocationRuleDto> SplitRules { get; init; } = [];
+    /// <summary>Current residents left out of a current Percentage or Fixed rule, by rule id.</summary>
+    public IReadOnlyDictionary<Guid, IReadOnlyList<string>> UnlistedResidents { get; init; } = new Dictionary<Guid, IReadOnlyList<string>>();
 }
 
 public class ContactDetailsViewModel
@@ -75,6 +89,8 @@ public class StatementsIndexViewModel
     public IReadOnlyList<BillingPeriod> PeriodOptions { get; init; } = [];
     public IReadOnlyList<MonthlyStatementDto> Statements { get; init; } = [];
     public PeriodOverview? Overview { get; init; }
+    /// <summary>Problems reported by the last generation run, shown once after redirect.</summary>
+    public IReadOnlyList<AllocationWarning> AllocationWarnings { get; init; } = [];
 }
 
 public class OverviewViewModel

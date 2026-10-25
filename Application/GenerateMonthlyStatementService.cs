@@ -12,40 +12,60 @@ public class GenerateMonthlyStatementService(
     IAddressContactRepository addressContactRepository,
     IMonthlyStatementRepository monthlyStatementRepository,
     IMonthlyStatementLineRepository monthlyStatementLineRepository,
+    IContactRepository contactRepository,
+    IAllocationRuleRepository allocationRuleRepository,
+    IInvoiceAllocationRepository invoiceAllocationRepository,
+    IInvoiceSplitCalculator splitCalculator,
     IBaseUow uow) : IGenerateMonthlyStatementService
 {
-    public async Task<IReadOnlyList<MonthlyStatement>> GenerateAsync(int year, int month, Guid userId)
+    public async Task<MonthlyStatementGenerationResult> GenerateAsync(int year, int month, Guid userId)
     {
         var invoices = await GetMonthInvoicesAsync(year, month, userId);
         if (invoices.Count == 0)
         {
-            return [];
+            return new MonthlyStatementGenerationResult();
         }
 
         var addresses = await GetAddressesAsync(userId);
         var services = await GetServicesAsync(userId);
         var addressContacts = await GetAddressContactsAsync(userId);
         var existingStatements = await GetExistingStatementsAsync(year, month, userId);
+        var rulesByAddress = (await allocationRuleRepository.GetForUserWithSharesAsync(userId))
+            .ToLookup(rule => rule.AddressId);
+        var manualByInvoice = (await invoiceAllocationRepository.GetOverridesByInvoiceIdsAsync(invoices.Select(invoice => invoice.Id).ToList(), userId))
+            .ToLookup(allocation => allocation.InvoiceId);
+        var warnings = new List<AllocationWarning>();
 
         await monthlyStatementLineRepository.RemoveByStatementIdsAsync(existingStatements.Select(statement => statement.Id).ToList(), userId);
 
         var generatedLines = new Dictionary<Guid, List<MonthlyStatementLine>>();
         foreach (var invoice in invoices)
         {
-            var activeContacts = GetActiveContactsForInvoice(invoice, addressContacts);
-            if (activeContacts.Count == 0)
+            var addressName = addresses.TryGetValue(invoice.AddressId, out var address) ? address.Name : "Unknown address";
+            var serviceName = services.TryGetValue(invoice.ServiceId, out var service) ? service.Name : "Unknown service";
+            var split = splitCalculator.Calculate(new InvoiceSplitInput
             {
-                Console.WriteLine($"Invoice {invoice.Id} for {invoice.InvoiceDate:yyyy-MM-dd} could not be allocated because address {invoice.AddressId} has no active contacts.");
-                continue;
+                Invoice = invoice,
+                ManualAllocations = manualByInvoice[invoice.Id].ToList(),
+                Rules = rulesByAddress[invoice.AddressId].ToList(),
+                ActiveResidentIds = GetActiveContactIdsForInvoice(invoice, addressContacts)
+            });
+
+            foreach (var warning in split.Warnings)
+            {
+                warning.AddressId = invoice.AddressId;
+                warning.AddressName = addressName;
+                warning.ServiceName = serviceName;
+                warning.InvoiceDate = invoice.InvoiceDate;
+                warnings.Add(warning);
             }
 
-            var shares = SplitEvenly(invoice.TotalSum, activeContacts.Select(contact => contact.ContactId).ToList());
-            foreach (var (contactId, amount) in shares)
+            foreach (var share in split.Shares)
             {
-                if (!generatedLines.TryGetValue(contactId, out var lines))
+                if (!generatedLines.TryGetValue(share.ContactId, out var lines))
                 {
                     lines = [];
-                    generatedLines[contactId] = lines;
+                    generatedLines[share.ContactId] = lines;
                 }
 
                 lines.Add(new MonthlyStatementLine
@@ -54,15 +74,18 @@ public class GenerateMonthlyStatementService(
                     UserId = userId,
                     InvoiceId = invoice.Id,
                     AddressId = invoice.AddressId,
-                    AddressName = addresses.TryGetValue(invoice.AddressId, out var address) ? address.Name : "Unknown address",
+                    AddressName = addressName,
                     ServiceId = invoice.ServiceId,
-                    ServiceName = services.TryGetValue(invoice.ServiceId, out var service) ? service.Name : "Unknown service",
+                    ServiceName = serviceName,
                     InvoiceDate = invoice.InvoiceDate,
                     PeriodStart = invoice.PeriodStart,
                     PeriodEnd = invoice.PeriodEnd,
                     InvoiceTotal = invoice.TotalSum,
-                    ResidentCount = activeContacts.Count,
-                    AllocatedAmount = amount
+                    ResidentCount = split.ParticipantCount,
+                    AllocatedAmount = share.Amount,
+                    AllocationMethod = split.Method,
+                    AllocationRuleId = split.RuleId,
+                    ShareValue = share.ShareValue
                 });
             }
         }
@@ -114,9 +137,31 @@ public class GenerateMonthlyStatementService(
         }
 
         await uow.SaveChangesAsync();
-        return generatedStatements
+        var statements = generatedStatements
             .OrderBy(statement => statement.ContactId)
             .ToList();
+        await AddContactNamesAsync(warnings, userId);
+        return new MonthlyStatementGenerationResult { Statements = statements, Warnings = warnings };
+    }
+
+    private async Task AddContactNamesAsync(List<AllocationWarning> warnings, Guid userId)
+    {
+        if (!warnings.Any(warning => warning.ContactId != null))
+        {
+            return;
+        }
+
+        var response = await contactRepository.GetAllAsync(userId);
+        var names = response.Successful && response.Value != null
+            ? response.Value.ToDictionary(contact => contact.Id, contact => contact.FullName)
+            : new Dictionary<Guid, string>();
+        foreach (var warning in warnings)
+        {
+            if (warning.ContactId is { } contactId && names.TryGetValue(contactId, out var name))
+            {
+                warning.ContactName = name;
+            }
+        }
     }
 
     private async Task<List<Invoice>> GetMonthInvoicesAsync(int year, int month, Guid userId)
@@ -165,38 +210,15 @@ public class GenerateMonthlyStatementService(
             : [];
     }
 
-    private static List<AddressContact> GetActiveContactsForInvoice(Invoice invoice, IEnumerable<AddressContact> addressContacts)
+    private static List<Guid> GetActiveContactIdsForInvoice(Invoice invoice, IEnumerable<AddressContact> addressContacts)
     {
         return addressContacts
             .Where(addressContact => addressContact.AddressId == invoice.AddressId
                                      && addressContact.IsActive(invoice.InvoiceDate))
-            .GroupBy(addressContact => addressContact.ContactId)
-            .Select(group => group.OrderBy(addressContact => addressContact.StartDate).First())
-            .OrderBy(addressContact => addressContact.ContactId)
+            .Select(addressContact => addressContact.ContactId)
+            .Distinct()
+            .OrderBy(contactId => contactId)
             .ToList();
-    }
-
-    private static Dictionary<Guid, decimal> SplitEvenly(decimal total, IReadOnlyList<Guid> contactIds)
-    {
-        var shares = new Dictionary<Guid, decimal>();
-        if (contactIds.Count == 0)
-        {
-            return shares;
-        }
-
-        var baseAmount = decimal.Round(total / contactIds.Count, 2, MidpointRounding.AwayFromZero);
-        var allocated = 0m;
-        for (var i = 0; i < contactIds.Count; i++)
-        {
-            var amount = i == contactIds.Count - 1
-                ? total - allocated
-                : baseAmount;
-
-            shares[contactIds[i]] = amount;
-            allocated += amount;
-        }
-
-        return shares;
     }
 
     private async Task<Dictionary<Guid, Address>> GetAddressesAsync(Guid userId)

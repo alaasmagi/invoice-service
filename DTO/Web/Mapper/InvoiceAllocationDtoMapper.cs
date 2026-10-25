@@ -15,6 +15,7 @@ public class InvoiceAllocationDtoMapper : IMapper<InvoiceAllocationDto, InvoiceA
             InvoiceId = entity.InvoiceId,
             ContactId = entity.ContactId,
             AllocatedSum = entity.AllocatedSum,
+            IsOverride = entity.IsOverride,
             CreatedAt = entity.CreatedAt
         };
     }
@@ -33,6 +34,7 @@ public class InvoiceAllocationDtoMapper : IMapper<InvoiceAllocationDto, InvoiceA
             InvoiceId = entity.InvoiceId,
             ContactId = entity.ContactId,
             AllocatedSum = entity.AllocatedSum,
+            IsOverride = entity.IsOverride,
             CreatedAt = entity.CreatedAt
         };
     }

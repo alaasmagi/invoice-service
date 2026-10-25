@@ -1,0 +1,75 @@
+@model AllocationRuleIndexViewModel
+@{
+    ViewData["Title"] = T["Split rules"];
+    var today = DateOnly.FromDateTime(DateTime.UtcNow);
+}
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Split rules"]</h1>
+        <p class="page-header__lede">@T["How invoices for each address are shared between the people living there. Addresses and services without a rule are split equally."]</p>
+    </div>
+    <div class="page-header__actions">
+        <a asp-action="Create" asp-route-addressId="@Model.AddressId" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add split rule"]</a>
+    </div>
+</header>
+
+<form method="get" asp-action="Index" class="card filter-bar" role="search" aria-label="@T["Filter split rules"]">
+    <div class="field">
+        <label for="filterAddress" class="field__label">@T["Address"]</label>
+        <div class="field__control">
+            <select id="filterAddress" name="addressId" class="input" data-autosubmit>
+                <option value="">@T["All addresses"]</option>
+                @foreach (var option in Model.AddressOptions)
+                {
+                    <option value="@option.Value" selected="@(option.Value == Model.AddressId?.ToString())">@option.Text</option>
+                }
+            </select>
+            <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+        </div>
+    </div>
+    @if (Model.ShowPast) { <input type="hidden" name="showPast" value="true" /> }
+    <noscript><button type="submit" class="btn btn--secondary">@T["Apply"]</button></noscript>
+</form>
+
+@if (Model.PastCount > 0)
+{
+    <div class="section-head">
+        <span></span>
+        <a asp-action="Index" asp-route-addressId="@Model.AddressId" asp-route-showPast="@(!Model.ShowPast)" class="btn btn--ghost btn--sm">@(Model.ShowPast ? T["Hide past rules"] : T.Plural(Model.PastCount, "Show {0} past rule", "Show {0} past rules"))</a>
+    </div>
+}
+
+<div class="card table-card">
+    <table class="data-table">
+        <thead><tr><th>@T["Address"]</th><th>@T["Applies to"]</th><th>@T["Split method"]</th><th>@T["Shares"]</th><th>@T["Valid"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
+        <tbody>
+        @foreach (var item in Model.Rules)
+        {
+            var ongoing = item.ValidTo == null;
+            var past = item.ValidTo != null && item.ValidTo < today;
+            <tr>
+                <td><a asp-controller="Addresses" asp-action="Details" asp-route-id="@item.AddressId" class="link">@item.Address.Name</a></td>
+                <td>@if (item.Service == null) { <span class="badge badge--neutral">@T["All services"]</span> } else { @item.Service.Name }</td>
+                <td><partial name="_MethodBadge" model="item.Method" /></td>
+                <td><a asp-action="Details" asp-route-id="@item.Id" class="link"><partial name="_SharesSummary" model="item" /></a></td>
+                <td class="nowrap">
+                    <div class="stack-cell">
+                        <span class="@(past ? "secondary" : null)">@T["From {0}", Fmt.Date(item.ValidFrom)]</span>
+                        @if (ongoing) { <span><span class="badge badge--success">@T["Ongoing"]</span></span> } else { <span>@T["Until {0}", Fmt.Date(item.ValidTo)]</span> }
+                    </div>
+                </td>
+                <td class="actions-col"><div class="row-actions">
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="@T["Edit"]" title="@T["Edit"]"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="@T["Delete"]" title="@T["Delete"]"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
+                </div></td>
+            </tr>
+        }
+        @if (!Model.Rules.Any())
+        {
+            <tr class="empty-row"><td colspan="6" class="empty">@T["No split rules yet, so every invoice is split equally between the residents."] <a asp-action="Create" asp-route-addressId="@Model.AddressId" class="link">@T["Add a split rule"]</a> @T["to share costs differently."]</td></tr>
+        }
+        </tbody>
+    </table>
+</div>

@@ -588,5 +588,19 @@ a.stat:hover { border-color: var(--color-border-strong); }
 .breakdown__bar { display: block; height: 100%; min-width: 2px; border-radius: 0 4px 4px 0; }
 .breakdown__meta { grid-column: 1 / -1; font-size: 12px; line-height: 16px; color: var(--color-text-muted); }
 
+/* ===== Split rules: radio segmented control, input suffix, shares total ===== */
+.segmented--radio { margin: 0; }
+.segmented--radio .segmented__item { position: relative; cursor: pointer; }
+.segmented--radio .segmented__item input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.segmented--radio .segmented__item:has(input:checked) { background: var(--color-accent-subtle); color: var(--color-accent-text); }
+.segmented--radio .segmented__item:has(input:focus-visible) { outline: var(--border-thick) solid var(--color-focus-ring); outline-offset: 2px; }
+.field__control > .field__suffix { position: absolute; right: var(--space-3); font-size: 14px; line-height: 20px; color: var(--color-text-muted); pointer-events: none; }
+.has-suffix .input { padding-right: 44px; text-align: right; font-variant-numeric: tabular-nums; }
+.shares-table td { vertical-align: top; }
+.shares-table .field__control { min-width: 140px; }
+.shares-total--ok { color: var(--color-status-success-text); }
+.shares-total--warning { color: var(--color-status-warning-text); }
+.method-help { margin: 0; }
+
 @@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
 </style>

@@ -1,16 +1,16 @@
 @model IReadOnlyList<InvoiceAllocationDto>
 @{
-    ViewData["Title"] = T["Invoice allocations"];
+    ViewData["Title"] = T["Manual splits"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
         <p class="kicker">@T["Billing"]</p>
-        <h1>@T["Invoice allocations"]</h1>
-        <p class="page-header__lede">@T["A record of how manually added invoices were split when they were created. Monthly statements don't read these. They split each invoice equally between the residents on the invoice date, so editing an allocation doesn't change any statement."]</p>
+        <h1>@T["Manual splits"]</h1>
+        <p class="page-header__lede">@T["Set exactly who pays what for a single invoice. A manual split overrides split rules for that invoice, and its amounts must add up to the invoice total. Rows marked \"Record only\" were written automatically by earlier versions and are ignored."]</p>
     </div>
     <div class="page-header__actions">
-        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Create allocation"]</a>
+        <a asp-action="Create" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add manual split"]</a>
     </div>
 </header>
 
@@ -23,7 +23,7 @@
             <tr>
                 <td><div class="stack-cell"><a asp-controller="Invoices" asp-action="Details" asp-route-id="@item.InvoiceId" class="link">@Fmt.Date(item.Invoice.InvoiceDate)</a><span>@item.Invoice.Address.Name</span></div></td>
                 <td>@item.Contact.FullName</td>
-                <td class="num">@Fmt.Money(item.AllocatedSum)</td>
+                <td class="num">@Fmt.Money(item.AllocatedSum)@if (!item.IsOverride) { <text> </text><span class="badge badge--neutral">@T["Record only"]</span> }</td>
                 <td class="actions-col"><div class="row-actions">
                     <a asp-action="Edit" asp-route-id="@item.Id" class="icon-btn" aria-label="@T["Edit"]" title="@T["Edit"]"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg></a>
                     <a asp-action="Delete" asp-route-id="@item.Id" class="icon-btn icon-btn--danger" aria-label="@T["Delete"]" title="@T["Delete"]"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></a>
@@ -32,7 +32,7 @@
         }
         @if (!Model.Any())
         {
-            <tr><td colspan="4" class="empty">@T["No allocations yet. They're created automatically when you add an invoice manually."]</td></tr>
+            <tr><td colspan="4" class="empty">@T["No manual splits. Invoices are split by your split rules, or equally between the residents."]</td></tr>
         }
         </tbody>
     </table>

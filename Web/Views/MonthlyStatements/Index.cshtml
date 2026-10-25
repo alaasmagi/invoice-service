@@ -50,6 +50,39 @@
     <noscript><button type="submit" class="btn btn--secondary">@T["Apply"]</button></noscript>
 </form>
 
+@if (Model.AllocationWarnings.Any())
+{
+    <div class="alert alert--warning" role="alert">
+        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+        <div class="alert__body">
+            <span class="alert__title">@T.Plural(Model.AllocationWarnings.Count, "{0} invoice needs attention", "{0} invoices need attention")</span>
+            <ul>
+                @foreach (var warning in Model.AllocationWarnings)
+                {
+                    <li>
+                        <strong>@warning.AddressName · @warning.ServiceName · @Fmt.Date(warning.InvoiceDate)</strong> — @Fmt.AllocationWarningText(warning)
+                        @switch (warning.Kind)
+                        {
+                            case Contracts.Application.EAllocationWarningKind.NoActiveResidents:
+                                <a asp-controller="Addresses" asp-action="Details" asp-route-id="@warning.AddressId" class="link">@T["Check residents"]</a>
+                                break;
+                            case Contracts.Application.EAllocationWarningKind.ManualSumMismatch:
+                                <a asp-controller="InvoiceAllocations" asp-action="Index" class="link">@T["Fix manual split"]</a>
+                                break;
+                            default:
+                                if (warning.RuleId != null)
+                                {
+                                    <a asp-controller="AllocationRules" asp-action="Edit" asp-route-id="@warning.RuleId" class="link">@T["Edit split rule"]</a>
+                                }
+                                break;
+                        }
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+}
+
 @if (overview != null)
 {
     var period = overview.Period;

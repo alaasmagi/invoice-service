@@ -114,9 +114,11 @@ public class ServicesController(AppDbContext context, WebDtoMapper mapper) : Use
     {
         var invoiceCount = await context.Invoices.CountAsync(e => e.UserId == userId && e.ServiceId == serviceId);
         var lineCount = await context.MonthlyStatementLines.CountAsync(e => e.UserId == userId && e.ServiceId == serviceId);
+        var ruleCount = await context.AllocationRules.CountAsync(e => e.UserId == userId && e.ServiceId == serviceId);
         var blockers = new List<string>();
         if (invoiceCount > 0) blockers.Add(T.Plural(invoiceCount, "{0} invoice uses this service. Delete or change it first.", "{0} invoices use this service. Delete or change them first."));
         else if (lineCount > 0) blockers.Add(T["Monthly statements still reference this service."]);
+        if (ruleCount > 0) blockers.Add(T.Plural(ruleCount, "{0} split rule applies to this service. Delete it first.", "{0} split rules apply to this service. Delete them first."));
         return new DeleteViewModel<ServiceDto> { Item = dto, Blockers = blockers };
     }
 }

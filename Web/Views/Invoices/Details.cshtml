@@ -30,17 +30,40 @@
         <h2 class="section-title">@T["Who pays"]</h2>
         <a asp-controller="AddressContacts" asp-action="Create" asp-route-addressId="@invoice.AddressId" asp-route-returnUrl="@(Context.Request.Path)" class="btn btn--ghost btn--sm"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add resident"]</a>
     </div>
+    @if (Model.SplitWarnings.Any())
+    {
+        <div class="alert alert--warning">
+            <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+            <div class="alert__body">
+                <ul>@foreach (var warning in Model.SplitWarnings) { <li>@Fmt.AllocationWarningText(warning)</li> }</ul>
+            </div>
+        </div>
+    }
     @if (Model.Split.Any())
     {
-        <p class="secondary">@T["Split equally between the residents living at {0} on {1}. Statement generation uses this split.", invoice.Address.Name, Fmt.Date(invoice.InvoiceDate)]</p>
+        <p class="secondary">
+            @switch (Model.SplitMethod)
+            {
+                case Domain.EAllocationMethod.Manual:
+                    @T["Split by a manual split for this invoice. Statement generation uses this split."] <a asp-controller="InvoiceAllocations" asp-action="Index" class="link">@T["Manual splits"]</a>
+                    break;
+                case Domain.EAllocationMethod.Equal when Model.SplitRuleId == null:
+                    @T["Split equally between the residents living at {0} on {1}. Statement generation uses this split.", invoice.Address.Name, Fmt.Date(invoice.InvoiceDate)] <a asp-controller="AllocationRules" asp-action="Create" asp-route-addressId="@invoice.AddressId" asp-route-serviceId="@invoice.ServiceId" asp-route-returnUrl="@(Context.Request.Path)" class="link">@T["Split differently"]</a>
+                    break;
+                default:
+                    @T["Split by a split rule ({0}) for {1} on {2}. Statement generation uses this split.", Fmt.MethodLabel(Model.SplitMethod), invoice.Address.Name, Fmt.Date(invoice.InvoiceDate)] <a asp-controller="AllocationRules" asp-action="Details" asp-route-id="@Model.SplitRuleId" class="link">@T["View split rule"]</a>
+                    break;
+            }
+        </p>
         <div class="card table-card">
             <table class="data-table">
-                <thead><tr><th>@T["Resident"]</th><th class="num">@T["Share"]</th></tr></thead>
+                <thead><tr><th>@T["Person"]</th><th class="num">@T["Split"]</th><th class="num">@T["Share"]</th></tr></thead>
                 <tbody>
                 @foreach (var share in Model.Split)
                 {
                     <tr>
                         <td><a asp-controller="Contacts" asp-action="Details" asp-route-id="@share.ContactId" class="link">@share.ContactName</a></td>
+                        <td class="num">@share.SplitLabel</td>
                         <td class="num">@Fmt.Money(share.Amount)</td>
                     </tr>
                 }
@@ -48,7 +71,7 @@
             </table>
         </div>
     }
-    else
+    else if (!Model.SplitWarnings.Any())
     {
         <div class="alert alert--warning">
             <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>

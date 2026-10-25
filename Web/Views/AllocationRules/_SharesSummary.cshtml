@@ -1,0 +1,16 @@
+@model AllocationRuleDto
+@using Domain
+@if (Model.Method == EAllocationMethod.Equal || !Model.Shares.Any())
+{
+    <span class="secondary">@T["Everyone living there"]</span>
+}
+else
+{
+    @string.Join(" · ", Model.Shares
+        .OrderBy(share => share.Contact?.FullName)
+        .Select(share => $"{share.Contact?.FullName} {(Model.Method == EAllocationMethod.Percentage ? Fmt.SharePercent(share.Value ?? 0) : Fmt.Money(share.Value ?? 0))}"))
+    @if (Model.Method == EAllocationMethod.Fixed)
+    {
+        <span class="secondary"> · @T["rest split equally"]</span>
+    }
+}

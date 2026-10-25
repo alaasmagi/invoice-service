@@ -1,4 +1,7 @@
-## ADDED Requirements
+## Purpose
+Define how provider PDF invoices are uploaded, parsed and turned into invoices.
+
+## Requirements
 
 ### Requirement: PDF import upload
 The system SHALL allow an authenticated user to upload one PDF file for invoice import.

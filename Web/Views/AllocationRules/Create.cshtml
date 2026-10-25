@@ -1,0 +1,21 @@
+@model AllocationRuleFormViewModel
+@{
+    ViewData["Title"] = T["Add split rule"];
+}
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Add split rule"]</h1>
+        <p class="page-header__lede">@T["Decide how invoices for an address are shared. Without a rule, everyone living there pays an equal part."]</p>
+    </div>
+</header>
+
+<form asp-action="Create" method="post" class="card form" data-rule-form data-rule-new data-currency="@Fmt.CurrencySymbol" data-residents-url="@Url.Action("Residents")">
+    <partial name="_AllocationRuleFields" model="Model" />
+    <div class="form-actions">
+        <button type="submit" class="btn btn--primary">@T["Save split rule"]</button>
+        <a href="@Url.LocalOr(Model.ReturnUrl, Url.Action("Index"))" class="btn btn--ghost">@T["Cancel"]</a>
+    </div>
+</form>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

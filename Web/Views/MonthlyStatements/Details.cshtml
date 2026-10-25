@@ -50,7 +50,7 @@
                     <td class="nowrap">@Fmt.Date(line.InvoiceDate)</td>
                     <td class="nowrap secondary">@Fmt.Range(line.PeriodStart, line.PeriodEnd)</td>
                     <td class="num">@Fmt.Money(line.InvoiceTotal)</td>
-                    <td class="num">÷ @line.ResidentCount</td>
+                    <td class="num">@Fmt.SplitLabel(line.AllocationMethod, line.ShareValue, line.ResidentCount)</td>
                     <td class="num"><strong>@Fmt.Money(line.AllocatedAmount)</strong></td>
                 </tr>
             }

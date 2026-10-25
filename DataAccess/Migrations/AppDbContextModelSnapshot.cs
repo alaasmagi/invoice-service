@@ -119,6 +119,112 @@ namespace DataAccess.Migrations
                     b.ToTable("Addresses", "invoice");
                 });
 
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.AllocationRuleEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AddressId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ConcurrencyToken")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<int>("Method")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ServiceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly>("ValidFrom")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("ValidTo")
+                        .HasColumnType("date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.HasIndex("UserId", "AddressId", "ServiceId", "ValidFrom");
+
+                    b.ToTable("AllocationRules", "invoice");
+                });
+
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.AllocationRuleShareEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AllocationRuleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ConcurrencyToken")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContactId");
+
+                    b.HasIndex("AllocationRuleId", "ContactId")
+                        .IsUnique();
+
+                    b.ToTable("AllocationRuleShares", "invoice");
+                });
+
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.AppUserEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -278,6 +384,9 @@ namespace DataAccess.Migrations
 
                     b.Property<Guid>("InvoiceId")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("IsOverride")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -440,6 +549,12 @@ namespace DataAccess.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
+                    b.Property<int>("AllocationMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("AllocationRuleId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("ConcurrencyToken")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -483,6 +598,10 @@ namespace DataAccess.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<decimal?>("ShareValue")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -497,6 +616,8 @@ namespace DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId");
+
+                    b.HasIndex("AllocationRuleId");
 
                     b.HasIndex("InvoiceId");
 
@@ -651,6 +772,43 @@ namespace DataAccess.Migrations
                     b.Navigation("Contact");
                 });
 
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.AllocationRuleEntity", b =>
+                {
+                    b.HasOne("DTO.DataAccess.DataAccess.DTO.AddressEntity", "Address")
+                        .WithMany("AllocationRules")
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DTO.DataAccess.DataAccess.DTO.ServiceEntity", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Address");
+
+                    b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.AllocationRuleShareEntity", b =>
+                {
+                    b.HasOne("DTO.DataAccess.DataAccess.DTO.AllocationRuleEntity", "AllocationRule")
+                        .WithMany("Shares")
+                        .HasForeignKey("AllocationRuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DTO.DataAccess.DataAccess.DTO.ContactEntity", "Contact")
+                        .WithMany("AllocationRuleShares")
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AllocationRule");
+
+                    b.Navigation("Contact");
+                });
+
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.InvoiceAllocationEntity", b =>
                 {
                     b.HasOne("DTO.DataAccess.DataAccess.DTO.ContactEntity", null)
@@ -712,6 +870,11 @@ namespace DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("DTO.DataAccess.DataAccess.DTO.AllocationRuleEntity", "AllocationRule")
+                        .WithMany()
+                        .HasForeignKey("AllocationRuleId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("DTO.DataAccess.DataAccess.DTO.InvoiceEntity", "Invoice")
                         .WithMany()
                         .HasForeignKey("InvoiceId")
@@ -732,6 +895,8 @@ namespace DataAccess.Migrations
 
                     b.Navigation("Address");
 
+                    b.Navigation("AllocationRule");
+
                     b.Navigation("Invoice");
 
                     b.Navigation("MonthlyStatement");
@@ -743,12 +908,21 @@ namespace DataAccess.Migrations
                 {
                     b.Navigation("AddressContacts");
 
+                    b.Navigation("AllocationRules");
+
                     b.Navigation("Invoices");
+                });
+
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.AllocationRuleEntity", b =>
+                {
+                    b.Navigation("Shares");
                 });
 
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.ContactEntity", b =>
                 {
                     b.Navigation("AddressContacts");
+
+                    b.Navigation("AllocationRuleShares");
 
                     b.Navigation("InvoiceAllocations");
 

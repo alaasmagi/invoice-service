@@ -51,9 +51,10 @@ public class InvoiceAllocationsController(AppDbContext context, WebDtoMapper map
         var entity = mapper.ToEntity(dto);
         StampNew(entity, userId);
         entity.CreatedAt = DateTime.UtcNow;
+        entity.IsOverride = true;
         context.Add(entity);
         await context.SaveChangesAsync();
-        Flash(T["Allocation saved."]);
+        Flash(T["Manual split saved. Regenerate statements for the invoice's month to apply it."]);
         return RedirectToAction(nameof(Index));
     }
 
@@ -86,9 +87,10 @@ public class InvoiceAllocationsController(AppDbContext context, WebDtoMapper map
         var entity = mapper.ToEntity(dto);
         StampExisting(entity, userId, existing);
         entity.CreatedAt = existing.CreatedAt;
+        entity.IsOverride = true;
         context.Update(entity);
         await context.SaveChangesAsync();
-        Flash(T["Allocation updated."]);
+        Flash(T["Manual split updated. Regenerate statements for the invoice's month to apply it."]);
         return RedirectToAction(nameof(Index));
     }
 
@@ -111,7 +113,7 @@ public class InvoiceAllocationsController(AppDbContext context, WebDtoMapper map
         {
             context.InvoiceAllocations.Remove(entity);
             await context.SaveChangesAsync();
-            Flash(T["Allocation deleted."]);
+            Flash(T["Manual split deleted. Regenerate statements for the invoice's month to apply the change."]);
         }
         return RedirectToAction(nameof(Index));
     }

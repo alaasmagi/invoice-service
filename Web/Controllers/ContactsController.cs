@@ -135,10 +135,12 @@ public class ContactsController(AppDbContext context, WebDtoMapper mapper) : Use
         var statementCount = await context.MonthlyStatements.CountAsync(e => e.UserId == userId && e.ContactId == contactId);
         var allocationCount = await context.InvoiceAllocations.CountAsync(e => e.UserId == userId && e.ContactId == contactId);
         var residencyCount = await context.AddressContacts.CountAsync(e => e.UserId == userId && e.ContactId == contactId);
+        var ruleCount = await context.AllocationRuleShares.CountAsync(e => e.UserId == userId && e.ContactId == contactId);
 
         var blockers = new List<string>();
         if (statementCount > 0) blockers.Add(T.Plural(statementCount, "{1} has {0} monthly statement. Delete it first, or keep the contact for history.", "{1} has {0} monthly statements. Delete them first, or keep the contact for history.", dto.FullName));
         if (allocationCount > 0) blockers.Add(T.Plural(allocationCount, "{1} has {0} invoice allocation. Delete it first.", "{1} has {0} invoice allocations. Delete them first.", dto.FullName));
+        if (ruleCount > 0) blockers.Add(T.Plural(ruleCount, "{1} is part of {0} split rule. Remove them from it first.", "{1} is part of {0} split rules. Remove them from those first.", dto.FullName));
 
         return new DeleteViewModel<ContactDto>
         {

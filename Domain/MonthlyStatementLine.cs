@@ -35,4 +35,11 @@ public class MonthlyStatementLine : BaseEntityUser
     public int ResidentCount { get; set; }
 
     public decimal AllocatedAmount { get; set; }
+
+    public EAllocationMethod AllocationMethod { get; set; } = EAllocationMethod.Equal;
+
+    public Guid? AllocationRuleId { get; set; }
+
+    /// <summary>Effective percentage for Percentage, the fixed amount for a fixed payer; null otherwise.</summary>
+    public decimal? ShareValue { get; set; }
 }

@@ -1,12 +1,12 @@
 @model InvoiceAllocationDto
 @{
-    ViewData["Title"] = T["Create allocation"];
+    ViewData["Title"] = T["Add manual split"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
         <p class="kicker">@T["Billing"]</p>
-        <h1>@T["Create allocation"]</h1>
+        <h1>@T["Add manual split"]</h1>
     </div>
 </header>
 
@@ -30,7 +30,7 @@
         </div>
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn--primary">@T["Create allocation"]</button>
+        <button type="submit" class="btn btn--primary">@T["Add manual split"]</button>
         <a asp-action="Index" class="btn btn--ghost">@T["Cancel"]</a>
     </div>
 </form>

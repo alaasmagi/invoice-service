@@ -13,4 +13,6 @@ public class AddressEntity : BaseEntityUserWithMetaConcurrency
     public ICollection<InvoiceEntity> Invoices { get; set; }
         = new List<InvoiceEntity>();
 
+    public ICollection<AllocationRuleEntity> AllocationRules { get; set; }
+        = new List<AllocationRuleEntity>();
 }

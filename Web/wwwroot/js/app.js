@@ -137,4 +137,105 @@
       target.textContent = select.selectedOptions[0]?.dataset.sample ?? "";
     });
   });
+  // ----- Split rule form: method switch, share rows, running total, resident prefill. -----
+  document.querySelectorAll("[data-rule-form]").forEach((form) => {
+    const sharesSection = form.querySelector("[data-shares]");
+    const body = form.querySelector("[data-share-rows]");
+    const template = form.querySelector("[data-share-template]");
+    const totalCell = form.querySelector("[data-share-total]");
+    const addressSelect = form.querySelector("[data-rule-address]");
+    const validFrom = form.querySelector("[data-rule-valid-from]");
+    const isNew = form.hasAttribute("data-rule-new");
+    const currency = form.dataset.currency || "";
+    const locale = document.documentElement.lang || undefined;
+    if (!sharesSection || !body || !template) return;
+
+    const method = () => form.querySelector("input[name='Rule.Method']:checked")?.value;
+    const rows = () => [...body.querySelectorAll("tr[data-share-row]")];
+
+    const reindex = () => {
+      rows().forEach((row, index) => {
+        row.querySelectorAll("[name^='Rule.Shares[']").forEach((input) => {
+          input.name = input.name.replace(/Rule\.Shares\[\d+\]/, `Rule.Shares[${index}]`);
+          if (input.id) input.id = input.id.replace(/Rule_Shares_\d+__/, `Rule_Shares_${index}__`);
+        });
+        row.querySelectorAll("[data-valmsg-for^='Rule.Shares[']").forEach((span) => {
+          span.dataset.valmsgFor = span.dataset.valmsgFor.replace(/Rule\.Shares\[\d+\]/, `Rule.Shares[${index}]`);
+        });
+      });
+    };
+
+    const update = () => {
+      const current = method();
+      sharesSection.hidden = current === "Equal";
+      form.querySelectorAll("[data-method-help]").forEach((help) => { help.hidden = help.dataset.methodHelp !== current; });
+      form.querySelectorAll("[data-share-suffix]").forEach((suffix) => { suffix.textContent = current === "Percentage" ? "%" : currency; });
+      form.querySelectorAll("[data-share-value]").forEach((input) => {
+        input.max = current === "Percentage" ? "100" : "";
+        input.step = "0.01";
+      });
+      if (!totalCell) return;
+      const values = rows()
+        .filter((row) => row.querySelector("select")?.value)
+        .map((row) => parseFloat(row.querySelector("[data-share-value]")?.value || "0") || 0);
+      const total = values.reduce((sum, value) => sum + value, 0);
+      if (current === "Percentage") {
+        const ok = Math.abs(total - 100) < 0.005;
+        totalCell.textContent = `${total.toLocaleString(locale, { maximumFractionDigits: 2 })} %`;
+        totalCell.className = `num ${ok ? "shares-total--ok" : "shares-total--warning"}`;
+        totalCell.title = ok ? "" : totalCell.dataset.warningTitle || "";
+      } else {
+        totalCell.textContent = `${total.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`.trim();
+        totalCell.className = "num";
+        totalCell.title = "";
+      }
+    };
+
+    const addRow = (contactId = "") => {
+      const fragment = template.content.cloneNode(true);
+      const row = fragment.querySelector("tr");
+      body.appendChild(fragment);
+      if (contactId) row.querySelector("select").value = contactId;
+      reindex();
+      update();
+      return row;
+    };
+
+    form.addEventListener("change", (event) => {
+      if (event.target.matches("input[name='Rule.Method']")) update();
+    });
+    form.addEventListener("input", (event) => {
+      if (event.target.matches("[data-share-value], select")) update();
+    });
+    form.addEventListener("click", (event) => {
+      const remove = event.target.closest("[data-share-remove]");
+      if (remove) {
+        remove.closest("tr")?.remove();
+        if (rows().length === 0) addRow();
+        reindex();
+        update();
+      }
+      if (event.target.closest("[data-share-add]")) addRow().querySelector("select")?.focus();
+    });
+
+    // New rules: picking an address fills the rows with the people living there on the start date.
+    const prefill = async () => {
+      if (!isNew || !addressSelect?.value || !form.dataset.residentsUrl) return;
+      const untouched = rows().every((row) => !row.querySelector("[data-share-value]")?.value);
+      if (!untouched) return;
+      const url = `${form.dataset.residentsUrl}?addressId=${encodeURIComponent(addressSelect.value)}&date=${encodeURIComponent(validFrom?.value || "")}`;
+      try {
+        const response = await fetch(url, { headers: { Accept: "application/json" } });
+        if (!response.ok) return;
+        const residents = await response.json();
+        rows().forEach((row) => row.remove());
+        residents.forEach((resident) => addRow(resident.id));
+        if (residents.length === 0) addRow();
+      } catch { /* keep the rows as they are */ }
+    };
+    addressSelect?.addEventListener("change", prefill);
+    validFrom?.addEventListener("change", prefill);
+
+    update();
+  });
 })();

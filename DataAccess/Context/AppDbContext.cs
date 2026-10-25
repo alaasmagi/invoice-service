@@ -17,6 +17,8 @@ public class AppDbContext : DbContext
     public DbSet<MonthlyStatementEntity> MonthlyStatements => Set<MonthlyStatementEntity>();
     public DbSet<MonthlyStatementLineEntity> MonthlyStatementLines => Set<MonthlyStatementLineEntity>();
     public DbSet<ServiceEntity> Services => Set<ServiceEntity>();
+    public DbSet<AllocationRuleEntity> AllocationRules => Set<AllocationRuleEntity>();
+    public DbSet<AllocationRuleShareEntity> AllocationRuleShares => Set<AllocationRuleShareEntity>();
     public DbSet<AppUserEntity> AppUsers => Set<AppUserEntity>();
     public DbSet<PublishedInvoiceEmailEntity> PublishedInvoiceEmails => Set<PublishedInvoiceEmailEntity>();
     public DbSet<ProcessedInboxMessageEntity> ProcessedInboxMessages => Set<ProcessedInboxMessageEntity>();
@@ -160,6 +162,46 @@ public class AppDbContext : DbContext
             entity.HasOne(e => e.Service)
                 .WithMany()
                 .HasForeignKey(e => e.ServiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.Property(e => e.ShareValue).HasPrecision(18, 2);
+
+            // Lines keep their amounts when the rule that produced them is deleted.
+            entity.HasOne(e => e.AllocationRule)
+                .WithMany()
+                .HasForeignKey(e => e.AllocationRuleId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<AllocationRuleEntity>(entity =>
+        {
+            entity.HasIndex(e => new { e.UserId, e.AddressId, e.ServiceId, e.ValidFrom });
+
+            entity.HasOne(e => e.Address)
+                .WithMany(e => e.AllocationRules)
+                .HasForeignKey(e => e.AddressId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Service)
+                .WithMany()
+                .HasForeignKey(e => e.ServiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(e => e.Shares)
+                .WithOne(e => e.AllocationRule)
+                .HasForeignKey(e => e.AllocationRuleId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<AllocationRuleShareEntity>(entity =>
+        {
+            entity.HasIndex(e => new { e.AllocationRuleId, e.ContactId }).IsUnique();
+            entity.HasIndex(e => e.ContactId);
+            entity.Property(e => e.Value).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.Contact)
+                .WithMany(e => e.AllocationRuleShares)
+                .HasForeignKey(e => e.ContactId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }

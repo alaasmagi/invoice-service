@@ -1,5 +1,7 @@
 using Contracts.Application;
 using DataAccess.Context;
+using Domain;
+using DTO.DataAccess.DataAccess.DTO;
 using DTO.DataAccess.Web.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,7 +13,7 @@ using Web.Models;
 
 namespace Web.Controllers;
 
-public class InvoicesController(AppDbContext context, ICreateInvoiceService createInvoiceService, WebDtoMapper mapper) : UserScopedControllerBase
+public class InvoicesController(AppDbContext context, ICreateInvoiceService createInvoiceService, IInvoiceSplitCalculator splitCalculator, WebDtoMapper mapper) : UserScopedControllerBase
 {
     public async Task<IActionResult> Index(string? period, Guid? addressId, Guid? serviceId)
     {
@@ -50,15 +52,7 @@ public class InvoicesController(AppDbContext context, ICreateInvoiceService crea
             .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
         if (entity == null) return NotFound();
 
-        var residents = await context.AddressContacts.Include(e => e.Contact)
-            .Where(e => e.UserId == userId && e.AddressId == entity.AddressId)
-            .ToListAsync();
-        var active = residents
-            .Where(e => e.IsActive(entity.InvoiceDate))
-            .GroupBy(e => e.ContactId)
-            .Select(g => g.First())
-            .OrderBy(e => e.ContactId)
-            .ToList();
+        var split = await PreviewSplit(entity, userId);
 
         var lines = await context.MonthlyStatementLines.Include(e => e.MonthlyStatement).ThenInclude(e => e.Contact)
             .Where(e => e.UserId == userId && e.InvoiceId == entity.Id)
@@ -68,7 +62,10 @@ public class InvoicesController(AppDbContext context, ICreateInvoiceService crea
         return View(new InvoiceDetailsViewModel
         {
             Invoice = mapper.ToDto(entity),
-            Split = SplitEvenly(entity.TotalSum, active.Select(e => (e.ContactId, e.Contact.FullName)).ToList()),
+            Split = split.Rows,
+            SplitMethod = split.Result.Method,
+            SplitRuleId = split.Result.RuleId,
+            SplitWarnings = split.Warnings,
             StatementLines = lines.Select(mapper.ToDto).ToList()
         });
     }
@@ -249,19 +246,52 @@ public class InvoicesController(AppDbContext context, ICreateInvoiceService crea
                && await context.Services.AnyAsync(e => e.Id == serviceId && e.UserId == userId);
     }
 
-    /// <summary>Mirrors the equal split used by monthly statement generation, for a preview on the details page.</summary>
-    private static IReadOnlyList<ShareRow> SplitEvenly(decimal total, IReadOnlyList<(Guid ContactId, string Name)> contacts)
+    /// <summary>How the next statement generation will split this invoice, using the same calculator.</summary>
+    private async Task<(InvoiceSplitResult Result, IReadOnlyList<ShareRow> Rows, IReadOnlyList<AllocationWarning> Warnings)> PreviewSplit(InvoiceEntity entity, Guid userId)
     {
-        if (contacts.Count == 0) return [];
-        var baseAmount = decimal.Round(total / contacts.Count, 2, MidpointRounding.AwayFromZero);
-        var rows = new List<ShareRow>();
-        var allocated = 0m;
-        for (var i = 0; i < contacts.Count; i++)
+        var activeIds = await context.AddressContacts
+            .Where(e => e.UserId == userId && e.AddressId == entity.AddressId
+                        && e.StartDate <= entity.InvoiceDate && (e.EndDate == null || e.EndDate >= entity.InvoiceDate))
+            .Select(e => e.ContactId)
+            .Distinct()
+            .ToListAsync();
+        var manual = (await context.InvoiceAllocations.Where(e => e.UserId == userId && e.InvoiceId == entity.Id && e.IsOverride).ToListAsync())
+            .Select(e => new InvoiceAllocation { Id = e.Id, UserId = e.UserId, InvoiceId = e.InvoiceId, ContactId = e.ContactId, AllocatedSum = e.AllocatedSum, IsOverride = true })
+            .ToList();
+        var rules = (await context.AllocationRules.Include(e => e.Shares)
+                .Where(e => e.UserId == userId && e.AddressId == entity.AddressId)
+                .ToListAsync())
+            .Select(mapper.ToDomain)
+            .ToList();
+
+        var result = splitCalculator.Calculate(new InvoiceSplitInput
         {
-            var amount = i == contacts.Count - 1 ? total - allocated : baseAmount;
-            allocated += amount;
-            rows.Add(new ShareRow(contacts[i].ContactId, contacts[i].Name, amount));
+            Invoice = mapper.ToDomain(entity),
+            ManualAllocations = manual,
+            Rules = rules,
+            ActiveResidentIds = activeIds.OrderBy(id => id).ToList()
+        });
+
+        var contactIds = result.Shares.Select(e => e.ContactId)
+            .Concat(result.Warnings.Where(e => e.ContactId != null).Select(e => e.ContactId!.Value))
+            .Distinct()
+            .ToList();
+        var names = await context.Contacts.Where(e => e.UserId == userId && contactIds.Contains(e.Id))
+            .ToDictionaryAsync(e => e.Id, e => e.FullName);
+        var rows = result.Shares
+            .Select(e => new ShareRow
+            {
+                ContactId = e.ContactId,
+                ContactName = names.GetValueOrDefault(e.ContactId, "—"),
+                Amount = e.Amount,
+                SplitLabel = Fmt.SplitLabel(result.Method, e.ShareValue, result.ParticipantCount)
+            })
+            .OrderBy(e => e.ContactName)
+            .ToList();
+        foreach (var warning in result.Warnings)
+        {
+            if (warning.ContactId is { } contactId) warning.ContactName = names.GetValueOrDefault(contactId);
         }
-        return rows.OrderBy(r => r.ContactName).ToList();
+        return (result, rows, result.Warnings);
     }
 }

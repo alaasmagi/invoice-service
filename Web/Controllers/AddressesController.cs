@@ -1,4 +1,5 @@
 using DataAccess.Context;
+using Domain;
 using DTO.DataAccess.Web.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -34,13 +35,39 @@ public class AddressesController(AppDbContext context, WebDtoMapper mapper) : Us
             .OrderBy(e => e.EndDate != null).ThenByDescending(e => e.StartDate)
             .ToListAsync();
         var invoices = context.Invoices.Include(e => e.Service).Where(e => e.UserId == userId && e.AddressId == entity.Id);
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var rules = await context.AllocationRules.Include(e => e.Service).Include(e => e.Shares).ThenInclude(e => e.Contact)
+            .Where(e => e.UserId == userId && e.AddressId == entity.Id && (e.ValidTo == null || e.ValidTo >= today))
+            .OrderBy(e => e.ServiceId != null).ThenBy(e => e.Service!.Name).ThenBy(e => e.ValidFrom)
+            .ToListAsync();
+
+        // Current residents who pay nothing under a current percentage rule because they aren't listed in it.
+        var currentResidents = residents.Where(e => e.IsActive(today)).GroupBy(e => e.ContactId).Select(g => g.First()).ToList();
+        var unlisted = rules
+            .Where(rule => rule.Method == EAllocationMethod.Percentage && rule.ValidFrom <= today)
+            .ToDictionary(
+                rule => rule.Id,
+                rule => (IReadOnlyList<string>)currentResidents
+                    .Where(resident => rule.Shares.All(share => share.ContactId != resident.ContactId))
+                    .Select(resident => resident.Contact.FullName)
+                    .OrderBy(name => name)
+                    .ToList())
+            .Where(pair => pair.Value.Count > 0)
+            .ToDictionary(pair => pair.Key, pair => pair.Value);
 
         return View(new AddressDetailsViewModel
         {
             Address = mapper.ToDto(entity),
             Residents = residents.Select(mapper.ToDto).ToList(),
             RecentInvoices = (await invoices.OrderByDescending(e => e.InvoiceDate).Take(10).ToListAsync()).Select(mapper.ToDto).ToList(),
-            InvoiceCount = await invoices.CountAsync()
+            InvoiceCount = await invoices.CountAsync(),
+            SplitRules = rules.Select(rule =>
+            {
+                var dto = mapper.ToDto(rule);
+                dto.Address = mapper.ToDto(entity);
+                return dto;
+            }).ToList(),
+            UnlistedResidents = unlisted
         });
     }
 
@@ -131,6 +158,7 @@ public class AddressesController(AppDbContext context, WebDtoMapper mapper) : Us
             .Where(e => e.UserId == userId && e.AddressId == addressId)
             .Select(e => e.MonthlyStatementId).Distinct().CountAsync();
         var invoiceCount = await context.Invoices.CountAsync(e => e.UserId == userId && e.AddressId == addressId);
+        var ruleCount = await context.AllocationRules.CountAsync(e => e.UserId == userId && e.AddressId == addressId);
         var residentCount = await context.AddressContacts.CountAsync(e => e.UserId == userId && e.AddressId == addressId);
 
         var consequences = new List<string>();
@@ -140,10 +168,16 @@ public class AddressesController(AppDbContext context, WebDtoMapper mapper) : Us
         return new DeleteViewModel<AddressDto>
         {
             Item = dto,
-            Blockers = statementCount > 0
-                ? [T.Plural(statementCount, "Invoices for this address are included in {0} monthly statement. Delete that statement first, or keep the address for history.", "Invoices for this address are included in {0} monthly statements. Delete those statements first, or keep the address for history.")]
-                : [],
+            Blockers = BuildBlockers(statementCount, ruleCount),
             Consequences = consequences
         };
+    }
+
+    private List<string> BuildBlockers(int statementCount, int ruleCount)
+    {
+        var blockers = new List<string>();
+        if (statementCount > 0) blockers.Add(T.Plural(statementCount, "Invoices for this address are included in {0} monthly statement. Delete that statement first, or keep the address for history.", "Invoices for this address are included in {0} monthly statements. Delete those statements first, or keep the address for history."));
+        if (ruleCount > 0) blockers.Add(T.Plural(ruleCount, "This address has {0} split rule. Delete it first.", "This address has {0} split rules. Delete them first."));
+        return blockers;
     }
 }

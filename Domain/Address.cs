@@ -13,4 +13,7 @@ public class Address : BaseEntityUser
     public ICollection<Invoice> Invoices { get; set; }
         = new List<Invoice>();
 
+    public ICollection<AllocationRule> AllocationRules { get; set; }
+        = new List<AllocationRule>();
+
 }

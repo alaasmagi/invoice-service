@@ -1,12 +1,12 @@
 @model InvoiceAllocationDto
 @{
-    ViewData["Title"] = T["Allocation details"];
+    ViewData["Title"] = T["Manual split"];
 }
 
 <header class="page-header">
     <div class="page-header__title">
         <p class="kicker">@T["Billing"]</p>
-        <h1>@T["Allocation details"]</h1>
+        <h1>@T["Manual split"]</h1>
     </div>
     <div class="page-header__actions">
         <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>@T["Edit"]</a>
@@ -19,5 +19,5 @@
     <div class="details__row"><dt>@T["Contact"]</dt><dd>@Model.Contact.FullName</dd></div>
     <div class="details__row"><dt>@T["Amount"]</dt><dd>@Fmt.Money(Model.AllocatedSum)</dd></div>
 </dl>
-    <div><a asp-action="Index" class="btn btn--ghost">@T["Back to allocations"]</a></div>
+    <div><a asp-action="Index" class="btn btn--ghost">@T["Back to manual splits"]</a></div>
 </div>

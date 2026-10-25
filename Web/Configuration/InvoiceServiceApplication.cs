@@ -1,4 +1,5 @@
 using Application;
+using Application.Allocation;
 using Base.Contracts.DataAccess;
 using Base.Contracts.DTO;
 using Base.Contracts.Message;
@@ -178,6 +179,8 @@ public static class InvoiceServiceApplication
         services.AddScoped<IMapper<MonthlyStatement, MonthlyStatementEntity>, MonthlyStatementEntityMapper>();
         services.AddScoped<IMapper<MonthlyStatementLine, MonthlyStatementLineEntity>, MonthlyStatementLineEntityMapper>();
         services.AddScoped<IMapper<Service, ServiceEntity>, ServiceEntityMapper>();
+        services.AddScoped<IMapper<AllocationRule, AllocationRuleEntity>, AllocationRuleEntityMapper>();
+        services.AddScoped<IMapper<AllocationRuleShare, AllocationRuleShareEntity>, AllocationRuleShareEntityMapper>();
     }
 
     private static void AddWebMappers(this IServiceCollection services)
@@ -190,6 +193,8 @@ public static class InvoiceServiceApplication
         services.AddScoped<IMapper<MonthlyStatementDto, MonthlyStatement>, MonthlyStatementDtoMapper>();
         services.AddScoped<IMapper<MonthlyStatementLineDto, MonthlyStatementLine>, MonthlyStatementLineDtoMapper>();
         services.AddScoped<IMapper<ServiceDto, Service>, ServiceDtoMapper>();
+        services.AddScoped<IMapper<AllocationRuleDto, AllocationRule>, AllocationRuleDtoMapper>();
+        services.AddScoped<IMapper<AllocationRuleShareDto, AllocationRuleShare>, AllocationRuleShareDtoMapper>();
     }
 
     private static void AddRepositories(this IServiceCollection services)
@@ -206,6 +211,7 @@ public static class InvoiceServiceApplication
         services.AddScoped<IMonthlyStatementRepository, MonthlyStatementRepository>();
         services.AddScoped<IMonthlyStatementLineRepository, MonthlyStatementLineRepository>();
         services.AddScoped<IServiceRepository, ServiceRepository>();
+        services.AddScoped<IAllocationRuleRepository, AllocationRuleRepository>();
         services.AddScoped<IBaseUow, DataAccessUow>();
     }
 
@@ -215,6 +221,13 @@ public static class InvoiceServiceApplication
         services.AddScoped<ICreateContactService, CreateContactService>();
         services.AddScoped<ICreateInvoiceService, CreateInvoiceService>();
         services.AddScoped<IGenerateMonthlyStatementService, GenerateMonthlyStatementService>();
+        services.AddScoped<EqualAllocationStrategy>();
+        services.AddScoped<IAllocationStrategy>(provider => provider.GetRequiredService<EqualAllocationStrategy>());
+        services.AddScoped<IAllocationStrategy, PercentageAllocationStrategy>();
+        services.AddScoped<IAllocationStrategy, FixedAllocationStrategy>();
+        services.AddScoped<IAllocationStrategy, ManualAllocationStrategy>();
+        services.AddScoped<IInvoiceSplitCalculator, InvoiceSplitCalculator>();
+        services.AddScoped<IAllocationRuleValidator, AllocationRuleValidator>();
         services.AddScoped<ISendMonthlyStatementService, SendMonthlyStatementService>();
         services.AddScoped<ISendPeriodInvoiceEmailsService, SendPeriodInvoiceEmailsService>();
         services.AddScoped<IMonthlyStatementSenderPaymentDetailsProvider, AppUserMonthlyStatementSenderPaymentDetailsProvider>();

@@ -1,0 +1,103 @@
+@model AllocationRuleFormViewModel
+@using System.Globalization
+@using Domain
+@{
+    var rule = Model.Rule;
+    var here = Context.Request.Path + Context.Request.QueryString;
+    var methods = new[] { EAllocationMethod.Equal, EAllocationMethod.Percentage, EAllocationMethod.Fixed };
+    var suffix = rule.Method == EAllocationMethod.Percentage ? "%" : Fmt.CurrencySymbol;
+    string InputValue(decimal? value) => value?.ToString("0.##", CultureInfo.InvariantCulture) ?? "";
+}
+<input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+@if (!Model.AddressOptions.Any())
+{
+    <div class="alert alert--warning">
+        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+        <div class="alert__body">
+            <span>@T["A split rule belongs to an address. Add one first:"]</span>
+            <span class="actions"><a asp-controller="Addresses" asp-action="Create" asp-route-returnUrl="@here" class="link">@T["Add an address"]</a></span>
+        </div>
+    </div>
+}
+<div asp-validation-summary="ModelOnly"></div>
+<div class="form-row">
+    <div class="field">
+        <label asp-for="Rule.AddressId" class="field__label"></label>
+        <div class="field__control"><select asp-for="Rule.AddressId" class="input" asp-items="Model.AddressOptions" data-rule-address><option value="">@T["Select address…"]</option></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+        <span asp-validation-for="Rule.AddressId"></span>
+    </div>
+    <div class="field">
+        <label asp-for="Rule.ServiceId" class="field__label"></label>
+        <div class="field__control"><select asp-for="Rule.ServiceId" class="input" asp-items="Model.ServiceOptions"><option value="">@T["All services"]</option></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+        <span class="field__help">@T["A rule for one service takes priority over the address's \"All services\" rule."]</span>
+        <span asp-validation-for="Rule.ServiceId"></span>
+    </div>
+</div>
+<div class="form-row">
+    <div class="field">
+        <label asp-for="Rule.ValidFrom" class="field__label"></label>
+        <div class="field__control has-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg><input asp-for="Rule.ValidFrom" class="input" type="date" data-rule-valid-from /></div>
+        <span class="field__help">@T["Applies to invoices dated from this day on."]</span>
+        <span asp-validation-for="Rule.ValidFrom"></span>
+    </div>
+    <div class="field">
+        <label asp-for="Rule.ValidTo" class="field__label"></label>
+        <div class="field__control has-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg><input asp-for="Rule.ValidTo" class="input" type="date" /></div>
+        <span class="field__help">@T["Leave empty to keep the rule going."]</span>
+        <span asp-validation-for="Rule.ValidTo"></span>
+    </div>
+</div>
+<fieldset class="field">
+    <legend class="field__label">@T["Split method"]</legend>
+    <div class="segmented segmented--radio">
+        @foreach (var method in methods)
+        {
+            <label class="segmented__item"><input type="radio" name="Rule.Method" value="@method" checked="@(rule.Method == method)" />@Fmt.MethodLabel(method)</label>
+        }
+    </div>
+    <p class="field__help method-help" data-method-help="Equal" hidden="@(rule.Method != EAllocationMethod.Equal)">@T["Everyone living at the address on the invoice date pays the same amount."]</p>
+    <p class="field__help method-help" data-method-help="Percentage" hidden="@(rule.Method != EAllocationMethod.Percentage)">@T["Each person pays their percentage. Percentages must add up to 100%. If someone has moved out, the others' percentages are scaled up."]</p>
+    <p class="field__help method-help" data-method-help="Fixed" hidden="@(rule.Method != EAllocationMethod.Fixed)">@T["The people listed pay a fixed amount. Whatever is left is split equally between the other residents."]</p>
+    <span asp-validation-for="Rule.Method"></span>
+</fieldset>
+
+<section class="field" data-shares hidden="@(rule.Method == EAllocationMethod.Equal)">
+    <div class="section-head">
+        <h2 class="section-title">@T["Shares"]</h2>
+        <button type="button" class="btn btn--ghost btn--sm" data-share-add><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Add person"]</button>
+    </div>
+    <div class="card table-card">
+        <table class="data-table shares-table">
+            <thead><tr><th>@T["Person"]</th><th class="num">@T["Share"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
+            <tbody data-share-rows>
+            @for (var i = 0; i < rule.Shares.Count; i++)
+            {
+                <tr data-share-row>
+                    <td>
+                        <div class="field__control"><select asp-for="Rule.Shares[i].ContactId" class="input" asp-items="Model.ContactOptions"><option value="">@T["Select person…"]</option></select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+                        <span asp-validation-for="Rule.Shares[i].ContactId"></span>
+                    </td>
+                    <td>
+                        <div class="field__control has-suffix"><input name="Rule.Shares[@i].Value" id="Rule_Shares_@(i)__Value" value="@InputValue(rule.Shares[i].Value)" class="input @(ViewData.ModelState[$"Rule.Shares[{i}].Value"]?.Errors.Any() == true ? "input-validation-error" : null)" type="number" inputmode="decimal" min="0" step="0.01" aria-label="@T["Share"]" data-share-value /><span class="field__suffix" data-share-suffix>@suffix</span></div>
+                        <span asp-validation-for="Rule.Shares[i].Value"></span>
+                    </td>
+                    <td class="actions-col"><div class="row-actions"><button type="button" class="icon-btn icon-btn--danger" aria-label="@T["Remove"]" title="@T["Remove"]" data-share-remove><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></button></div></td>
+                </tr>
+            }
+            </tbody>
+            <tfoot><tr><td>@T["Total"]</td><td class="num" data-share-total data-warning-title="@T["Percentages must add up to 100%."]"></td><td></td></tr></tfoot>
+        </table>
+    </div>
+    <span class="field__help">@T["Only people who live at the address on the invoice date take part. Need someone who isn't listed?"] <a asp-controller="AddressContacts" asp-action="Create" asp-route-addressId="@(rule.AddressId == Guid.Empty ? null : rule.AddressId)" asp-route-returnUrl="@here" class="link">@T["Add a resident"]</a></span>
+    <template data-share-template>
+        <tr data-share-row>
+            <td>
+                <div class="field__control"><select name="Rule.Shares[0].ContactId" class="input"><option value="">@T["Select person…"]</option>@foreach (var option in Model.ContactOptions) { <option value="@option.Value">@option.Text</option> }</select><svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg></div>
+            </td>
+            <td>
+                <div class="field__control has-suffix"><input name="Rule.Shares[0].Value" class="input" type="number" inputmode="decimal" min="0" step="0.01" aria-label="@T["Share"]" data-share-value /><span class="field__suffix" data-share-suffix>@suffix</span></div>
+            </td>
+            <td class="actions-col"><div class="row-actions"><button type="button" class="icon-btn icon-btn--danger" aria-label="@T["Remove"]" title="@T["Remove"]" data-share-remove><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></button></div></td>
+        </tr>
+    </template>
+</section>

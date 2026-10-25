@@ -1,0 +1,100 @@
+@model AllocationRuleDetailsViewModel
+@using Domain
+@{
+    var rule = Model.Rule;
+    ViewData["Title"] = T["Split rule"];
+    var preview = Model.Preview;
+    var here = Context.Request.Path.ToString();
+}
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">@T["Split rule"]</p>
+        <h1>@rule.Address.Name · @(rule.Service?.Name ?? T["All services"])</h1>
+        <p class="page-header__lede">@Fmt.MethodLabel(rule.Method) · @Fmt.Range(rule.ValidFrom, rule.ValidTo)</p>
+    </div>
+    <div class="page-header__actions">
+        <a asp-action="Edit" asp-route-id="@rule.Id" asp-route-returnUrl="@here" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>@T["Edit"]</a>
+        <a asp-action="Delete" asp-route-id="@rule.Id" class="btn btn--ghost"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>@T["Delete"]</a>
+    </div>
+</header>
+
+<div class="section medium">
+    <dl class="card details">
+        <div class="details__row"><dt>@T["Address"]</dt><dd><div class="stack-cell"><a asp-controller="Addresses" asp-action="Details" asp-route-id="@rule.AddressId" class="link">@rule.Address.Name</a><span>@rule.Address.FullAddress</span></div></dd></div>
+        <div class="details__row"><dt>@T["Applies to"]</dt><dd>@if (rule.Service == null) { <span class="badge badge--neutral">@T["All services"]</span> } else { @rule.Service.Name }</dd></div>
+        <div class="details__row"><dt>@T["Split method"]</dt><dd><partial name="_MethodBadge" model="rule.Method" /></dd></div>
+        <div class="details__row"><dt>@T["Valid from"]</dt><dd>@Fmt.Date(rule.ValidFrom)</dd></div>
+        <div class="details__row"><dt>@T["Valid until"]</dt><dd>@if (rule.ValidTo == null) { <span class="badge badge--success">@T["Ongoing"]</span> } else { @Fmt.Date(rule.ValidTo) }</dd></div>
+    </dl>
+</div>
+
+@if (rule.Method != EAllocationMethod.Equal)
+{
+    <section class="section medium">
+        <div class="section-head"><h2 class="section-title">@T["Shares"]</h2></div>
+        <div class="card table-card">
+            <table class="data-table">
+                <thead><tr><th>@T["Person"]</th><th class="num">@T["Share"]</th></tr></thead>
+                <tbody>
+                @foreach (var share in rule.Shares.OrderBy(e => e.Contact?.FullName))
+                {
+                    <tr>
+                        <td><a asp-controller="Contacts" asp-action="Details" asp-route-id="@share.ContactId" class="link">@share.Contact?.FullName</a></td>
+                        <td class="num">@(rule.Method == EAllocationMethod.Percentage ? Fmt.SharePercent(share.Value ?? 0) : Fmt.Money(share.Value ?? 0))</td>
+                    </tr>
+                }
+                @if (rule.Method == EAllocationMethod.Fixed)
+                {
+                    <tr><td colspan="2" class="secondary">@T["Everyone else living at the address splits the rest equally."]</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
+
+<section class="section medium">
+    <div class="section-head">
+        <h2 class="section-title">@T["Split preview"]</h2>
+    </div>
+    <p class="secondary">
+        @if (Model.PreviewInvoice != null)
+        {
+            @T["How the latest invoice this rule applies to is split:"] <a asp-controller="Invoices" asp-action="Details" asp-route-id="@Model.PreviewInvoice.Id" class="link">@Model.PreviewInvoice.Service?.Name · @Fmt.Date(Model.PreviewInvoice.InvoiceDate) · @Fmt.Money(Model.PreviewTotal)</a>
+        }
+        else
+        {
+            @T["No invoices use this rule yet. This is how an invoice of {0} would be split between the current residents.", Fmt.Money(Model.PreviewTotal)]
+        }
+    </p>
+    @if (Model.PreviewWarnings.Any())
+    {
+        <div class="alert alert--warning" role="status">
+            <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+            <div class="alert__body">
+                <ul>@foreach (var warning in Model.PreviewWarnings) { <li>@Fmt.AllocationWarningText(warning)</li> }</ul>
+            </div>
+        </div>
+    }
+    @if (preview.Shares.Any())
+    {
+        <div class="card table-card">
+            <table class="data-table">
+                <thead><tr><th>@T["Person"]</th><th class="num">@T["Split"]</th><th class="num">@T["Amount"]</th></tr></thead>
+                <tbody>
+                @foreach (var share in preview.Shares.OrderByDescending(e => e.Amount))
+                {
+                    <tr>
+                        <td>@(Model.ContactNames.TryGetValue(share.ContactId, out var name) ? name : "—")</td>
+                        <td class="num">@Fmt.SplitLabel(preview.Method, share.ShareValue, preview.ParticipantCount)</td>
+                        <td class="num"><strong>@Fmt.Money(share.Amount)</strong></td>
+                    </tr>
+                }
+                </tbody>
+                <tfoot><tr><td colspan="2">@T["Total"]</td><td class="num">@Fmt.Money(preview.Shares.Sum(e => e.Amount))</td></tr></tfoot>
+            </table>
+        </div>
+    }
+    <div><a asp-action="Index" class="btn btn--ghost">@T["Back to split rules"]</a></div>
+</section>

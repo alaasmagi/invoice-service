@@ -1,0 +1,10 @@
+@model Domain.EAllocationMethod
+@{
+    var tone = Model switch
+    {
+        Domain.EAllocationMethod.Percentage => "badge--accent",
+        Domain.EAllocationMethod.Fixed => "badge--warning",
+        _ => "badge--neutral"
+    };
+}
+<span class="badge @tone">@Fmt.MethodLabel(Model)</span>

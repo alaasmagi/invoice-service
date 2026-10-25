@@ -1,0 +1,32 @@
+@model DeleteViewModel<AllocationRuleDto>
+@{
+    ViewData["Title"] = T["Delete split rule"];
+    var item = Model.Item;
+}
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">@T["Directory"]</p>
+        <h1>@T["Delete split rule"]</h1>
+    </div>
+</header>
+
+<div class="section medium">
+    <partial name="_DeleteNotice" model='Model.Notice(T["rule"])' />
+    <dl class="card details">
+        <div class="details__row"><dt>@T["Address"]</dt><dd>@item.Address.Name</dd></div>
+        <div class="details__row"><dt>@T["Applies to"]</dt><dd>@(item.Service?.Name ?? T["All services"])</dd></div>
+        <div class="details__row"><dt>@T["Split method"]</dt><dd><partial name="_MethodBadge" model="item.Method" /></dd></div>
+        <div class="details__row"><dt>@T["Shares"]</dt><dd><partial name="_SharesSummary" model="item" /></dd></div>
+        <div class="details__row"><dt>@T["Valid"]</dt><dd>@Fmt.Range(item.ValidFrom, item.ValidTo)</dd></div>
+    </dl>
+    <form asp-action="Delete" method="post" class="form-actions">
+        <input type="hidden" name="Id" value="@item.Id" />
+        <button type="submit" class="btn btn--danger">@T["Delete split rule"]</button>
+        @if (item.ValidTo == null)
+        {
+            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn--secondary">@T["Set an end date instead"]</a>
+        }
+        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn--ghost">@T["Cancel"]</a>
+    </form>
+</div>

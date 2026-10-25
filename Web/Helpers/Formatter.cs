@@ -1,4 +1,5 @@
 using System.Globalization;
+using Contracts.Application;
 using Domain;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Localization;
@@ -65,6 +66,39 @@ public class Formatter(IHttpContextAccessor httpContextAccessor, IStringLocalize
         EMonthlyStatementStatus.Sent => t["Sent"],
         EMonthlyStatementStatus.Failed => t["Failed"],
         _ => status.ToString()
+    };
+
+    /// <summary>A share percentage given as 0–100, keeping decimals only when needed: 60 → "60%", 66.67 → "66.67%".</summary>
+    public string SharePercent(decimal value) => (value / 100m).ToString(value % 1 == 0 ? "P0" : "P2", Culture);
+
+    public string MethodLabel(EAllocationMethod method) => method switch
+    {
+        EAllocationMethod.Equal => t["Equal"],
+        EAllocationMethod.Percentage => t["Percentage"],
+        EAllocationMethod.Fixed => t["Fixed amount"],
+        EAllocationMethod.Manual => t["Manual"],
+        _ => method.ToString()
+    };
+
+    /// <summary>How a statement line's amount was calculated, e.g. "÷ 3", "60%", "Fixed", "Remainder ÷ 2", "Manual".</summary>
+    public string SplitLabel(EAllocationMethod method, decimal? shareValue, int participants) => method switch
+    {
+        EAllocationMethod.Percentage when shareValue.HasValue => SharePercent(shareValue.Value),
+        EAllocationMethod.Fixed when shareValue.HasValue => t["Fixed"],
+        EAllocationMethod.Fixed => t["Remainder ÷ {0}", participants],
+        EAllocationMethod.Manual => t["Manual"],
+        _ => $"÷ {participants}"
+    };
+
+    public string AllocationWarningText(AllocationWarning warning) => warning.Kind switch
+    {
+        EAllocationWarningKind.NoActiveResidents => t["Nobody lived at the address on the invoice date, so it was not billed."],
+        EAllocationWarningKind.UnlistedResident => t["{0} lives here but is not part of the split rule, so they pay nothing for it.", warning.ContactName ?? t["A resident"]],
+        EAllocationWarningKind.NoListedResidentActive => t["Nobody in the split rule lived here on the invoice date, so it was split equally instead."],
+        EAllocationWarningKind.FixedExceedsTotal => t["The fixed amounts ({0}) are more than the invoice total, so it was not billed.", Money(warning.Amount ?? 0)],
+        EAllocationWarningKind.RemainderWithoutPayer => t["{0} is left after the fixed amounts and nobody else lives here to pay it, so it was not billed.", Money(warning.Amount ?? 0)],
+        EAllocationWarningKind.ManualSumMismatch => t["The manual split differs from the invoice total by {0}, so it was not billed.", Money(warning.Amount ?? 0)],
+        _ => warning.Kind.ToString()
     };
 
     public IEnumerable<SelectListItem> StatusOptions() =>

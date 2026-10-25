@@ -63,7 +63,7 @@
                 <svg class="icon" aria-hidden="true"><use href="#i-chart"></use></svg>@T["Statistics"]
             </a>
             <a class="nav-item" asp-area="" asp-controller="InvoiceAllocations" asp-action="Index" aria-current="@Current("InvoiceAllocations")">
-                <svg class="icon" aria-hidden="true"><use href="#i-split"></use></svg>@T["Allocations"]
+                <svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>@T["Manual splits"]
             </a>
 
             <div class="nav__group">@T["Directory"]</div>
@@ -75,6 +75,9 @@
             </a>
             <a class="nav-item" asp-area="" asp-controller="AddressContacts" asp-action="Index" aria-current="@Current("AddressContacts")">
                 <svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg>@T["Residents"]
+            </a>
+            <a class="nav-item" asp-area="" asp-controller="AllocationRules" asp-action="Index" aria-current="@Current("AllocationRules")">
+                <svg class="icon" aria-hidden="true"><use href="#i-split"></use></svg>@T["Split rules"]
             </a>
             <a class="nav-item" asp-area="" asp-controller="Services" asp-action="Index" aria-current="@Current("Services")">
                 <svg class="icon" aria-hidden="true"><use href="#i-zap"></use></svg>@T["Services"]

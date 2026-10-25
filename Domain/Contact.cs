@@ -18,4 +18,7 @@ public class Contact : BaseEntityUser
     
     public ICollection<MonthlyStatement> MonthlyStatements { get; set; }
         = new List<MonthlyStatement>();
+
+    public ICollection<AllocationRuleShare> AllocationRuleShares { get; set; }
+        = new List<AllocationRuleShare>();
 }

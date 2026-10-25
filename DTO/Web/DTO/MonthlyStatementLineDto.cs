@@ -1,4 +1,5 @@
 using Base.Domain;
+using Domain;
 
 namespace DTO.DataAccess.Web.DTO;
 
@@ -35,4 +36,10 @@ public class MonthlyStatementLineDto : BaseEntityUserWithConcurrency
     public int ResidentCount { get; set; }
 
     public decimal AllocatedAmount { get; set; }
+
+    public EAllocationMethod AllocationMethod { get; set; } = EAllocationMethod.Equal;
+
+    public Guid? AllocationRuleId { get; set; }
+
+    public decimal? ShareValue { get; set; }
 }

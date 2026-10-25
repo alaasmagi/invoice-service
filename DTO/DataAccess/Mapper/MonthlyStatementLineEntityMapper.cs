@@ -23,7 +23,10 @@ public class MonthlyStatementLineEntityMapper : IMapper<MonthlyStatementLine, Mo
             PeriodEnd = entity.PeriodEnd,
             InvoiceTotal = entity.InvoiceTotal,
             ResidentCount = entity.ResidentCount,
-            AllocatedAmount = entity.AllocatedAmount
+            AllocatedAmount = entity.AllocatedAmount,
+            AllocationMethod = entity.AllocationMethod,
+            AllocationRuleId = entity.AllocationRuleId,
+            ShareValue = entity.ShareValue
         };
     }
 
@@ -49,7 +52,10 @@ public class MonthlyStatementLineEntityMapper : IMapper<MonthlyStatementLine, Mo
             PeriodEnd = entity.PeriodEnd,
             InvoiceTotal = entity.InvoiceTotal,
             ResidentCount = entity.ResidentCount,
-            AllocatedAmount = entity.AllocatedAmount
+            AllocatedAmount = entity.AllocatedAmount,
+            AllocationMethod = entity.AllocationMethod,
+            AllocationRuleId = entity.AllocationRuleId,
+            ShareValue = entity.ShareValue
         };
     }
 

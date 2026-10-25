@@ -515,4 +515,117 @@
   <data name="Change them in your account settings" xml:space="preserve"><value>Muuda neid oma konto seadetes</value></data>
   <data name="Payment details" xml:space="preserve"><value>Makseandmed</value></data>
   <data name="Shown on statements together with your name, so recipients know where to pay." xml:space="preserve"><value>Kuvatakse aruannetel koos sinu nimega, et saajad teaksid, kuhu maksta.</value></data>
+  <data name="Applies to" xml:space="preserve"><value>Kehtib</value></data>
+  <data name="Split method" xml:space="preserve"><value>Jagamisviis</value></data>
+  <data name="Valid from" xml:space="preserve"><value>Kehtib alates</value></data>
+  <data name="Valid until" xml:space="preserve"><value>Kehtib kuni</value></data>
+  <data name="Split rule saved. Regenerate statements for affected months to apply it." xml:space="preserve"><value>Jagamisreegel salvestatud. Selle rakendamiseks genereeri mõjutatud kuude aruanded uuesti.</value></data>
+  <data name="Split rule updated. Regenerate statements for affected months to apply the change." xml:space="preserve"><value>Jagamisreegel uuendatud. Muudatuse rakendamiseks genereeri mõjutatud kuude aruanded uuesti.</value></data>
+  <data name="Statements that were already generated keep their amounts until you regenerate them." xml:space="preserve"><value>Juba genereeritud aruanded säilitavad oma summad, kuni need uuesti genereerid.</value></data>
+  <data name="Split rule deleted. Regenerate statements for affected months to apply the change." xml:space="preserve"><value>Jagamisreegel kustutatud. Muudatuse rakendamiseks genereeri mõjutatud kuude aruanded uuesti.</value></data>
+  <data name="Enter a value." xml:space="preserve"><value>Sisesta väärtus.</value></data>
+  <data name="Select an address." xml:space="preserve"><value>Vali aadress.</value></data>
+  <data name="Selected service was not found." xml:space="preserve"><value>Valitud teenust ei leitud.</value></data>
+  <data name="Select a person." xml:space="preserve"><value>Vali isik.</value></data>
+  <data name="The end date can't be before the start date." xml:space="preserve"><value>Lõppkuupäev ei saa olla enne alguskuupäeva.</value></data>
+  <data name="Choose Equal, Percentage or Fixed amount." xml:space="preserve"><value>Vali „Võrdselt“, „Protsendid“ või „Fikseeritud summa“.</value></data>
+  <data name="An equal split doesn't use shares." xml:space="preserve"><value>Võrdne jagamine osasid ei kasuta.</value></data>
+  <data name="Add at least one person." xml:space="preserve"><value>Lisa vähemalt üks isik.</value></data>
+  <data name="Enter a percentage between 0 and 100." xml:space="preserve"><value>Sisesta protsent vahemikus 0–100.</value></data>
+  <data name="The shares add up to {0} instead of 100%." xml:space="preserve"><value>Osade summa on {0}, mitte 100%.</value></data>
+  <data name="Enter an amount greater than zero." xml:space="preserve"><value>Sisesta nullist suurem summa.</value></data>
+  <data name="This person is already in the rule." xml:space="preserve"><value>See isik on reeglis juba olemas.</value></data>
+  <data name="This person doesn't live at the address while the rule is valid." xml:space="preserve"><value>See isik ei ela reegli kehtivuse ajal sellel aadressil.</value></data>
+  <data name="Another split rule already covers these dates." xml:space="preserve"><value>Need kuupäevad on juba teise jagamisreegliga kaetud.</value></data>
+  <data name="Another split rule for the same address and service already covers these dates ({0}). Change its dates or edit it instead." xml:space="preserve"><value>Sama aadressi ja teenuse jaoks on need kuupäevad juba teise jagamisreegliga kaetud ({0}). Muuda selle kuupäevi või muuda hoopis seda reeglit.</value></data>
+  <data name="{0} invoices at {1} will be split by the address's default rule when statements are regenerated." xml:space="preserve"><value>Aadressi {1} teenuse {0} arved jagatakse aruannete uuesti genereerimisel aadressi üldreegli järgi.</value></data>
+  <data name="{0} invoices at {1} will be split equally between the residents when statements are regenerated." xml:space="preserve"><value>Aadressi {1} teenuse {0} arved jagatakse aruannete uuesti genereerimisel elanike vahel võrdselt.</value></data>
+  <data name="Invoices at {0} without their own service rule will be split equally between the residents when statements are regenerated." xml:space="preserve"><value>Aadressi {0} arved, millel pole oma teenusereeglit, jagatakse aruannete uuesti genereerimisel elanike vahel võrdselt.</value></data>
+  <data name="Add split rule" xml:space="preserve"><value>Lisa jagamisreegel</value></data>
+  <data name="Decide how invoices for an address are shared. Without a rule, everyone living there pays an equal part." xml:space="preserve"><value>Määra, kuidas aadressi arved jagatakse. Reeglita maksab iga seal elav inimene võrdse osa.</value></data>
+  <data name="Save split rule" xml:space="preserve"><value>Salvesta jagamisreegel</value></data>
+  <data name="Delete split rule" xml:space="preserve"><value>Kustuta jagamisreegel</value></data>
+  <data name="rule" xml:space="preserve"><value>reegel</value></data>
+  <data name="Shares" xml:space="preserve"><value>Osad</value></data>
+  <data name="Valid" xml:space="preserve"><value>Kehtivus</value></data>
+  <data name="Set an end date instead" xml:space="preserve"><value>Määra hoopis lõppkuupäev</value></data>
+  <data name="Split rule" xml:space="preserve"><value>Jagamisreegel</value></data>
+  <data name="Ongoing" xml:space="preserve"><value>Kehtib edasi</value></data>
+  <data name="Everyone else living at the address splits the rest equally." xml:space="preserve"><value>Ülejäänu jagavad võrdselt kõik teised sellel aadressil elavad inimesed.</value></data>
+  <data name="Split preview" xml:space="preserve"><value>Jagamise eelvaade</value></data>
+  <data name="How the latest invoice this rule applies to is split:" xml:space="preserve"><value>Kuidas jagatakse viimast arvet, millele see reegel kehtib:</value></data>
+  <data name="No invoices use this rule yet. This is how an invoice of {0} would be split between the current residents." xml:space="preserve"><value>Seda reeglit ei kasuta veel ükski arve. Nii jagataks {0} suurust arvet praeguste elanike vahel.</value></data>
+  <data name="Back to split rules" xml:space="preserve"><value>Tagasi jagamisreeglite juurde</value></data>
+  <data name="Edit split rule" xml:space="preserve"><value>Muuda jagamisreeglit</value></data>
+  <data name="Changes apply to statements you generate or regenerate from now on." xml:space="preserve"><value>Muudatused kehtivad aruannetele, mille edaspidi genereerid või uuesti genereerid.</value></data>
+  <data name="Split rules" xml:space="preserve"><value>Jagamisreeglid</value></data>
+  <data name="How invoices for each address are shared between the people living there. Addresses and services without a rule are split equally." xml:space="preserve"><value>Kuidas iga aadressi arved seal elavate inimeste vahel jagatakse. Reeglita aadresside ja teenuste arved jagatakse võrdselt.</value></data>
+  <data name="Filter split rules" xml:space="preserve"><value>Filtreeri jagamisreegleid</value></data>
+  <data name="Hide past rules" xml:space="preserve"><value>Peida varasemad reeglid</value></data>
+  <data name="From {0}" xml:space="preserve"><value>Alates {0}</value></data>
+  <data name="Until {0}" xml:space="preserve"><value>Kuni {0}</value></data>
+  <data name="No split rules yet, so every invoice is split equally between the residents." xml:space="preserve"><value>Jagamisreegleid veel pole, seega jagatakse iga arve elanike vahel võrdselt.</value></data>
+  <data name="Add a split rule" xml:space="preserve"><value>Lisa jagamisreegel</value></data>
+  <data name="to share costs differently." xml:space="preserve"><value>, et kulusid teisiti jagada.</value></data>
+  <data name="Show {0} past rule" xml:space="preserve"><value>Näita {0} varasemat reeglit</value></data>
+  <data name="Show {0} past rules" xml:space="preserve"><value>Näita {0} varasemat reeglit</value></data>
+  <data name="A split rule belongs to an address. Add one first:" xml:space="preserve"><value>Jagamisreegel kuulub aadressile. Lisa esmalt aadress:</value></data>
+  <data name="A rule for one service takes priority over the address's &quot;All services&quot; rule." xml:space="preserve"><value>Ühe teenuse reegel on tähtsam kui aadressi „Kõik teenused“ reegel.</value></data>
+  <data name="Applies to invoices dated from this day on." xml:space="preserve"><value>Kehtib arvetele, mis on dateeritud sellest päevast alates.</value></data>
+  <data name="Leave empty to keep the rule going." xml:space="preserve"><value>Jäta tühjaks, kui reegel kehtib edasi.</value></data>
+  <data name="Everyone living at the address on the invoice date pays the same amount." xml:space="preserve"><value>Kõik arve kuupäeval aadressil elavad inimesed maksavad sama summa.</value></data>
+  <data name="Each person pays their percentage. Percentages must add up to 100%. If someone has moved out, the others' percentages are scaled up." xml:space="preserve"><value>Iga inimene maksab oma protsendi. Protsentide summa peab olema 100%. Kui keegi on välja kolinud, suurendatakse teiste protsente proportsionaalselt.</value></data>
+  <data name="The people listed pay a fixed amount. Whatever is left is split equally between the other residents." xml:space="preserve"><value>Loetletud inimesed maksavad fikseeritud summa. Ülejäänu jagatakse teiste elanike vahel võrdselt.</value></data>
+  <data name="Add person" xml:space="preserve"><value>Lisa isik</value></data>
+  <data name="Percentages must add up to 100%." xml:space="preserve"><value>Protsentide summa peab olema 100%.</value></data>
+  <data name="Only people who live at the address on the invoice date take part. Need someone who isn't listed?" xml:space="preserve"><value>Osalevad ainult arve kuupäeval aadressil elavad inimesed. Kas kedagi on puudu?</value></data>
+  <data name="Everyone living there" xml:space="preserve"><value>Kõik seal elavad</value></data>
+  <data name="rest split equally" xml:space="preserve"><value>ülejäänu võrdselt</value></data>
+  <data name="This address has {0} split rule. Delete it first." xml:space="preserve"><value>Sellel aadressil on {0} jagamisreegel. Kustuta see esmalt.</value></data>
+  <data name="This address has {0} split rules. Delete them first." xml:space="preserve"><value>Sellel aadressil on {0} jagamisreeglit. Kustuta need esmalt.</value></data>
+  <data name="{1} is part of {0} split rule. Remove them from it first." xml:space="preserve"><value>{1} on osa {0} jagamisreeglist. Eemalda ta esmalt sellest.</value></data>
+  <data name="{1} is part of {0} split rules. Remove them from those first." xml:space="preserve"><value>{1} on osa {0} jagamisreeglist. Eemalda ta esmalt nendest.</value></data>
+  <data name="Manual split saved. Regenerate statements for the invoice's month to apply it." xml:space="preserve"><value>Käsitsi jagamine salvestatud. Selle rakendamiseks genereeri arve kuu aruanded uuesti.</value></data>
+  <data name="Manual split updated. Regenerate statements for the invoice's month to apply it." xml:space="preserve"><value>Käsitsi jagamine uuendatud. Selle rakendamiseks genereeri arve kuu aruanded uuesti.</value></data>
+  <data name="Manual split deleted. Regenerate statements for the invoice's month to apply the change." xml:space="preserve"><value>Käsitsi jagamine kustutatud. Muudatuse rakendamiseks genereeri arve kuu aruanded uuesti.</value></data>
+  <data name="{0} invoice could not be billed. See the details below." xml:space="preserve"><value>{0} arvet ei saanud arveldada. Vaata üksikasju allpool.</value></data>
+  <data name="{0} invoices could not be billed. See the details below." xml:space="preserve"><value>{0} arvet ei saanud arveldada. Vaata üksikasju allpool.</value></data>
+  <data name="{0} split rule applies to this service. Delete it first." xml:space="preserve"><value>Sellele teenusele kehtib {0} jagamisreegel. Kustuta see esmalt.</value></data>
+  <data name="{0} split rules apply to this service. Delete them first." xml:space="preserve"><value>Sellele teenusele kehtib {0} jagamisreeglit. Kustuta need esmalt.</value></data>
+  <data name="Equal" xml:space="preserve"><value>Võrdselt</value></data>
+  <data name="Percentage" xml:space="preserve"><value>Protsendid</value></data>
+  <data name="Fixed amount" xml:space="preserve"><value>Fikseeritud summa</value></data>
+  <data name="Manual" xml:space="preserve"><value>Käsitsi</value></data>
+  <data name="Fixed" xml:space="preserve"><value>Fikseeritud</value></data>
+  <data name="Remainder ÷ {0}" xml:space="preserve"><value>Ülejäänu ÷ {0}</value></data>
+  <data name="Nobody lived at the address on the invoice date, so it was not billed." xml:space="preserve"><value>Arve kuupäeval ei elanud aadressil kedagi, seega seda ei arveldatud.</value></data>
+  <data name="{0} lives here but is not part of the split rule, so they pay nothing for it." xml:space="preserve"><value>{0} elab siin, kuid ei ole jagamisreeglis, seega ei maksa ta selle eest midagi.</value></data>
+  <data name="A resident" xml:space="preserve"><value>Üks elanik</value></data>
+  <data name="Nobody in the split rule lived here on the invoice date, so it was split equally instead." xml:space="preserve"><value>Arve kuupäeval ei elanud siin kedagi jagamisreeglis olevatest, seega jagati see hoopis võrdselt.</value></data>
+  <data name="The fixed amounts ({0}) are more than the invoice total, so it was not billed." xml:space="preserve"><value>Fikseeritud summad ({0}) ületavad arve kogusummat, seega seda ei arveldatud.</value></data>
+  <data name="{0} is left after the fixed amounts and nobody else lives here to pay it, so it was not billed." xml:space="preserve"><value>Pärast fikseeritud summasid jääb üle {0} ja seda pole kellelgi teisel maksta, seega arvet ei arveldatud.</value></data>
+  <data name="The manual split differs from the invoice total by {0}, so it was not billed." xml:space="preserve"><value>Käsitsi jagamine erineb arve kogusummast {0} võrra, seega seda ei arveldatud.</value></data>
+  <data name="Link a person to an address. Invoices are shared between everyone living there on the invoice date, equally unless a split rule says otherwise." xml:space="preserve"><value>Seo isik aadressiga. Arved jagatakse kõigi arve kuupäeval seal elavate inimeste vahel – võrdselt, kui jagamisreegel ei määra teisiti.</value></data>
+  <data name="Who lives where. Invoices are shared between the residents of an address on the invoice date, equally unless a split rule says otherwise." xml:space="preserve"><value>Kes kus elab. Arved jagatakse aadressi elanike vahel arve kuupäeva seisuga – võrdselt, kui jagamisreegel ei määra teisiti.</value></data>
+  <data name="Invoices for this address are split by the split rules below. Services without a rule are split equally between the people living here on the invoice date." xml:space="preserve"><value>Selle aadressi arved jagatakse allolevate jagamisreeglite järgi. Reeglita teenuste arved jagatakse arve kuupäeval siin elavate inimeste vahel võrdselt.</value></data>
+  <data name="{0} lives here but isn't part of a percentage rule, so they pay nothing for the invoices it covers." xml:space="preserve"><value>{0} elab siin, kuid ei ole protsendireeglis, seega ei maksa ta selle reegliga kaetud arvete eest midagi.</value></data>
+  <data name="No split rules, so every invoice here is split equally." xml:space="preserve"><value>Jagamisreegleid pole, seega jagatakse iga siinne arve võrdselt.</value></data>
+  <data name="Split differently" xml:space="preserve"><value>Jaga teisiti</value></data>
+  <data name="Add manual split" xml:space="preserve"><value>Lisa käsitsi jagamine</value></data>
+  <data name="Delete manual split" xml:space="preserve"><value>Kustuta käsitsi jagamine</value></data>
+  <data name="Delete this manual split row?" xml:space="preserve"><value>Kas kustutada see käsitsi jagamise rida?</value></data>
+  <data name="Manual split" xml:space="preserve"><value>Käsitsi jagamine</value></data>
+  <data name="Back to manual splits" xml:space="preserve"><value>Tagasi käsitsi jagamiste juurde</value></data>
+  <data name="Edit manual split" xml:space="preserve"><value>Muuda käsitsi jagamist</value></data>
+  <data name="Manual splits" xml:space="preserve"><value>Käsitsi jagamised</value></data>
+  <data name="Set exactly who pays what for a single invoice. A manual split overrides split rules for that invoice, and its amounts must add up to the invoice total. Rows marked &quot;Record only&quot; were written automatically by earlier versions and are ignored." xml:space="preserve"><value>Määra ühe arve puhul täpselt, kes mida maksab. Käsitsi jagamine on selle arve puhul tähtsam kui jagamisreeglid ning selle summad peavad kokku andma arve kogusumma. „Ainult kirje“ märgisega read lõid varasemad versioonid automaatselt ja neid ei arvestata.</value></data>
+  <data name="Record only" xml:space="preserve"><value>Ainult kirje</value></data>
+  <data name="No manual splits. Invoices are split by your split rules, or equally between the residents." xml:space="preserve"><value>Käsitsi jagamisi pole. Arved jagatakse jagamisreeglite järgi või elanike vahel võrdselt.</value></data>
+  <data name="Split by a manual split for this invoice. Statement generation uses this split." xml:space="preserve"><value>Jagatud selle arve käsitsi jagamise järgi. Aruannete genereerimine kasutab seda jagamist.</value></data>
+  <data name="Split by a split rule ({0}) for {1} on {2}. Statement generation uses this split." xml:space="preserve"><value>Jagatud jagamisreegli ({0}) järgi aadressil {1} kuupäeval {2}. Aruannete genereerimine kasutab seda jagamist.</value></data>
+  <data name="View split rule" xml:space="preserve"><value>Vaata jagamisreeglit</value></data>
+  <data name="Check residents" xml:space="preserve"><value>Kontrolli elanikke</value></data>
+  <data name="Fix manual split" xml:space="preserve"><value>Paranda käsitsi jagamist</value></data>
+  <data name="{0} invoice needs attention" xml:space="preserve"><value>{0} arve vajab tähelepanu</value></data>
+  <data name="{0} invoices need attention" xml:space="preserve"><value>{0} arvet vajab tähelepanu</value></data>
 </root>

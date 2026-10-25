@@ -25,7 +25,9 @@ public class WebDtoMapper(
     IMapper<MonthlyStatementLine, MonthlyStatementLineEntity> lineEntityMapper,
     IMapper<MonthlyStatementLineDto, MonthlyStatementLine> lineDtoMapper,
     IMapper<Service, ServiceEntity> serviceEntityMapper,
-    IMapper<ServiceDto, Service> serviceDtoMapper)
+    IMapper<ServiceDto, Service> serviceDtoMapper,
+    IMapper<AllocationRule, AllocationRuleEntity> ruleEntityMapper,
+    IMapper<AllocationRuleDto, AllocationRule> ruleDtoMapper)
 {
     public AddressDto ToDto(AddressEntity entity) => addressDtoMapper.Map(addressEntityMapper.Map(entity))!;
 
@@ -71,7 +73,28 @@ public class WebDtoMapper(
         return dto;
     }
 
+    public AllocationRuleDto ToDto(AllocationRuleEntity entity)
+    {
+        var dto = ruleDtoMapper.Map(ruleEntityMapper.Map(entity))!;
+        if (entity.Address != null) dto.Address = ToDto(entity.Address);
+        if (entity.Service != null) dto.Service = ToDto(entity.Service);
+        var contacts = entity.Shares
+            .Where(share => share.Contact != null)
+            .ToDictionary(share => share.Id, share => share.Contact);
+        foreach (var share in dto.Shares)
+        {
+            if (contacts.TryGetValue(share.Id, out var contact)) share.Contact = ToDto(contact);
+        }
+        return dto;
+    }
+
     public Invoice ToDomain(InvoiceDto dto) => invoiceDtoMapper.Map(dto)!;
+
+    public Invoice ToDomain(InvoiceEntity entity) => invoiceEntityMapper.Map(entity)!;
+
+    public AllocationRule ToDomain(AllocationRuleDto dto) => ruleDtoMapper.Map(dto)!;
+
+    public AllocationRule ToDomain(AllocationRuleEntity entity) => ruleEntityMapper.Map(entity)!;
 
     public AddressEntity ToEntity(AddressDto dto) => addressEntityMapper.Map(addressDtoMapper.Map(dto))!;
 
@@ -86,4 +109,6 @@ public class WebDtoMapper(
     public InvoiceAllocationEntity ToEntity(InvoiceAllocationDto dto) => allocationEntityMapper.Map(allocationDtoMapper.Map(dto))!;
 
     public MonthlyStatementEntity ToEntity(MonthlyStatementDto dto) => statementEntityMapper.Map(statementDtoMapper.Map(dto))!;
+
+    public AllocationRuleEntity ToEntity(AllocationRuleDto dto) => ruleEntityMapper.Map(ruleDtoMapper.Map(dto))!;
 }
