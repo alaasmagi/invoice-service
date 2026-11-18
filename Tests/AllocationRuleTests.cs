@@ -157,14 +157,15 @@ public class GenerateMonthlyStatementServiceTests
     private static (GenerateMonthlyStatementService Service, List<MonthlyStatementLine> Lines) Create(
         IEnumerable<Invoice> invoices,
         IEnumerable<AddressContact> residents,
-        IReadOnlyList<AllocationRule>? rules = null)
+        IReadOnlyList<AllocationRule>? rules = null,
+        Mock<IMonthlyStatementRepository>? statementRepository = null)
     {
         var lines = new List<MonthlyStatementLine>();
         var lineRepository = new Mock<IMonthlyStatementLineRepository>();
         lineRepository.Setup(repository => repository.CreateAsync(It.IsAny<MonthlyStatementLine>(), It.IsAny<Guid>()))
             .Callback<MonthlyStatementLine, Guid>((line, _) => lines.Add(line))
             .ReturnsAsync((MonthlyStatementLine line, Guid _) => MethodResponse<MonthlyStatementLine>.Success(line));
-        var statementRepository = RepositoryMocks.Returning<IMonthlyStatementRepository, MonthlyStatement>([]);
+        statementRepository ??= RepositoryMocks.Returning<IMonthlyStatementRepository, MonthlyStatement>([]);
         statementRepository.Setup(repository => repository.CreateAsync(It.IsAny<MonthlyStatement>(), It.IsAny<Guid>()))
             .ReturnsAsync((MonthlyStatement statement, Guid _) => MethodResponse<MonthlyStatement>.Success(statement));
         var ruleRepository = new Mock<IAllocationRuleRepository>();
@@ -248,6 +249,20 @@ public class GenerateMonthlyStatementServiceTests
         Assert.Equal("Tehnika", warning.AddressName);
         Assert.Equal("Electricity", warning.ServiceName);
         Assert.Equal(invoice.InvoiceDate, warning.InvoiceDate);
+    }
+
+    [Fact]
+    public async Task Regeneration_UpdatesTotalOfExistingStatement()
+    {
+        var existing = new MonthlyStatement { Id = Guid.NewGuid(), UserId = UserId, ContactId = Mari, Year = 2026, Month = 3, TotalSum = 10m, Status = EMonthlyStatementStatus.Sent };
+        var statementRepository = RepositoryMocks.Returning<IMonthlyStatementRepository, MonthlyStatement>([existing]);
+        var (service, _) = Create([Invoice(10m), Invoice(35m)], [Resident(Mari)], statementRepository: statementRepository);
+
+        var result = await service.GenerateAsync(2026, 3, UserId);
+
+        Assert.Equal(45m, Assert.Single(result.Statements).TotalSum);
+        statementRepository.Verify(repository => repository.MarkRegeneratedAsync(existing.Id, UserId, 45m), Times.Once);
+        statementRepository.Verify(repository => repository.CreateAsync(It.IsAny<MonthlyStatement>(), It.IsAny<Guid>()), Times.Never);
     }
 }
 
