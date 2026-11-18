@@ -13,7 +13,7 @@ public static class MessagingContract
     // with "invoice" as the action -> invoice-service.invoice-service.invoice.
     public const string InvoiceSource = "invoice-service";
     public const string InvoiceTenant = "invoice-service";
-    public const string InvoiceAction = "invoice";
+    public const string InvoiceAction = "email-invoice";
     public const string InvoiceContentVersion = "1.0";
 
     // Inbound identity events consumed from the invoice-service queue: the concrete publisher slug in
