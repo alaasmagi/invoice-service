@@ -16,6 +16,7 @@ using DTO.DataAccess.DataAccess.Mapper;
 using DTO.DataAccess.Web.DTO;
 using DTO.DataAccess.Web.Mapper;
 using Infrastructure.Messaging;
+using Infrastructure.Storage;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -124,6 +125,7 @@ public static class InvoiceServiceApplication
         var keycloakOptions = RequiredConfiguration.KeycloakOptions();
         var rabbitMqOptions = RequiredConfiguration.RabbitMqOptions();
         var invoiceMessagingOptions = RequiredConfiguration.InvoiceMessagingOptions();
+        var storageOptions = RequiredConfiguration.StorageOptions();
 
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(appDbConnectionString));
@@ -136,10 +138,18 @@ public static class InvoiceServiceApplication
         builder.Services.AddAuthorization();
 
         builder.Services.AddSingleton(invoiceMessagingOptions);
-        builder.Services.AddRabbitMqPublisher(rabbitMqOptions);
+        builder.Services.AddRabbitMq(rabbitMqOptions);
+        builder.Services.AddRabbitMqExchangePublisher(
+            RabbitMqPublisherKeys.NotificationHub, rabbitMqOptions.ForExchange(invoiceMessagingOptions.NotificationHubExchange));
+        builder.Services.AddRabbitMqExchangePublisher(
+            RabbitMqPublisherKeys.AiHub, rabbitMqOptions.ForExchange(invoiceMessagingOptions.AiHubExchange));
         builder.Services.AddSingleton<IBaseEventHandler<UserEventContent>, UserEventHandler>();
-        builder.Services.AddRabbitMqConsumer<UserEventConsumer>();
+        // One queue per service: the router dispatches each message by its routing-key source.
+        builder.Services.AddRabbitMqRoutingConsumer(invoiceMessagingOptions.Queue, routes => routes
+            .Route<UserEventContent>(MessagingContract.IdentitySource));
         builder.Services.AddSingleton<IMonthlyInvoiceEmailPublisher, RabbitMqMonthlyInvoiceEmailPublisher>();
+
+        builder.Services.AddR2FileStorage(storageOptions);
 
         builder.Services.AddDataMappers();
         builder.Services.AddWebMappers();
@@ -166,6 +176,14 @@ public static class InvoiceServiceApplication
             .AddDataAnnotationsLocalization(options =>
                 options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(SharedResource)));
         builder.Services.ConfigureForwardedHeaders();
+    }
+
+    private static void AddRabbitMqExchangePublisher(this IServiceCollection services, string key, RabbitMqOptions options)
+    {
+        services.AddKeyedSingleton<IBaseEventPublisher>(key, (provider, _) => new RabbitMqEventPublisher(
+            provider.GetRequiredService<RabbitMqConnectionManager>(),
+            options,
+            provider.GetRequiredService<ILogger<RabbitMqEventPublisher>>()));
     }
 
     private static void AddDataMappers(this IServiceCollection services)

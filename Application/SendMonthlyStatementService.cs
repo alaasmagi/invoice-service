@@ -63,7 +63,7 @@ public class SendMonthlyStatementService(
         }
 
         // Record only after the broker confirmed the publish. Should the app crash between confirm and
-        // this write, a re-run republishes the SAME deterministic envelope id and email-hub drops it.
+        // this write, a re-run republishes the SAME deterministic envelope id and notification-hub drops it.
         await publishedInvoiceEmailRepository.AddAsync(
             new PublishedInvoiceEmail
             {
@@ -114,7 +114,7 @@ public class SendMonthlyStatementService(
         var invoiceDate = DateOnly.FromDateTime(DateTime.UtcNow);
         var dueDate = invoiceDate.AddDays(14);
 
-        // Machine-readable values only: email-hub owns all localisation and formats per recipient.
+        // Machine-readable values only: notification-hub owns all localisation and formats per recipient.
         return new MonthlyInvoiceEmailContent
         {
             Email = contact.Email,
@@ -143,7 +143,7 @@ public class SendMonthlyStatementService(
                 .ToList(),
             PaymentFullName = senderPaymentDetails.FullName.Trim(),
             PaymentIban = senderPaymentDetails.BankIban.Trim(),
-            // Opaque reconciliation key — copied character for character by email-hub. NOT ISO:
+            // Opaque reconciliation key — copied character for character by notification-hub. NOT ISO:
             // this is exactly what incoming-payment reconciliation matches against.
             PaymentDescription = $"{invoiceIdentifier} {PaymentReferencePeriod(statement)}"
         };

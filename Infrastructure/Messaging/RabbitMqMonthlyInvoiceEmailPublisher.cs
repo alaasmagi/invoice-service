@@ -1,6 +1,7 @@
 using Base.Contracts.Message;
 using Base.Message;
 using Contracts.Application;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,11 +9,11 @@ using System.Text;
 namespace Infrastructure.Messaging;
 
 public class RabbitMqMonthlyInvoiceEmailPublisher(
-    IBaseEventPublisher publisher,
+    [FromKeyedServices(RabbitMqPublisherKeys.NotificationHub)] IBaseEventPublisher publisher,
     ILogger<RabbitMqMonthlyInvoiceEmailPublisher> logger) : IMonthlyInvoiceEmailPublisher
 {
     // Fixed namespace for the deterministic (UUIDv5) envelope id. Re-running a batch reproduces the
-    // same id from the same invoice identity + attempt, so email-hub (which dedups on id) drops the repeat.
+    // same id from the same invoice identity + attempt, so notification-hub (which dedups on id) drops the repeat.
     private static readonly Guid InvoiceEmailNamespace = new("b1d3f2a4-0c5e-4a6b-8c7d-9e0f1a2b3c4d");
 
     public async Task<InvoiceEmailPublishResult> PublishAsync(
@@ -57,7 +58,7 @@ public class RabbitMqMonthlyInvoiceEmailPublisher(
         var identity = $"{content.InvoiceIdentifier}:{content.InvoicePeriod}:{content.Email}";
 
         // Attempt 1 keeps the original (suffix-free) identity so ids minted before resend support stay
-        // stable. Each explicit resend bumps the attempt, changing the id so email-hub delivers it anew.
+        // stable. Each explicit resend bumps the attempt, changing the id so notification-hub delivers it anew.
         if (attempt > 1)
         {
             identity = $"{identity}:{attempt}";

@@ -45,11 +45,8 @@ public class UserEventHandler(
 
     private static void Validate(IBaseEventEnvelope<UserEventContent> @event)
     {
-        // The invoice.users queue is bound to the identity publisher's events, so the AMQP routing-key
-        // source is provably the identity slug. The shared consumer does not surface the raw routing
-        // key, so we assert the payload source equals that constant — equivalent to comparing
-        // routing-key source to payload source, closing the topic-permission bypass the contract warns
-        // about.
+        // The routing consumer only routes identity-hub keys here and rejects envelopes that do not match
+        // their routing key; asserting the source again keeps the handler safe if it is wired up elsewhere.
         if (!string.Equals(@event.Source, MessagingContract.IdentitySource, StringComparison.Ordinal))
         {
             throw new InvalidOperationException(

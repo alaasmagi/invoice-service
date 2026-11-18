@@ -8,7 +8,7 @@ namespace Contracts.Application;
 /// </summary>
 public static class MessagingContract
 {
-    // Outbound "invoice" command published to email-hub.commands.
+    // Outbound "invoice" command published to notification-hub.commands.
     // Routing key follows source.tenant.action: the publishing app's slug is both source and tenant,
     // with "invoice" as the action -> invoice-service.invoice-service.invoice.
     public const string InvoiceSource = "invoice-service";
@@ -16,7 +16,7 @@ public static class MessagingContract
     public const string InvoiceAction = "invoice";
     public const string InvoiceContentVersion = "1.0";
 
-    // Inbound identity events consumed from the invoice.users queue: the concrete publisher slug in
+    // Inbound identity events consumed from the invoice-service queue: the concrete publisher slug in
     // the envelope 'source' (and first routing-key segment). Matches the live wire, the shared
     // package's Base.Message.DefaultSources.IdentityHub, and the exchange name identity-hub.events.
     public const string IdentitySource = "identity-hub";

@@ -2,6 +2,7 @@ using Base.Contracts.Message;
 using Base.Message;
 using Contracts.Application;
 using Infrastructure.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Text.Json;
 using Xunit;
@@ -76,7 +77,7 @@ public class RabbitMqMonthlyInvoiceEmailPublisherTests
         var rerun = await sut.PublishAsync(SampleContent("a@example.com"), attempt: 1);
         var other = await sut.PublishAsync(SampleContent("b@example.com"), attempt: 1);
 
-        // Re-publishing the same attempt reproduces the same id -> email-hub drops the repeat.
+        // Re-publishing the same attempt reproduces the same id -> notification-hub drops the repeat.
         Assert.Equal(first.EnvelopeId, rerun.EnvelopeId);
         // A different recipient is a different message.
         Assert.NotEqual(first.EnvelopeId, other.EnvelopeId);
@@ -92,7 +93,7 @@ public class RabbitMqMonthlyInvoiceEmailPublisherTests
         var resend = await sut.PublishAsync(SampleContent("a@example.com"), attempt: 2);
         var resendRerun = await sut.PublishAsync(SampleContent("a@example.com"), attempt: 2);
 
-        // A higher attempt is a new message email-hub will deliver...
+        // A higher attempt is a new message notification-hub will deliver...
         Assert.NotEqual(first.EnvelopeId, resend.EnvelopeId);
         // ...but that resend attempt is still deterministic, so a crash-recovery re-publish is dropped.
         Assert.Equal(resend.EnvelopeId, resendRerun.EnvelopeId);
@@ -156,6 +157,24 @@ public class RabbitMqMonthlyInvoiceEmailPublisherTests
 
         // camelCase, not PascalCase.
         Assert.False(content.TryGetProperty("Email", out _));
+    }
+
+    [Fact]
+    public async Task PublishAsync_UsesNotificationHubPublisher_WhenResolvedFromDi()
+    {
+        var notificationHub = new FakeBaseEventPublisher();
+        var aiHub = new FakeBaseEventPublisher();
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddKeyedSingleton<IBaseEventPublisher>(RabbitMqPublisherKeys.NotificationHub, notificationHub);
+        services.AddKeyedSingleton<IBaseEventPublisher>(RabbitMqPublisherKeys.AiHub, aiHub);
+        services.AddSingleton<IMonthlyInvoiceEmailPublisher, RabbitMqMonthlyInvoiceEmailPublisher>();
+        await using var provider = services.BuildServiceProvider();
+
+        await provider.GetRequiredService<IMonthlyInvoiceEmailPublisher>().PublishAsync(SampleContent(), attempt: 1);
+
+        Assert.Equal(1, notificationHub.Calls);
+        Assert.Equal(0, aiHub.Calls);
     }
 
     private class FakeBaseEventPublisher : IBaseEventPublisher

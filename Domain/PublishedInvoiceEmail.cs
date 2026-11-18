@@ -23,7 +23,7 @@ public class PublishedInvoiceEmail : BaseEntity
 
     public string Recipient { get; set; } = default!;
 
-    /// <summary>Deterministic envelope id sent to email-hub (its idempotency key).</summary>
+    /// <summary>Deterministic envelope id sent to notification-hub (its idempotency key).</summary>
     public string EnvelopeId { get; set; } = default!;
 
     public DateTime ConfirmedAt { get; set; } = DateTime.UtcNow;

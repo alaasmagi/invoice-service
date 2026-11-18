@@ -47,22 +47,32 @@ jobs:
           DATABASE_CONNECTION_STRING: ${{ secrets.DATABASE_CONNECTION_STRING }}
           RABBITMQ_URI: ${{ secrets.RABBITMQ_URI }}
           RABBITMQ_QUEUE: ${{ secrets.RABBITMQ_QUEUE }}
-          RABBITMQ_EXCHANGE: ${{ secrets.RABBITMQ_EXCHANGE }}
+          RABBITMQ_NOTIFICATION_HUB_EXCHANGE: ${{ secrets.RABBITMQ_NOTIFICATION_HUB_EXCHANGE }}
+          RABBITMQ_AI_HUB_EXCHANGE: ${{ secrets.RABBITMQ_AI_HUB_EXCHANGE }}
           GLITCHTIP_DSN: ${{ secrets.GLITCHTIP_DSN }}
           GLITCHTIP_RELEASE: ${{ secrets.GLITCHTIP_RELEASE || 'invoice-service' }}
           KEYCLOAK_AUTHORITY: ${{ secrets.KEYCLOAK_AUTHORITY }}
           KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
           KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
+          STORAGE_ENDPOINT: ${{ secrets.STORAGE_ENDPOINT }}
+          STORAGE_ACCESS_KEY_ID: ${{ secrets.STORAGE_ACCESS_KEY_ID }}
+          STORAGE_SECRET_ACCESS_KEY: ${{ secrets.STORAGE_SECRET_ACCESS_KEY }}
+          STORAGE_BUCKET_NAME: ${{ secrets.STORAGE_BUCKET_NAME }}
         run: |
           set -euo pipefail
 
           : "${DATABASE_CONNECTION_STRING:?DATABASE_CONNECTION_STRING is required}"
           : "${RABBITMQ_URI:?RABBITMQ_URI is required}"
           : "${RABBITMQ_QUEUE:?RABBITMQ_QUEUE is required}"
-          : "${RABBITMQ_EXCHANGE:?RABBITMQ_EXCHANGE is required}"
+          : "${RABBITMQ_NOTIFICATION_HUB_EXCHANGE:?RABBITMQ_NOTIFICATION_HUB_EXCHANGE is required}"
+          : "${RABBITMQ_AI_HUB_EXCHANGE:?RABBITMQ_AI_HUB_EXCHANGE is required}"
           : "${KEYCLOAK_AUTHORITY:?KEYCLOAK_AUTHORITY is required}"
           : "${KEYCLOAK_CLIENT_ID:?KEYCLOAK_CLIENT_ID is required}"
           : "${KEYCLOAK_CLIENT_SECRET:?KEYCLOAK_CLIENT_SECRET is required}"
+          : "${STORAGE_ENDPOINT:?STORAGE_ENDPOINT is required}"
+          : "${STORAGE_ACCESS_KEY_ID:?STORAGE_ACCESS_KEY_ID is required}"
+          : "${STORAGE_SECRET_ACCESS_KEY:?STORAGE_SECRET_ACCESS_KEY is required}"
+          : "${STORAGE_BUCKET_NAME:?STORAGE_BUCKET_NAME is required}"
 
           {
             printf 'ASPNETCORE_ENVIRONMENT=%s\n' 'Production'
@@ -73,7 +83,8 @@ jobs:
 
             printf 'RABBITMQ_URI=%s\n' "${RABBITMQ_URI}"
             printf 'RABBITMQ_QUEUE=%s\n' "${RABBITMQ_QUEUE}"
-            printf 'RABBITMQ_EXCHANGE=%s\n' "${RABBITMQ_EXCHANGE}"
+            printf 'RABBITMQ_NOTIFICATION_HUB_EXCHANGE=%s\n' "${RABBITMQ_NOTIFICATION_HUB_EXCHANGE}"
+            printf 'RABBITMQ_AI_HUB_EXCHANGE=%s\n' "${RABBITMQ_AI_HUB_EXCHANGE}"
 
             printf 'GLITCHTIP_DSN=%s\n' "${GLITCHTIP_DSN}"
             printf 'GLITCHTIP_RELEASE=%s\n' "${GLITCHTIP_RELEASE}"
@@ -81,6 +92,11 @@ jobs:
             printf 'KEYCLOAK_AUTHORITY=%s\n' "${KEYCLOAK_AUTHORITY}"
             printf 'KEYCLOAK_CLIENT_ID=%s\n' "${KEYCLOAK_CLIENT_ID}"
             printf 'KEYCLOAK_CLIENT_SECRET=%s\n' "${KEYCLOAK_CLIENT_SECRET}"
+
+            printf 'STORAGE_ENDPOINT=%s\n' "${STORAGE_ENDPOINT}"
+            printf 'STORAGE_ACCESS_KEY_ID=%s\n' "${STORAGE_ACCESS_KEY_ID}"
+            printf 'STORAGE_SECRET_ACCESS_KEY=%s\n' "${STORAGE_SECRET_ACCESS_KEY}"
+            printf 'STORAGE_BUCKET_NAME=%s\n' "${STORAGE_BUCKET_NAME}"
           } > .env
 
           chmod 600 .env
