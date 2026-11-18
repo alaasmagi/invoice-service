@@ -40,7 +40,6 @@ public class RabbitMqMonthlyInvoiceEmailPublisher(
 
         if (!result.Success)
         {
-            // Log identity only — never the body or paymentIban (personal data).
             logger.LogError(
                 "Invoice email not confirmed (id={Id}, source={Source}, tenant={Tenant}, action={Action}): {Reason}",
                 envelope.Id, envelope.Source, envelope.Tenant, envelope.Action, result.FailureReason);
