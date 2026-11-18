@@ -120,7 +120,7 @@ public class GenerateMonthlyStatementService(
 
             if (existingStatements.Any(existing => existing.Id == statement.Id))
             {
-                await monthlyStatementRepository.UpdateAsync(statement.Id, statement, string.Empty, userId);
+                await monthlyStatementRepository.MarkRegeneratedAsync(statement.Id, userId, statement.TotalSum);
             }
             else
             {

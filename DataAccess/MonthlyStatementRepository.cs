@@ -39,4 +39,14 @@ public class MonthlyStatementRepository : BaseRepository<MonthlyStatement, Month
                 .SetProperty(statement => statement.Status, status)
                 .SetProperty(statement => statement.SentAt, sentAt));
     }
+
+    public async Task MarkRegeneratedAsync(Guid monthlyStatementId, Guid userId, decimal totalSum)
+    {
+        var statement = await _context.MonthlyStatements
+            .FirstAsync(statement => statement.Id == monthlyStatementId && statement.UserId == userId);
+
+        statement.TotalSum = totalSum;
+        statement.Status = EMonthlyStatementStatus.ReadyToSend;
+        statement.SentAt = null;
+    }
 }
