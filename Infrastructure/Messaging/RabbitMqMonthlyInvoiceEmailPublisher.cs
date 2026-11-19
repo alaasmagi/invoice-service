@@ -33,7 +33,7 @@ public class RabbitMqMonthlyInvoiceEmailPublisher(
         };
 
         // No expiration: invoice mail must still arrive after an outage.
-        // The shared publisher derives the routing key (invoice-service.invoice-service.invoice) via BaseRoutingKey,
+        // The shared publisher derives the routing key (invoice-service.invoice-service.email-invoice) via BaseRoutingKey,
         // publishes persistent + mandatory with publisher confirms, and only reports Success when the
         // broker confirms. BasicPublish returning without an exception is not enough.
         var result = await publisher.PublishAsync(envelope, expiration: null, ct);

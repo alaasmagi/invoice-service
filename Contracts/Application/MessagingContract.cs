@@ -8,9 +8,9 @@ namespace Contracts.Application;
 /// </summary>
 public static class MessagingContract
 {
-    // Outbound "invoice" command published to notification-hub.commands.
+    // Outbound "email-invoice" command published to notification-hub.commands.
     // Routing key follows source.tenant.action: the publishing app's slug is both source and tenant,
-    // with "invoice" as the action -> invoice-service.invoice-service.invoice.
+    // with "email-invoice" as the action -> invoice-service.invoice-service.email-invoice.
     public const string InvoiceSource = "invoice-service";
     public const string InvoiceTenant = "invoice-service";
     public const string InvoiceAction = "email-invoice";

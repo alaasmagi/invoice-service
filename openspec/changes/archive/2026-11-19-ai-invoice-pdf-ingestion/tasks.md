@@ -65,7 +65,7 @@
 
 ## 10. Wrap-up
 
-- [ ] 10.1 `dotnet build` and `dotnet test` pass
+- [x] 10.1 `dotnet build` and `dotnet test` pass
 - [x] 10.2 Search the repo for any new or changed environment variables and sync `.env`, `.env.example`, the deploy workflow and Docker files (none expected)
-- [ ] 10.3 Run the macOS backslash cleanup
+- [x] 10.3 Run the macOS backslash cleanup
 - [x] 10.4 Change summary with migration and manual steps (apply migration, create an API key, ai-hub must implement the contract before replies are published)
