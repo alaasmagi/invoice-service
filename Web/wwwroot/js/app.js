@@ -238,4 +238,7 @@
 
     update();
   });
+
+  // ----- PWA: the service worker serves the offline page when navigation fails. -----
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
 })();

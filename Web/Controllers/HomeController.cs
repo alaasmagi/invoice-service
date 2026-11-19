@@ -41,6 +41,11 @@ public class HomeController(AppDbContext context, PeriodOverviewService periodOv
         return View();
     }
 
+    public IActionResult Offline()
+    {
+        return View();
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

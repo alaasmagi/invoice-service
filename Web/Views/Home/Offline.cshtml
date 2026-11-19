@@ -1,0 +1,30 @@
+@* Cached by the service worker, so it uses no layout and shows no user data. *@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" data-theme="dark">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="theme-color" content="#141619"/>
+    <title>@T["Offline"] - @T["Invoice Service"]</title>
+    <partial name="_DesignSystem"/>
+</head>
+<body>
+<partial name="_Icons"/>
+<main role="main" class="content">
+    <section class="card prose medium">
+        <p class="kicker">@T["Offline"]</p>
+        <h1>@T["You're offline"]</h1>
+        <div class="alert alert--warning" role="alert">
+            <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+            <div class="alert__body">@T["Invoice Service needs a connection. Check your network and try again."]</div>
+        </div>
+        <div class="actions">
+            <button type="button" class="btn btn--primary" onclick="location.reload()">@T["Try again"]</button>
+        </div>
+    </section>
+</main>
+</body>
+</html>

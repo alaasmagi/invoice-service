@@ -691,4 +691,8 @@
   <data name="Already exists" xml:space="preserve"><value>On juba olemas</value></data>
   <data name="Incomplete" xml:space="preserve"><value>Puudulik</value></data>
   <data name="Discarded" xml:space="preserve"><value>Kõrvale jäetud</value></data>
+  <data name="Offline" xml:space="preserve"><value>Võrguühenduseta</value></data>
+  <data name="You're offline" xml:space="preserve"><value>Võrguühendus puudub</value></data>
+  <data name="Invoice Service needs a connection. Check your network and try again." xml:space="preserve"><value>Invoice Service vajab võrguühendust. Kontrolli ühendust ja proovi uuesti.</value></data>
+  <data name="Try again" xml:space="preserve"><value>Proovi uuesti</value></data>
 </root>
