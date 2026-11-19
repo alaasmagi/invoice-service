@@ -92,6 +92,7 @@ public class InvoiceDocumentWebTests
     [InlineData("Views/InvoiceDocuments/Details.cshtml")]
     [InlineData("Views/ApiKeys/Index.cshtml")]
     [InlineData("Views/InvoiceImports/Upload.cshtml")]
+    [InlineData("Views/Home/Offline.cshtml")]
     [InlineData("Controllers/InvoiceDocumentsController.cs")]
     [InlineData("Controllers/ApiKeysController.cs")]
     [InlineData("Controllers/InvoiceImportsController.cs")]

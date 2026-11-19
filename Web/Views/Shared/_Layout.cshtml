@@ -8,6 +8,9 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="color-scheme" content="dark light"/>
+    <meta name="theme-color" content="#141619"/>
+    <link rel="manifest" href="~/manifest.webmanifest"/>
+    <link rel="apple-touch-icon" href="~/icons/apple-touch-icon.png"/>
     <title>@ViewData["Title"] - @T["Invoice Service"]</title>
     <script>
         (() => {
@@ -39,7 +42,7 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar__top">
             <a class="brand" asp-area="" asp-controller="Home" asp-action="Index">
-                <span class="brand__mark" aria-hidden="true">IS</span>
+                <img class="brand__mark" src="~/icons/icon-64.png" alt="" width="32" height="32"/>
                 <span>@T["Invoice Service"]</span>
             </a>
             <button class="icon-btn menu-button" type="button" aria-controls="mainNavigation" aria-expanded="false" aria-label="@T["Toggle navigation"]" data-menu-toggle>
@@ -133,7 +136,12 @@
         const storageKey = "invoice-service-theme";
         const root = document.documentElement;
         const toggle = document.getElementById("dsThemeToggle");
-        const sync = () => toggle.setAttribute("aria-checked", String(root.getAttribute("data-theme") === "dark"));
+        const themeColor = document.querySelector('meta[name="theme-color"]');
+        const sync = () => {
+            toggle.setAttribute("aria-checked", String(root.getAttribute("data-theme") === "dark"));
+            // Mobile top bar is the sidebar, so the installed app's status bar follows its surface token.
+            themeColor.content = getComputedStyle(document.getElementById("sidebar")).backgroundColor;
+        };
         toggle.addEventListener("click", () => {
             const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
             root.setAttribute("data-theme", next);
