@@ -22,6 +22,9 @@ public class AppDbContext : DbContext
     public DbSet<AppUserEntity> AppUsers => Set<AppUserEntity>();
     public DbSet<PublishedInvoiceEmailEntity> PublishedInvoiceEmails => Set<PublishedInvoiceEmailEntity>();
     public DbSet<ProcessedInboxMessageEntity> ProcessedInboxMessages => Set<ProcessedInboxMessageEntity>();
+    public DbSet<InvoiceDocumentEntity> InvoiceDocuments => Set<InvoiceDocumentEntity>();
+    public DbSet<InvoiceDocumentRowEntity> InvoiceDocumentRows => Set<InvoiceDocumentRowEntity>();
+    public DbSet<ApiKeyEntity> ApiKeys => Set<ApiKeyEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -111,6 +114,39 @@ public class AppDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.ServiceId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.InvoiceDocument)
+                .WithMany()
+                .HasForeignKey(e => e.InvoiceDocumentId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<InvoiceDocumentEntity>(entity =>
+        {
+            entity.HasIndex(e => new { e.UserId, e.Sha256 }).IsUnique();
+            entity.HasIndex(e => new { e.UserId, e.UploadedAt });
+
+            entity.HasMany(e => e.Rows)
+                .WithOne(e => e.InvoiceDocument)
+                .HasForeignKey(e => e.InvoiceDocumentId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<InvoiceDocumentRowEntity>(entity =>
+        {
+            entity.HasIndex(e => new { e.InvoiceDocumentId, e.Position }).IsUnique();
+            entity.Property(e => e.Amount).HasPrecision(18, 2);
+
+            // A row keeps its parsed values when the invoice created from it is deleted.
+            entity.HasOne(e => e.Invoice)
+                .WithMany()
+                .HasForeignKey(e => e.InvoiceId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<ApiKeyEntity>(entity =>
+        {
+            entity.HasIndex(e => e.KeyHash).IsUnique();
         });
 
         modelBuilder.Entity<InvoiceAllocationEntity>(entity =>

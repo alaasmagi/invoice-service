@@ -34,7 +34,6 @@
   <data name="address" xml:space="preserve"><value>aadress</value></data>
   <data name="Address &quot;{0}&quot; added. Next, add the people who live there." xml:space="preserve"><value>Aadress "{0}" lisatud. Järgmisena lisa seal elavad inimesed.</value></data>
   <data name="Address &quot;{0}&quot; deleted." xml:space="preserve"><value>Aadress "{0}" kustutatud.</value></data>
-  <data name="Address text" xml:space="preserve"><value>Aadressi tekst</value></data>
   <data name="Address updated." xml:space="preserve"><value>Aadress uuendatud.</value></data>
   <data name="Addresses" xml:space="preserve"><value>Aadressid</value></data>
   <data name="All addresses" xml:space="preserve"><value>Kõik aadressid</value></data>
@@ -75,7 +74,6 @@
   <data name="By person" xml:space="preserve"><value>Inimeste kaupa</value></data>
   <data name="By service" xml:space="preserve"><value>Teenuste kaupa</value></data>
   <data name="Cancel" xml:space="preserve"><value>Tühista</value></data>
-  <data name="Check the amounts below. When every invoice for the month is in, generate the statements so they can be sent." xml:space="preserve"><value>Kontrolli allolevaid summasid. Kui kõik kuu arved on sees, genereeri aruanded, et neid saaks saata.</value></data>
   <data name="Check the recipients' email addresses and send them again." xml:space="preserve"><value>Kontrolli saajate e-posti aadresse ja saada uuesti.</value></data>
   <data name="Check the {0} invoice that may still be missing first." xml:space="preserve"><value>Kontrolli enne üle {0} arve, mis võib veel puududa.</value></data>
   <data name="Check the {0} invoices that may still be missing first." xml:space="preserve"><value>Kontrolli enne üle {0} arvet, mis võivad veel puududa.</value></data>
@@ -93,9 +91,7 @@
   <data name="Contact updated." xml:space="preserve"><value>Kontakt uuendatud.</value></data>
   <data name="Contacts" xml:space="preserve"><value>Kontaktid</value></data>
   <data name="Create allocation" xml:space="preserve"><value>Lisa jaotus</value></data>
-  <data name="Create invoices manually or import provider PDFs for Telia and Enefit." xml:space="preserve"><value>Lisa arveid käsitsi või impordi Telia ja Enefiti PDF-arved.</value></data>
   <data name="Create statement" xml:space="preserve"><value>Loo aruanne</value></data>
-  <data name="Created invoices" xml:space="preserve"><value>Loodud arved</value></data>
   <data name="Currency" xml:space="preserve"><value>Valuuta</value></data>
   <data name="Dark mode" xml:space="preserve"><value>Tume režiim</value></data>
   <data name="Date" xml:space="preserve"><value>Kuupäev</value></data>
@@ -140,8 +136,6 @@
   <data name="Email" xml:space="preserve"><value>E-post</value></data>
   <data name="Email the {0} statement ({1}) to {2} &lt;{3}&gt;?" xml:space="preserve"><value>Kas saata perioodi {0} aruanne ({1}) isikule {2} &lt;{3}&gt;?</value></data>
   <data name="Email this statement ({0}) to {1} &lt;{2}&gt;?" xml:space="preserve"><value>Kas saata see aruanne ({0}) isikule {1} &lt;{2}&gt;?</value></data>
-  <data name="Enter an invoice by hand. For Telia or Enefit PDFs you can" xml:space="preserve"><value>Sisesta arve käsitsi. Telia või Enefiti PDF-arved saad ka</value></data>
-  <data name="Enter invoices manually or import Telia and Enefit PDFs." xml:space="preserve"><value>Sisesta arved käsitsi või impordi Telia ja Enefiti PDF-id.</value></data>
   <data name="environment by setting the" xml:space="preserve"><value>keskkond, määrates keskkonnamuutuja</value></data>
   <data name="environment variable to" xml:space="preserve"><value>väärtuseks</value></data>
   <data name="environment will display more detailed information about the error that occurred." xml:space="preserve"><value>kuvatakse tekkinud vea kohta täpsemat teavet.</value></data>
@@ -166,15 +160,11 @@
   <data name="import a PDF" xml:space="preserve"><value>impordi PDF</value></data>
   <data name="Import a provider PDF" xml:space="preserve"><value>Impordi teenusepakkuja PDF</value></data>
   <data name="import a provider PDF" xml:space="preserve"><value>impordi teenusepakkuja PDF</value></data>
-  <data name="Import another PDF" xml:space="preserve"><value>Impordi veel üks PDF</value></data>
-  <data name="Import failed." xml:space="preserve"><value>Import ebaõnnestus.</value></data>
   <data name="Import invoice PDF" xml:space="preserve"><value>Impordi arve PDF</value></data>
   <data name="Import PDF" xml:space="preserve"><value>Impordi PDF</value></data>
   <data name="import the file" xml:space="preserve"><value>failist importida</value></data>
   <data name="Import utility invoices, keep address and contact records tidy, split costs, and send monthly statements without leaving the service." xml:space="preserve"><value>Impordi kommunaalarved, hoia aadressid ja kontaktid korras, jaga kulud ja saada igakuised aruanded, ilma et peaksid teenusest lahkuma.</value></data>
   <data name="Import, split, send" xml:space="preserve"><value>Impordi, jaga, saada</value></data>
-  <data name="Imported {0} invoice from {1}, {2} in total." xml:space="preserve"><value>Imporditi {0} arve teenusepakkujalt {1}, kokku {2}.</value></data>
-  <data name="Imported {0} invoices from {1}, {2} in total." xml:space="preserve"><value>Imporditi {0} arvet teenusepakkujalt {1}, kokku {2}.</value></data>
   <data name="in progress" xml:space="preserve"><value>pooleli</value></data>
   <data name="Included in the {0} statement for {1} ({2}). Delete that statement first." xml:space="preserve"><value>Sisaldub perioodi {0} aruandes isikule {1} ({2}). Kustuta enne see aruanne.</value></data>
   <data name="instead." xml:space="preserve"><value>.</value></data>
@@ -277,13 +267,11 @@
   <data name="Over {0} months" xml:space="preserve"><value>{0} kuu põhjal</value></data>
   <data name="Overview" xml:space="preserve"><value>Ülevaade</value></data>
   <data name="Partially sent" xml:space="preserve"><value>Osaliselt saadetud</value></data>
-  <data name="PDF import result" xml:space="preserve"><value>PDF-i impordi tulemus</value></data>
   <data name="PDF invoice" xml:space="preserve"><value>PDF-arve</value></data>
   <data name="People" xml:space="preserve"><value>Inimesed</value></data>
   <data name="People who receive monthly statements. Link them to an address under" xml:space="preserve"><value>Inimesed, kes saavad igakuiseid aruandeid. Seo nad aadressiga jaotises</value></data>
   <data name="People who receive statements." xml:space="preserve"><value>Inimesed, kes saavad aruandeid.</value></data>
   <data name="Per month" xml:space="preserve"><value>Kuus</value></data>
-  <data name="Period" xml:space="preserve"><value>Periood</value></data>
   <data name="Period end" xml:space="preserve"><value>Perioodi lõpp</value></data>
   <data name="Period end can't be before period start." xml:space="preserve"><value>Perioodi lõpp ei saa olla enne perioodi algust.</value></data>
   <data name="Period start" xml:space="preserve"><value>Perioodi algus</value></data>
@@ -314,7 +302,6 @@
   <data name="Review failed" xml:space="preserve"><value>Vaata ebaõnnestunuid</value></data>
   <data name="Review generated statements, inspect invoice shares, and send drafts." xml:space="preserve"><value>Vaata genereeritud aruandeid, kontrolli arvete osasid ja saada mustandid.</value></data>
   <data name="Review the invoice and split" xml:space="preserve"><value>Vaata üle arve ja jaotus</value></data>
-  <data name="Review the invoices, then generate statements" xml:space="preserve"><value>Vaata arved üle ja genereeri siis aruanded</value></data>
   <data name="Review them first" xml:space="preserve"><value>Vaata need enne üle</value></data>
   <data name="Runtime" xml:space="preserve"><value>Käitusaeg</value></data>
   <data name="Same as language" xml:space="preserve"><value>Sama mis keel</value></data>
@@ -374,7 +361,6 @@
   <data name="Show as table" xml:space="preserve"><value>Näita tabelina</value></data>
   <data name="Show {0} past resident" xml:space="preserve"><value>Näita {0} endist elanikku</value></data>
   <data name="Show {0} past residents" xml:space="preserve"><value>Näita {0} endist elanikku</value></data>
-  <data name="Skipped rows" xml:space="preserve"><value>Vahele jäetud read</value></data>
   <data name="so invoices can be split." xml:space="preserve"><value>, et arveid saaks jagada.</value></data>
   <data name="Some setup is missing" xml:space="preserve"><value>Osa seadistusest on puudu</value></data>
   <data name="Source" xml:space="preserve"><value>Lähtekood</value></data>
@@ -394,7 +380,6 @@
   <data name="Statistics appear as soon as there are invoices to count." xml:space="preserve"><value>Statistika ilmub kohe, kui on arveid, mida kokku lugeda.</value></data>
   <data name="Status" xml:space="preserve"><value>Olek</value></data>
   <data name="Swapping to" xml:space="preserve"><value>Lülitudes keskkonda</value></data>
-  <data name="Telia or Enefit invoice · PDF · Maximum file size: 10 MB." xml:space="preserve"><value>Telia või Enefiti arve · PDF · Maksimaalne failisuurus: 10 MB.</value></data>
   <data name="The currency your invoices are in. Amounts are shown with it and sent in statement emails; nothing is converted." xml:space="preserve"><value>Valuuta, milles sinu arved on. Summad kuvatakse ja saadetakse aruannete e-kirjades selles valuutas, midagi ei konverteerita.</value></data>
   <data name="The Development environment shouldn't be enabled for deployed applications." xml:space="preserve"><value>Development-keskkonda ei tohiks avaldatud rakendustes lubada.</value></data>
   <data name="The field must be a number." xml:space="preserve"><value>Väli peab olema number.</value></data>
@@ -435,7 +420,6 @@
   <data name="Totals for the last {0} months" xml:space="preserve"><value>Viimase {0} kuu kokkuvõte</value></data>
   <data name="Track invoices, residents, allocations, and monthly statements from one workspace." xml:space="preserve"><value>Halda arveid, elanikke, jaotusi ja igakuiseid aruandeid ühest kohast.</value></data>
   <data name="Update statements for {0}" xml:space="preserve"><value>Uuenda aruandeid: {0}</value></data>
-  <data name="Upload a Telia or Enefit invoice PDF. The importer will match service and address records before creating invoices." xml:space="preserve"><value>Laadi üles Telia või Enefiti arve PDF. Importija seob teenused ja aadressid enne arvete loomist.</value></data>
   <data name="Used for times such as when a statement was sent." xml:space="preserve"><value>Kasutatakse kellaaegade jaoks, näiteks millal aruanne saadeti.</value></data>
   <data name="Username" xml:space="preserve"><value>Kasutajanimi</value></data>
   <data name="Usually statements are generated from invoices on the" xml:space="preserve"><value>Tavaliselt genereeritakse aruanded arvetest lehel</value></data>
@@ -445,7 +429,6 @@
   <data name="View invoices" xml:space="preserve"><value>Vaata arveid</value></data>
   <data name="View statements" xml:space="preserve"><value>Vaata aruandeid</value></data>
   <data name="vs previous {0} months" xml:space="preserve"><value>võrreldes eelmise {0} kuuga</value></data>
-  <data name="Warnings" xml:space="preserve"><value>Hoiatused</value></data>
   <data name="Where the money goes: invoice costs by month, service, address and person. Invoices count in the month of their invoice date." xml:space="preserve"><value>Kuhu raha läheb: arvete kulud kuude, teenuste, aadresside ja inimeste kaupa. Arve läheb arvesse selle kuu all, kuhu jääb arve kuupäev.</value></data>
   <data name="Who lives where. Invoices are split equally between the residents of an address on the invoice date." xml:space="preserve"><value>Kes kus elab. Arved jagatakse võrdselt aadressi elanike vahel, kes elasid seal arve kuupäeval.</value></data>
   <data name="Who pays" xml:space="preserve"><value>Kes maksab</value></data>
@@ -628,4 +611,84 @@
   <data name="Fix manual split" xml:space="preserve"><value>Paranda käsitsi jagamist</value></data>
   <data name="{0} invoice needs attention" xml:space="preserve"><value>{0} arve vajab tähelepanu</value></data>
   <data name="{0} invoices need attention" xml:space="preserve"><value>{0} arvet vajab tähelepanu</value></data>
+  <data name="API key revoked. Requests using it are rejected from now on." xml:space="preserve"><value>API-võti tühistati. Seda kasutavad päringud lükatakse nüüdsest tagasi.</value></data>
+  <data name="API keys" xml:space="preserve"><value>API-võtmed</value></data>
+  <data name="Active" xml:space="preserve"><value>Aktiivne</value></data>
+  <data name="Address in PDF" xml:space="preserve"><value>Aadress PDF-is</value></data>
+  <data name="All rows are handled. The document is done." xml:space="preserve"><value>Kõik read on käsitletud. Dokument on valmis.</value></data>
+  <data name="Back to settings" xml:space="preserve"><value>Tagasi seadetesse</value></data>
+  <data name="Back to uploaded PDFs" xml:space="preserve"><value>Tagasi üles laaditud PDF-ide juurde</value></data>
+  <data name="Choose a PDF invoice file to import." xml:space="preserve"><value>Vali imporditav PDF-arve.</value></data>
+  <data name="Choose a service and an address." xml:space="preserve"><value>Vali teenus ja aadress.</value></data>
+  <data name="Choose the service and address for each row below, or discard it." xml:space="preserve"><value>Vali iga allpool oleva rea jaoks teenus ja aadress või jäta rida kõrvale.</value></data>
+  <data name="Copy your new key now" xml:space="preserve"><value>Kopeeri uus võti kohe</value></data>
+  <data name="Create invoice" xml:space="preserve"><value>Loo arve</value></data>
+  <data name="Create invoices manually or import invoice PDFs from any provider." xml:space="preserve"><value>Sisesta arveid käsitsi või impordi mis tahes teenusepakkuja PDF-arveid.</value></data>
+  <data name="Create key" xml:space="preserve"><value>Loo võti</value></data>
+  <data name="Created" xml:space="preserve"><value>Loodud</value></data>
+  <data name="Discard" xml:space="preserve"><value>Jäta kõrvale</value></data>
+  <data name="Discard row?" xml:space="preserve"><value>Jätta rida kõrvale?</value></data>
+  <data name="Download PDF" xml:space="preserve"><value>Laadi PDF alla</value></data>
+  <data name="Enter a name of up to 128 characters." xml:space="preserve"><value>Sisesta kuni 128 märgi pikkune nimi.</value></data>
+  <data name="Enter an invoice by hand. If you have the PDF you can" xml:space="preserve"><value>Sisesta arve käsitsi. Kui sul on PDF, võid</value></data>
+  <data name="Enter invoices manually or import invoice PDFs." xml:space="preserve"><value>Sisesta arveid käsitsi või impordi PDF-arveid.</value></data>
+  <data name="Every invoice PDF you upload is kept here. Invoices are created from it once it has been read." xml:space="preserve"><value>Kõik üles laaditud PDF-arved hoitakse siin. Arved luuakse neist pärast PDF-i lugemist.</value></data>
+  <data name="File" xml:space="preserve"><value>Fail</value></data>
+  <data name="Import a PDF" xml:space="preserve"><value>Impordi PDF</value></data>
+  <data name="Invoice PDF · Maximum file size: 10 MB." xml:space="preserve"><value>PDF-arve · Suurim failimaht: 10 MB.</value></data>
+  <data name="Invoices created" xml:space="preserve"><value>Loodud arveid</value></data>
+  <data name="It is shown only once. If you lose it, revoke it and create a new one." xml:space="preserve"><value>Seda näidatakse ainult üks kord. Kui see kaob, tühista võti ja loo uus.</value></data>
+  <data name="Key" xml:space="preserve"><value>Võti</value></data>
+  <data name="Last used" xml:space="preserve"><value>Viimati kasutatud</value></data>
+  <data name="Let another program, such as a Gmail forwarder, upload invoice PDFs for you. Send the key in the X-Api-Key header to POST /api/v1/invoice-documents." xml:space="preserve"><value>Luba teisel programmil, näiteks Gmaili edastajal, sinu eest PDF-arveid üles laadida. Saada võti päises X-Api-Key päringuga POST /api/v1/invoice-documents.</value></data>
+  <data name="Missing a service or address?" xml:space="preserve"><value>Teenus või aadress puudub?</value></data>
+  <data name="Needs review" xml:space="preserve"><value>Vajab ülevaatamist</value></data>
+  <data name="Never" xml:space="preserve"><value>Mitte kunagi</value></data>
+  <data name="New API key" xml:space="preserve"><value>Uus API-võti</value></data>
+  <data name="No API keys yet." xml:space="preserve"><value>API-võtmeid veel pole.</value></data>
+  <data name="No PDFs uploaded yet." xml:space="preserve"><value>PDF-e pole veel üles laaditud.</value></data>
+  <data name="No invoice will be created for this row." xml:space="preserve"><value>Selle rea kohta arvet ei looda.</value></data>
+  <data name="No invoices were created" xml:space="preserve"><value>Arveid ei loodud</value></data>
+  <data name="No result arrived in time. Send it again to retry." xml:space="preserve"><value>Tulemus ei saabunud õigel ajal. Proovimiseks saada see uuesti.</value></data>
+  <data name="Only PDF files can be imported." xml:space="preserve"><value>Importida saab ainult PDF-faile.</value></data>
+  <data name="Original PDF" xml:space="preserve"><value>Algne PDF</value></data>
+  <data name="PDF saved, but it could not be sent for reading. Use Send again." xml:space="preserve"><value>PDF salvestati, kuid seda ei õnnestunud lugemiseks saata. Kasuta nuppu „Saada uuesti“.</value></data>
+  <data name="PDF uploaded. Its invoices appear here once it has been read." xml:space="preserve"><value>PDF laaditi üles. Arved ilmuvad siia pärast selle lugemist.</value></data>
+  <data name="Programs using the key {0} can no longer upload PDFs." xml:space="preserve"><value>Võtit {0} kasutavad programmid ei saa enam PDF-e üles laadida.</value></data>
+  <data name="Reading took too long" xml:space="preserve"><value>Lugemine võttis liiga kaua aega</value></data>
+  <data name="Result" xml:space="preserve"><value>Tulemus</value></data>
+  <data name="Revoke" xml:space="preserve"><value>Tühista</value></data>
+  <data name="Revoke key?" xml:space="preserve"><value>Tühistada võti?</value></data>
+  <data name="Revoked" xml:space="preserve"><value>Tühistatud</value></data>
+  <data name="Row discarded." xml:space="preserve"><value>Rida jäeti kõrvale.</value></data>
+  <data name="Row resolved." xml:space="preserve"><value>Rida lahendati.</value></data>
+  <data name="Rows" xml:space="preserve"><value>Read</value></data>
+  <data name="Select address" xml:space="preserve"><value>Vali aadress</value></data>
+  <data name="Select service" xml:space="preserve"><value>Vali teenus</value></data>
+  <data name="Sent for reading" xml:space="preserve"><value>Lugemiseks saadetud</value></data>
+  <data name="Sent for reading again." xml:space="preserve"><value>Saadeti uuesti lugemiseks.</value></data>
+  <data name="The PDF is being read. Reload this page in a moment to see the invoices." xml:space="preserve"><value>PDF-i loetakse. Arvete nägemiseks laadi leht hetke pärast uuesti.</value></data>
+  <data name="The PDF is too large. Maximum allowed size is 10 MB." xml:space="preserve"><value>PDF on liiga suur. Suurim lubatud maht on 10 MB.</value></data>
+  <data name="The document could not be sent for reading. Try again later." xml:space="preserve"><value>Dokumenti ei õnnestunud lugemiseks saata. Proovi hiljem uuesti.</value></data>
+  <data name="The file is empty." xml:space="preserve"><value>Fail on tühi.</value></data>
+  <data name="This document cannot be sent again right now." xml:space="preserve"><value>Seda dokumenti ei saa praegu uuesti saata.</value></data>
+  <data name="This row has already been handled." xml:space="preserve"><value>See rida on juba käsitletud.</value></data>
+  <data name="Upload an invoice PDF from any provider. It is read automatically, then matched to your services and addresses before invoices are created." xml:space="preserve"><value>Laadi üles mis tahes teenusepakkuja PDF-arve. See loetakse automaatselt ja seotakse enne arvete loomist sinu teenuste ja aadressidega.</value></data>
+  <data name="Uploaded" xml:space="preserve"><value>Üles laaditud</value></data>
+  <data name="Uploaded PDF" xml:space="preserve"><value>Üles laaditud PDF</value></data>
+  <data name="Uploaded PDFs" xml:space="preserve"><value>Üles laaditud PDF-id</value></data>
+  <data name="Uploaded {0}" xml:space="preserve"><value>Üles laaditud {0}</value></data>
+  <data name="You have already uploaded this PDF. Showing the existing document." xml:space="preserve"><value>Oled selle PDF-i juba üles laadinud. Kuvatakse olemasolev dokument.</value></data>
+  <data name="add an address" xml:space="preserve"><value>lisa aadress</value></data>
+  <data name="e.g. Gmail forwarder" xml:space="preserve"><value>nt Gmaili edastaja</value></data>
+  <data name="{0} row needs review" xml:space="preserve"><value>{0} rida vajab ülevaatamist</value></data>
+  <data name="{0} rows need review" xml:space="preserve"><value>{0} rida vajab ülevaatamist</value></data>
+  <data name="Timed out" xml:space="preserve"><value>Aegus</value></data>
+  <data name="Not sent for reading" xml:space="preserve"><value>Lugemiseks saatmata</value></data>
+  <data name="Reading" xml:space="preserve"><value>Loetakse</value></data>
+  <data name="Done" xml:space="preserve"><value>Valmis</value></data>
+  <data name="Invoice created" xml:space="preserve"><value>Arve loodud</value></data>
+  <data name="Already exists" xml:space="preserve"><value>On juba olemas</value></data>
+  <data name="Incomplete" xml:space="preserve"><value>Puudulik</value></data>
+  <data name="Discarded" xml:space="preserve"><value>Kõrvale jäetud</value></data>
 </root>

@@ -6,11 +6,12 @@
     <div class="page-header__title">
         <p class="kicker">@T["Billing"]</p>
         <h1>@T["Import invoice PDF"]</h1>
-        <p class="page-header__lede">@T["Upload a Telia or Enefit invoice PDF. The importer will match service and address records before creating invoices."]</p>
+        <p class="page-header__lede">@T["Upload an invoice PDF from any provider. It is read automatically, then matched to your services and addresses before invoices are created."]</p>
     </div>
 </header>
 
 <form asp-action="Upload" method="post" enctype="multipart/form-data" class="card form narrow">
+    <div asp-validation-summary="All"></div>
     <div class="field">
         <label for="pdfFile" class="field__label">@T["PDF invoice"]</label>
         <div class="dropzone" data-dropzone>
@@ -18,12 +19,12 @@
             <span class="icon-tile"><svg class="icon icon--lg" aria-hidden="true"><use href="#i-upload"></use></svg></span>
             <span class="dropzone__prompt" data-dropzone-prompt>@T["Drop a PDF here or"] <strong>@T["browse files"]</strong></span>
             <span class="dropzone__file" data-dropzone-file hidden></span>
-            <span class="field__help" id="pdfFileHelp">@T["Telia or Enefit invoice · PDF · Maximum file size: 10 MB."]</span>
+            <span class="field__help" id="pdfFileHelp">@T["Invoice PDF · Maximum file size: 10 MB."]</span>
         </div>
     </div>
     <div class="form-actions">
         <button type="submit" class="btn btn--primary">@T["Import PDF"]</button>
-        <a asp-controller="Invoices" asp-action="Index" class="btn btn--ghost">@T["Back to invoices"]</a>
+        <a asp-controller="InvoiceDocuments" asp-action="Index" class="btn btn--ghost">@T["Uploaded PDFs"]</a>
     </div>
 </form>
 

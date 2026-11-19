@@ -225,6 +225,60 @@ namespace DataAccess.Migrations
                     b.ToTable("AllocationRuleShares", "invoice");
                 });
 
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.ApiKeyEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("KeyHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("KeyPrefix")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<DateTime?>("LastUsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KeyHash")
+                        .IsUnique();
+
+                    b.ToTable("ApiKeys", "invoice");
+                });
+
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.AppUserEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -410,6 +464,144 @@ namespace DataAccess.Migrations
                     b.ToTable("InvoiceAllocations", "invoice");
                 });
 
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.InvoiceDocumentEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("FailureReason")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("ParseExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ParseRequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ServiceName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Sha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("StorageKey")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Sha256")
+                        .IsUnique();
+
+                    b.HasIndex("UserId", "UploadedAt");
+
+                    b.ToTable("InvoiceDocuments", "invoice");
+                });
+
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.InvoiceDocumentRowEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AddressText")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<decimal?>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateOnly?>("InvoiceDate")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("InvoiceDocumentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("InvoiceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Outcome")
+                        .HasColumnType("integer");
+
+                    b.Property<DateOnly?>("PeriodEnd")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("PeriodStart")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvoiceId");
+
+                    b.HasIndex("InvoiceDocumentId", "Position")
+                        .IsUnique();
+
+                    b.ToTable("InvoiceDocumentRows", "invoice");
+                });
+
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.InvoiceEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -434,6 +626,9 @@ namespace DataAccess.Migrations
 
                     b.Property<DateOnly>("InvoiceDate")
                         .HasColumnType("date");
+
+                    b.Property<Guid?>("InvoiceDocumentId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateOnly?>("PeriodEnd")
                         .HasColumnType("date");
@@ -464,6 +659,8 @@ namespace DataAccess.Migrations
                     b.HasIndex("AddressId");
 
                     b.HasIndex("InvoiceDate");
+
+                    b.HasIndex("InvoiceDocumentId");
 
                     b.HasIndex("ServiceId");
 
@@ -832,6 +1029,24 @@ namespace DataAccess.Migrations
                     b.Navigation("Invoice");
                 });
 
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.InvoiceDocumentRowEntity", b =>
+                {
+                    b.HasOne("DTO.DataAccess.DataAccess.DTO.InvoiceDocumentEntity", "InvoiceDocument")
+                        .WithMany("Rows")
+                        .HasForeignKey("InvoiceDocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DTO.DataAccess.DataAccess.DTO.InvoiceEntity", "Invoice")
+                        .WithMany()
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("InvoiceDocument");
+                });
+
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.InvoiceEntity", b =>
                 {
                     b.HasOne("DTO.DataAccess.DataAccess.DTO.AddressEntity", "Address")
@@ -840,6 +1055,11 @@ namespace DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DTO.DataAccess.DataAccess.DTO.InvoiceDocumentEntity", "InvoiceDocument")
+                        .WithMany()
+                        .HasForeignKey("InvoiceDocumentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("DTO.DataAccess.DataAccess.DTO.ServiceEntity", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId")
@@ -847,6 +1067,8 @@ namespace DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Address");
+
+                    b.Navigation("InvoiceDocument");
 
                     b.Navigation("Service");
                 });
@@ -929,6 +1151,11 @@ namespace DataAccess.Migrations
                     b.Navigation("MonthlyStatementContacts");
 
                     b.Navigation("MonthlyStatements");
+                });
+
+            modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.InvoiceDocumentEntity", b =>
+                {
+                    b.Navigation("Rows");
                 });
 
             modelBuilder.Entity("DTO.DataAccess.DataAccess.DTO.InvoiceEntity", b =>

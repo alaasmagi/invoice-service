@@ -53,8 +53,11 @@
             </a>
 
             <div class="nav__group">@T["Billing"]</div>
-            <a class="nav-item" asp-area="" asp-controller="Invoices" asp-action="Index" aria-current="@Current("Invoices", "InvoiceImports")">
+            <a class="nav-item" asp-area="" asp-controller="Invoices" asp-action="Index" aria-current="@Current("Invoices")">
                 <svg class="icon" aria-hidden="true"><use href="#i-file-text"></use></svg>@T["Invoices"]
+            </a>
+            <a class="nav-item" asp-area="" asp-controller="InvoiceDocuments" asp-action="Index" aria-current="@Current("InvoiceDocuments", "InvoiceImports")">
+                <svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>@T["Uploaded PDFs"]
             </a>
             <a class="nav-item" asp-area="" asp-controller="MonthlyStatements" asp-action="Index" aria-current="@Current("MonthlyStatements")">
                 <svg class="icon" aria-hidden="true"><use href="#i-receipt"></use></svg>@T["Statements"]

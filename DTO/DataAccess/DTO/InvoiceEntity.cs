@@ -20,6 +20,10 @@ public class InvoiceEntity : BaseEntityUserWithMetaConcurrency
 
     public decimal TotalSum { get; set; }
 
+    public Guid? InvoiceDocumentId { get; set; }
+
+    public InvoiceDocumentEntity? InvoiceDocument { get; set; }
+
     public ICollection<InvoiceAllocationEntity> Allocations { get; set; }
         = new List<InvoiceAllocationEntity>();
 }

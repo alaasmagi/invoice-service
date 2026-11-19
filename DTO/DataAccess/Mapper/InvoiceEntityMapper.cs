@@ -17,7 +17,8 @@ public class InvoiceEntityMapper : IMapper<Invoice, InvoiceEntity>
             InvoiceDate = entity.InvoiceDate,
             PeriodStart = entity.PeriodStart,
             PeriodEnd = entity.PeriodEnd,
-            TotalSum = entity.TotalSum
+            TotalSum = entity.TotalSum,
+            InvoiceDocumentId = entity.InvoiceDocumentId
         };
     }
 
@@ -37,7 +38,8 @@ public class InvoiceEntityMapper : IMapper<Invoice, InvoiceEntity>
             InvoiceDate = entity.InvoiceDate,
             PeriodStart = entity.PeriodStart,
             PeriodEnd = entity.PeriodEnd,
-            TotalSum = entity.TotalSum
+            TotalSum = entity.TotalSum,
+            InvoiceDocumentId = entity.InvoiceDocumentId
         };
     }
 

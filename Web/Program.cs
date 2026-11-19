@@ -21,6 +21,8 @@ InvoiceServiceApplication.Run(args, app =>
     app.UseAuthentication();
     app.UseRequestLocalization();
     app.UseAuthorization();
+    // After authorization, so API requests are limited per authenticated user (see ApiRateLimiting).
+    app.UseRateLimiter();
 
     app.MapStaticAssets();
 

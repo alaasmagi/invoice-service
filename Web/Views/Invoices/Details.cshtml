@@ -12,6 +12,10 @@
         <p class="page-header__lede">@T["{0} · dated {1}", Fmt.Money(invoice.TotalSum), Fmt.Date(invoice.InvoiceDate)]</p>
     </div>
     <div class="page-header__actions">
+        @if (invoice.InvoiceDocumentId != null)
+        {
+            <a asp-controller="InvoiceDocuments" asp-action="Download" asp-route-id="@invoice.InvoiceDocumentId" class="btn btn--ghost"><svg class="icon" aria-hidden="true"><use href="#i-file-text"></use></svg>@T["Original PDF"]</a>
+        }
         <a asp-action="Edit" asp-route-id="@invoice.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>@T["Edit"]</a>
         <a asp-action="Delete" asp-route-id="@invoice.Id" class="btn btn--ghost"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>@T["Delete"]</a>
     </div>

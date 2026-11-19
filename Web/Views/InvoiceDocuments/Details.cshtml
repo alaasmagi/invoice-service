@@ -1,0 +1,163 @@
+@model InvoiceDocumentDetailsViewModel
+@{
+    var document = Model.Document;
+    ViewData["Title"] = document.FileName;
+    var unmatched = document.Rows.Where(row => row.Outcome == Domain.EInvoiceDocumentRowOutcome.Unmatched).ToList();
+    var handled = document.Rows.Where(row => row.Outcome != Domain.EInvoiceDocumentRowOutcome.Unmatched).ToList();
+}
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">@T["Uploaded PDF"]</p>
+        <h1>@document.FileName</h1>
+        <p class="page-header__lede">@T["Uploaded {0}", Fmt.Timestamp(document.UploadedAt)]</p>
+    </div>
+    <div class="page-header__actions">
+        <a asp-action="Download" asp-route-id="@document.Id" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-file-text"></use></svg>@T["Download PDF"]</a>
+        @if (document.CanRetry)
+        {
+            <form asp-action="Retry" asp-route-id="@document.Id" method="post">
+                <button type="submit" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>@T["Send again"]</button>
+            </form>
+        }
+    </div>
+</header>
+
+@if (document.IsTimedOut)
+{
+    <div class="alert alert--warning">
+        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+        <div class="alert__body"><span class="alert__title">@T["Reading took too long"]</span><span>@T["No result arrived in time. Send it again to retry."]</span></div>
+    </div>
+}
+else if (document.Status == Domain.EInvoiceDocumentStatus.Processing)
+{
+    <div class="alert alert--info">
+        <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+        <div class="alert__body"><span>@T["The PDF is being read. Reload this page in a moment to see the invoices."]</span></div>
+    </div>
+}
+else if (document.Status is Domain.EInvoiceDocumentStatus.Failed or Domain.EInvoiceDocumentStatus.Uploaded && document.FailureReason != null)
+{
+    <div class="alert alert--danger">
+        <svg class="icon" aria-hidden="true"><use href="#i-circle-x"></use></svg>
+        <div class="alert__body"><span class="alert__title">@T["No invoices were created"]</span><span>@document.FailureReason</span></div>
+    </div>
+}
+else if (document.Status == Domain.EInvoiceDocumentStatus.NeedsReview)
+{
+    <div class="alert alert--warning">
+        <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"></use></svg>
+        <div class="alert__body"><span class="alert__title">@T.Plural(unmatched.Count, "{0} row needs review", "{0} rows need review")</span><span>@T["Choose the service and address for each row below, or discard it."]</span></div>
+    </div>
+}
+
+<dl class="card details medium">
+    <div class="details__row"><dt>@T["Status"]</dt><dd><partial name="_DocumentStatus" model="document" /></dd></div>
+    <div class="details__row"><dt>@T["Service"]</dt><dd>@(document.ServiceName ?? "—")</dd></div>
+    <div class="details__row"><dt>@T["Sent for reading"]</dt><dd>@Fmt.Timestamp(document.ParseRequestedAt)</dd></div>
+    <div class="details__row"><dt>@T["Invoices created"]</dt><dd>@handled.Count(row => row.Outcome == Domain.EInvoiceDocumentRowOutcome.Created)</dd></div>
+</dl>
+
+@if (unmatched.Any())
+{
+    <section class="section">
+        <div class="section-head"><h2 class="section-title">@T["Needs review"]</h2></div>
+        <div class="card table-card">
+            <table class="data-table">
+                <thead><tr><th>@T["Address in PDF"]</th><th>@T["Invoice date"]</th><th>@T["Billed period"]</th><th class="num">@T["Amount"]</th><th>@T["Reason"]</th><th>@T["Service"]</th><th>@T["Address"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
+                <tbody>
+                @foreach (var row in unmatched)
+                {
+                    var formId = $"resolve-{row.Id}";
+                    <tr>
+                        <td>@row.AddressText</td>
+                        <td class="nowrap">@Fmt.Date(row.InvoiceDate)</td>
+                        <td class="nowrap">@Fmt.Range(row.PeriodStart, row.PeriodEnd)</td>
+                        <td class="num">@(row.Amount.HasValue ? Fmt.Money(row.Amount.Value) : "—")</td>
+                        <td class="secondary">@row.Reason</td>
+                        <td>
+                            <div class="field__control">
+                                <select name="serviceId" form="@formId" class="input" aria-label="@T["Service"]" required>
+                                    <option value="">@T["Select service"]</option>
+                                    @foreach (var option in Model.ServiceOptions)
+                                    {
+                                        <option value="@option.Value" selected="@(option.Value == Model.SuggestedServiceId?.ToString())">@option.Text</option>
+                                    }
+                                </select>
+                                <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="field__control">
+                                <select name="addressId" form="@formId" class="input" aria-label="@T["Address"]" required>
+                                    <option value="">@T["Select address"]</option>
+                                    @foreach (var option in Model.AddressOptions)
+                                    {
+                                        <option value="@option.Value">@option.Text</option>
+                                    }
+                                </select>
+                                <svg class="icon icon--end" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+                            </div>
+                        </td>
+                        <td class="actions-col">
+                            <div class="row-actions">
+                                <form id="@formId" asp-action="Resolve" asp-route-id="@document.Id" method="post">
+                                    <input type="hidden" name="rowId" value="@row.Id" />
+                                    <button type="submit" class="btn btn--secondary btn--sm">@T["Create invoice"]</button>
+                                </form>
+                                <form asp-action="Discard" asp-route-id="@document.Id" method="post"
+                                      data-confirm="@T["No invoice will be created for this row."]" data-confirm-title="@T["Discard row?"]" data-confirm-action="@T["Discard"]" data-confirm-tone="danger">
+                                    <input type="hidden" name="rowId" value="@row.Id" />
+                                    <button type="submit" class="icon-btn icon-btn--danger" aria-label="@T["Discard"]" title="@T["Discard"]"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        @if (!Model.ServiceOptions.Any() || !Model.AddressOptions.Any())
+        {
+            <p class="secondary">@T["Missing a service or address?"] <a asp-controller="Services" asp-action="Create" class="link">@T["Add a service"]</a> @T["or"] <a asp-controller="Addresses" asp-action="Create" class="link">@T["add an address"]</a>.</p>
+        }
+    </section>
+}
+
+@if (handled.Any())
+{
+    <section class="section">
+        <div class="section-head"><h2 class="section-title">@T["Rows"]</h2></div>
+        <div class="card table-card">
+            <table class="data-table">
+                <thead><tr><th>@T["Address in PDF"]</th><th>@T["Invoice date"]</th><th>@T["Billed period"]</th><th class="num">@T["Amount"]</th><th>@T["Result"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
+                <tbody>
+                @foreach (var row in handled)
+                {
+                    <tr>
+                        <td>@(row.AddressText ?? "—")</td>
+                        <td class="nowrap">@Fmt.Date(row.InvoiceDate)</td>
+                        <td class="nowrap">@Fmt.Range(row.PeriodStart, row.PeriodEnd)</td>
+                        <td class="num">@(row.Amount.HasValue ? Fmt.Money(row.Amount.Value) : "—")</td>
+                        <td>
+                            <div class="stack-cell">
+                                <span>@Fmt.RowOutcomeLabel(row.Outcome)</span>
+                                @if (row.Reason != null) { <span>@row.Reason</span> }
+                            </div>
+                        </td>
+                        <td class="actions-col">
+                            @if (row.InvoiceId != null)
+                            {
+                                <a asp-controller="Invoices" asp-action="Details" asp-route-id="@row.InvoiceId" class="btn btn--ghost btn--sm">@T["Details"]</a>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
+
+<div><a asp-action="Index" class="btn btn--ghost">@T["Back to uploaded PDFs"]</a></div>

@@ -8,6 +8,7 @@ using Base.Keycloak.Events;
 using Base.Message.RabbitMQ;
 using Contracts.Application;
 using Contracts.DataAccess;
+using Contracts.External;
 using DataAccess;
 using DataAccess.Context;
 using Domain;
@@ -22,6 +23,8 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 using System.Net;
+using Microsoft.AspNetCore.Authentication;
+using Web.Authentication;
 using Web.Filters;
 using Web.Helpers;
 using Web.Localization;
@@ -134,7 +137,9 @@ public static class InvoiceServiceApplication
         builder.Services.AddHealthChecks();
 
         builder.Services.AddHttpContextAccessor();
-        builder.Services.AddKeycloakOidc(keycloakOptions);
+        builder.Services.AddKeycloakOidc(keycloakOptions)
+            .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.SchemeName, null);
+        builder.Services.AddApiRateLimiting();
         builder.Services.AddAuthorization();
 
         builder.Services.AddSingleton(invoiceMessagingOptions);
@@ -146,8 +151,14 @@ public static class InvoiceServiceApplication
         builder.Services.AddSingleton<IBaseEventHandler<UserEventContent>, UserEventHandler>();
         // One queue per service: the router dispatches each message by its routing-key source.
         builder.Services.AddRabbitMqRoutingConsumer(invoiceMessagingOptions.Queue, routes => routes
-            .Route<UserEventContent>(MessagingContract.IdentitySource));
+            .Route<UserEventContent>(MessagingContract.IdentitySource)
+            .Route<InvoiceParsedContent>(MessagingContract.AiHubSource, MessagingContract.InvoiceParsedAction)
+            .Route<InvoiceParseFailedContent>(MessagingContract.AiHubSource, MessagingContract.InvoiceParseFailedAction));
+        builder.Services.AddScoped<IBaseEventHandler<InvoiceParsedContent>, InvoiceParsedEventHandler>();
+        builder.Services.AddScoped<IBaseEventHandler<InvoiceParseFailedContent>, InvoiceParseFailedEventHandler>();
         builder.Services.AddSingleton<IMonthlyInvoiceEmailPublisher, RabbitMqMonthlyInvoiceEmailPublisher>();
+        builder.Services.AddSingleton<IInvoiceParseRequestPublisher, RabbitMqInvoiceParseRequestPublisher>();
+        builder.Services.AddSingleton(TimeProvider.System);
 
         builder.Services.AddR2FileStorage(storageOptions);
 
@@ -199,6 +210,9 @@ public static class InvoiceServiceApplication
         services.AddScoped<IMapper<Service, ServiceEntity>, ServiceEntityMapper>();
         services.AddScoped<IMapper<AllocationRule, AllocationRuleEntity>, AllocationRuleEntityMapper>();
         services.AddScoped<IMapper<AllocationRuleShare, AllocationRuleShareEntity>, AllocationRuleShareEntityMapper>();
+        services.AddScoped<IMapper<InvoiceDocument, InvoiceDocumentEntity>, InvoiceDocumentEntityMapper>();
+        services.AddScoped<IMapper<InvoiceDocumentRow, InvoiceDocumentRowEntity>, InvoiceDocumentRowEntityMapper>();
+        services.AddScoped<IMapper<ApiKey, ApiKeyEntity>, ApiKeyEntityMapper>();
     }
 
     private static void AddWebMappers(this IServiceCollection services)
@@ -213,6 +227,9 @@ public static class InvoiceServiceApplication
         services.AddScoped<IMapper<ServiceDto, Service>, ServiceDtoMapper>();
         services.AddScoped<IMapper<AllocationRuleDto, AllocationRule>, AllocationRuleDtoMapper>();
         services.AddScoped<IMapper<AllocationRuleShareDto, AllocationRuleShare>, AllocationRuleShareDtoMapper>();
+        services.AddScoped<IMapper<InvoiceDocumentDto, InvoiceDocument>, InvoiceDocumentDtoMapper>();
+        services.AddScoped<IMapper<InvoiceDocumentDetailsDto, InvoiceDocument>, InvoiceDocumentDetailsDtoMapper>();
+        services.AddScoped<IMapper<ApiKeyDto, ApiKey>, ApiKeyDtoMapper>();
     }
 
     private static void AddRepositories(this IServiceCollection services)
@@ -230,6 +247,9 @@ public static class InvoiceServiceApplication
         services.AddScoped<IMonthlyStatementLineRepository, MonthlyStatementLineRepository>();
         services.AddScoped<IServiceRepository, ServiceRepository>();
         services.AddScoped<IAllocationRuleRepository, AllocationRuleRepository>();
+        services.AddScoped<IInvoiceDocumentRepository, InvoiceDocumentRepository>();
+        services.AddScoped<IInvoiceDocumentRowRepository, InvoiceDocumentRowRepository>();
+        services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
         services.AddScoped<IBaseUow, DataAccessUow>();
     }
 
@@ -249,11 +269,11 @@ public static class InvoiceServiceApplication
         services.AddScoped<ISendMonthlyStatementService, SendMonthlyStatementService>();
         services.AddScoped<ISendPeriodInvoiceEmailsService, SendPeriodInvoiceEmailsService>();
         services.AddScoped<IMonthlyStatementSenderPaymentDetailsProvider, AppUserMonthlyStatementSenderPaymentDetailsProvider>();
-        services.AddScoped<IPdfInvoiceImportService, PdfInvoiceImportService>();
-        services.AddScoped<IPdfInvoiceTextExtractor, PdfInvoiceTextExtractor>();
-        services.AddScoped<IPdfInvoiceProviderDetector, PdfInvoiceProviderDetector>();
-        services.AddScoped<IPdfInvoiceParser, TeliaPdfInvoiceParser>();
-        services.AddScoped<IPdfInvoiceParser, EnefitPdfInvoiceParser>();
+        services.AddScoped<IParsedInvoiceImporter, ParsedInvoiceImporter>();
+        services.AddScoped<IInvoiceDocumentService, InvoiceDocumentService>();
+        services.AddScoped<IInvoiceParseResultService, InvoiceParseResultService>();
+        services.AddScoped<IInvoiceDocumentReviewService, InvoiceDocumentReviewService>();
+        services.AddScoped<IApiKeyService, ApiKeyService>();
     }
 
     private static void AddLocalizationSupport(this IServiceCollection services)

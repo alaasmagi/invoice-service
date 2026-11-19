@@ -1,0 +1,42 @@
+@model IReadOnlyList<DTO.DataAccess.Web.DTO.InvoiceDocumentDetailsDto>
+@{
+    ViewData["Title"] = T["Uploaded PDFs"];
+}
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">@T["Billing"]</p>
+        <h1>@T["Uploaded PDFs"]</h1>
+        <p class="page-header__lede">@T["Every invoice PDF you upload is kept here. Invoices are created from it once it has been read."]</p>
+    </div>
+    <div class="page-header__actions">
+        <a asp-controller="InvoiceImports" asp-action="Upload" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>@T["Import PDF"]</a>
+    </div>
+</header>
+
+<div class="card table-card">
+    <table class="data-table">
+        <thead><tr><th>@T["File"]</th><th>@T["Service"]</th><th>@T["Uploaded"]</th><th>@T["Status"]</th><th class="num">@T["Invoices"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
+        <tbody>
+        @foreach (var document in Model)
+        {
+            <tr class="@(document.Status == Domain.EInvoiceDocumentStatus.Failed ? "is-warning" : null)">
+                <td><a asp-action="Details" asp-route-id="@document.Id" class="link">@document.FileName</a></td>
+                <td>@(document.ServiceName ?? "—")</td>
+                <td class="nowrap secondary">@Fmt.Timestamp(document.UploadedAt)</td>
+                <td><partial name="_DocumentStatus" model="document" /></td>
+                <td class="num">@document.Rows.Count(row => row.Outcome == Domain.EInvoiceDocumentRowOutcome.Created)</td>
+                <td class="actions-col">
+                    <div class="row-actions">
+                        <a asp-action="Download" asp-route-id="@document.Id" class="icon-btn" aria-label="@T["Download PDF"]" title="@T["Download PDF"]"><svg class="icon" aria-hidden="true"><use href="#i-file-text"></use></svg></a>
+                    </div>
+                </td>
+            </tr>
+        }
+        @if (!Model.Any())
+        {
+            <tr><td colspan="6" class="empty"><span>@T["No PDFs uploaded yet."] <a asp-controller="InvoiceImports" asp-action="Upload" class="link">@T["Import a PDF"]</a></span></td></tr>
+        }
+        </tbody>
+    </table>
+</div>

@@ -27,6 +27,9 @@ public class InvoiceDto : BaseEntityUserWithConcurrency
     [Display(Name = "Total")]
     public decimal TotalSum { get; set; }
 
+    /// <summary>The uploaded PDF this invoice was created from, if any. Set only by the import; never bound from forms.</summary>
+    public Guid? InvoiceDocumentId { get; set; }
+
     public ICollection<InvoiceAllocationDto> Allocations { get; set; }
         = new List<InvoiceAllocationDto>();
 }

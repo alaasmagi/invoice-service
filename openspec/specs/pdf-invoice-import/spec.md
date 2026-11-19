@@ -1,14 +1,17 @@
 ## Purpose
-Define how provider PDF invoices are uploaded, parsed and turned into invoices.
-
+Define how invoice PDFs are uploaded in the web UI and how their parsed rows are matched and turned into invoices.
 ## Requirements
-
 ### Requirement: PDF import upload
-The system SHALL allow an authenticated user to upload one PDF file for invoice import.
+The system SHALL allow an authenticated user to upload one PDF file for invoice import. An accepted upload SHALL be
+stored as an invoice document and queued for AI parsing; invoices are created when the parse result arrives.
 
 #### Scenario: Upload page is available
 - **WHEN** an authenticated user opens the invoice import page
 - **THEN** the system displays a PDF upload form
+
+#### Scenario: Accepted upload is queued
+- **WHEN** an authenticated user submits a valid PDF
+- **THEN** the system stores it as an invoice document, requests AI parsing and shows the document's status page
 
 #### Scenario: Non-PDF upload is rejected
 - **WHEN** an authenticated user submits a file that is not a PDF
@@ -18,100 +21,71 @@ The system SHALL allow an authenticated user to upload one PDF file for invoice 
 - **WHEN** an authenticated user submits a PDF larger than the configured upload limit
 - **THEN** the system rejects the import and creates no invoices
 
-### Requirement: Provider detection
-The system SHALL detect whether an uploaded PDF is a supported Telia or Enefit invoice before parsing address-level invoice rows.
-
-#### Scenario: Telia invoice is detected
-- **WHEN** the uploaded PDF text contains Telia invoice markers
-- **THEN** the system selects the Telia import parser
-
-#### Scenario: Enefit invoice is detected
-- **WHEN** the uploaded PDF text contains Enefit invoice markers
-- **THEN** the system selects the Enefit import parser
-
-#### Scenario: Unsupported provider is rejected
-- **WHEN** the uploaded PDF text does not match Telia or Enefit
-- **THEN** the system rejects the import and creates no invoices
-
-#### Scenario: Ambiguous provider is rejected
-- **WHEN** the uploaded PDF text matches more than one provider with equal confidence
-- **THEN** the system rejects the import and creates no invoices
-
-### Requirement: Provider-specific PDF parsing
-The system SHALL parse Telia and Enefit invoices using separate provider-specific import processes.
-
-#### Scenario: Multi-page invoice is parsed
-- **WHEN** a supported provider PDF contains multiple pages
-- **THEN** the system reads all pages before producing invoice rows
-
-#### Scenario: Multiple addresses are parsed
-- **WHEN** a supported provider PDF contains charges for multiple addresses
-- **THEN** the system produces one parsed invoice row per address charge
-
-#### Scenario: Address amount is preserved
-- **WHEN** a parsed invoice row contains an address-specific amount
-- **THEN** the system uses that address-specific amount as the invoice total for that address
-
-#### Scenario: Required invoice metadata is missing
-- **WHEN** a parsed invoice row is missing service, invoice date, period, address, or amount data required to create an invoice
-- **THEN** the system skips that row and reports the missing data
-
 ### Requirement: Service matching
-The system SHALL match the parsed provider/service name to an existing `Service` record owned by the authenticated user.
+The system SHALL match the parsed provider/service name to an existing `Service` record owned by the document's
+owner. When no service matches, the document's rows SHALL wait for the user to choose a service in review.
 
 #### Scenario: Existing service is matched
-- **WHEN** the parsed provider is Telia or Enefit and the current user has a matching service record
+- **WHEN** the parsed service name matches a service record of the document's owner
 - **THEN** the system uses that service when creating imported invoices
 
-#### Scenario: Missing service blocks import
-- **WHEN** the parsed provider has no matching service record for the current user
-- **THEN** the system creates no invoices and reports the missing service match
+#### Scenario: Missing service requires review
+- **WHEN** the parsed service name has no matching service record for the document's owner
+- **THEN** the system creates no invoices yet, records the rows as unmatched and sets the document to `NeedsReview`
 
 #### Scenario: Another user's service is ignored
-- **WHEN** another user has a matching service record but the current user does not
-- **THEN** the system treats the service as missing for the current user
+- **WHEN** another user has a matching service record but the document's owner does not
+- **THEN** the system treats the service as missing for the document's owner
 
 ### Requirement: Address matching
-The system SHALL match each parsed PDF address to an existing `Address` record owned by the authenticated user before creating an invoice for that address. Matching SHALL support normalized exact matches and normalized partial matches where the parsed PDF address text is contained in the stored address name or full address.
+The system SHALL match each parsed PDF address to an existing `Address` record owned by the document's owner before
+creating an invoice for that address. Matching SHALL support normalized exact matches and normalized partial matches
+where the parsed PDF address text is contained in the stored address name or full address. Rows that cannot be
+matched SHALL wait for the user to choose an address in review.
 
 #### Scenario: Address name is matched
-- **WHEN** a parsed PDF address matches the current user's address name after normalization
+- **WHEN** a parsed PDF address matches the owner's address name after normalization
 - **THEN** the system attaches the imported invoice to that address
 
 #### Scenario: Full address is matched
-- **WHEN** a parsed PDF address matches the current user's full address after normalization
+- **WHEN** a parsed PDF address matches the owner's full address after normalization
 - **THEN** the system attaches the imported invoice to that address
 
 #### Scenario: Partial address is matched
-- **WHEN** a parsed PDF address is contained in exactly one current-user address name or full address after normalization
+- **WHEN** a parsed PDF address is contained in exactly one of the owner's address names or full addresses after normalization
 - **THEN** the system attaches the imported invoice to that address
 
-#### Scenario: Ambiguous partial address is skipped
-- **WHEN** a parsed PDF address is contained in more than one equally ranked current-user address
-- **THEN** the system skips that address row and reports the ambiguous address match
+#### Scenario: Ambiguous partial address requires review
+- **WHEN** a parsed PDF address is contained in more than one equally ranked address of the owner
+- **THEN** the system records the row as unmatched with the ambiguity reason and the document requires review
 
-#### Scenario: Unmatched address is skipped
-- **WHEN** a parsed PDF address does not match any current-user address
-- **THEN** the system skips that address row and reports the unmatched address
+#### Scenario: Unmatched address requires review
+- **WHEN** a parsed PDF address does not match any address of the owner
+- **THEN** the system records the row as unmatched and the document requires review
 
 #### Scenario: Another user's address is ignored
-- **WHEN** another user has a matching address but the current user does not
-- **THEN** the system treats the address as unmatched for the current user
+- **WHEN** another user has a matching address but the document's owner does not
+- **THEN** the system treats the address as unmatched for the document's owner
 
 ### Requirement: Invoice creation from imported rows
-The system SHALL create one `Invoice` per successfully matched address row from the PDF.
+The system SHALL create one `Invoice` per successfully matched address row of a parsed document, linked to that
+document.
 
 #### Scenario: Matched row creates invoice
 - **WHEN** a parsed row has a matched service, matched address, invoice date, period, and amount
-- **THEN** the system creates an invoice with the parsed service, address, invoice date, period, and amount
+- **THEN** the system creates an invoice with the parsed service, address, invoice date, period, and amount, linked to the document
 
 #### Scenario: Imported invoice creates allocations
 - **WHEN** the system creates an invoice from an imported row
 - **THEN** the system applies the same allocation behavior as manual invoice creation
 
-#### Scenario: Partial import succeeds with skipped rows
-- **WHEN** a PDF contains both matched and unmatched address rows
-- **THEN** the system creates invoices for matched rows and reports skipped rows for unmatched addresses
+#### Scenario: Partial import goes to review
+- **WHEN** a parsed document contains both matched and unmatched rows
+- **THEN** the system creates invoices for matched rows and sets the document to `NeedsReview` for the rest
+
+#### Scenario: Row with missing data is not created
+- **WHEN** a parsed row is missing the address, amount or invoice date needed to create an invoice
+- **THEN** the system creates no invoice for that row and records it as invalid with the missing data
 
 ### Requirement: Duplicate import protection
 The system SHALL avoid creating duplicate invoices for rows that already exist for the current user.
@@ -125,16 +99,17 @@ The system SHALL avoid creating duplicate invoices for rows that already exist f
 - **THEN** the system does not treat the row as an exact duplicate
 
 ### Requirement: Import result reporting
-The system SHALL show the user a result summary after an import attempt.
+The system SHALL show the user each import's outcome on the invoice document's page once parsing has finished.
 
 #### Scenario: Successful import summary
-- **WHEN** one or more invoices are created from the PDF
-- **THEN** the system shows the number of created invoices and their matched addresses and amounts
+- **WHEN** one or more invoices are created from the document
+- **THEN** the document page shows the number of created invoices and their matched addresses and amounts
 
 #### Scenario: Skipped row summary
-- **WHEN** one or more parsed rows are skipped
-- **THEN** the system shows the skipped rows and the reason each row was skipped
+- **WHEN** one or more parsed rows are duplicates, invalid, unmatched or discarded
+- **THEN** the document page shows those rows and the reason for each
 
-#### Scenario: Fatal import error summary
-- **WHEN** provider detection, text extraction, or required service matching fails
-- **THEN** the system shows the error and confirms that no invoices were created
+#### Scenario: Failed import summary
+- **WHEN** parsing fails or the parse result cannot be used
+- **THEN** the document page shows the failure reason and confirms that no invoices were created
+

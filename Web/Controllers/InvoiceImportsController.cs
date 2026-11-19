@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers;
 
-public class InvoiceImportsController(IPdfInvoiceImportService importService) : UserScopedControllerBase
+public class InvoiceImportsController(IInvoiceDocumentService documentService) : UserScopedControllerBase
 {
-    private const long MaxUploadBytes = 10 * 1024 * 1024;
+    // Slightly above the 10 MB file limit, so a file just over it gets the validation message instead of a 413.
+    private const long MaxRequestBytes = 11 * 1024 * 1024;
 
     public IActionResult Upload()
     {
@@ -14,42 +15,39 @@ public class InvoiceImportsController(IPdfInvoiceImportService importService) : 
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [RequestSizeLimit(MaxUploadBytes)]
+    [RequestSizeLimit(MaxRequestBytes)]
+    [RequestFormLimits(MultipartBodyLengthLimit = MaxRequestBytes)]
     public async Task<IActionResult> Upload(IFormFile? pdfFile)
     {
-        if (pdfFile == null || pdfFile.Length == 0)
+        if (pdfFile == null)
         {
-            return View("Result", ErrorResult("Choose a PDF invoice file to import."));
-        }
-
-        if (pdfFile.Length > MaxUploadBytes)
-        {
-            return View("Result", ErrorResult("The PDF is too large. Maximum allowed size is 10 MB."));
-        }
-
-        var hasPdfExtension = Path.GetExtension(pdfFile.FileName).Equals(".pdf", StringComparison.OrdinalIgnoreCase);
-        var hasPdfContentType = pdfFile.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase)
-                                || pdfFile.ContentType.Equals("application/x-pdf", StringComparison.OrdinalIgnoreCase);
-        if (!hasPdfExtension || !hasPdfContentType)
-        {
-            return View("Result", ErrorResult("Only PDF files can be imported."));
+            ModelState.AddModelError(nameof(pdfFile), T["Choose a PDF invoice file to import."]);
+            return View();
         }
 
         await using var stream = pdfFile.OpenReadStream();
-        var result = await importService.ImportAsync(new PdfInvoiceImportRequest
+        var result = await documentService.UploadAsync(new InvoiceDocumentUploadRequest
         {
-            PdfStream = stream,
+            Content = stream,
             FileName = pdfFile.FileName,
             Length = pdfFile.Length
-        }, CurrentUserId());
+        }, CurrentUserId(), HttpContext.RequestAborted);
 
-        return View("Result", result);
-    }
+        if (!result.Successful)
+        {
+            ModelState.AddModelError(nameof(pdfFile), result.Error?.Code switch
+            {
+                InvoiceDocumentErrors.FileTooLarge => T["The PDF is too large. Maximum allowed size is 10 MB."],
+                InvoiceDocumentErrors.EmptyFile => T["The file is empty."],
+                _ => T["Only PDF files can be imported."]
+            });
+            return View();
+        }
 
-    private static PdfInvoiceImportResult ErrorResult(string message)
-    {
-        var result = new PdfInvoiceImportResult();
-        result.FatalErrors.Add(message);
-        return result;
+        var document = result.Value!.Document;
+        if (result.Value.IsDuplicate) Flash(T["You have already uploaded this PDF. Showing the existing document."], "info");
+        else if (document.Status == Domain.EInvoiceDocumentStatus.Processing) Flash(T["PDF uploaded. Its invoices appear here once it has been read."]);
+        else Flash(T["PDF saved, but it could not be sent for reading. Use Send again."], "warning");
+        return RedirectToAction("Details", "InvoiceDocuments", new { id = document.Id });
     }
 }

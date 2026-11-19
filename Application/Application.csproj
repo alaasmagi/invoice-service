@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="alaasmagi.Base.DTO" Version="1.7.0" />
       <PackageReference Include="FluentValidation" Version="12.1.0" />
-      <PackageReference Include="UglyToad.PdfPig" Version="1.7.0-custom-5" />
     </ItemGroup>
 
     <ItemGroup>

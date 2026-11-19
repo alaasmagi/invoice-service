@@ -1,0 +1,73 @@
+@model ApiKeysViewModel
+@{
+    ViewData["Title"] = T["API keys"];
+}
+
+<header class="page-header">
+    <div class="page-header__title">
+        <p class="kicker">@T["Settings"]</p>
+        <h1>@T["API keys"]</h1>
+        <p class="page-header__lede">@T["Let another program, such as a Gmail forwarder, upload invoice PDFs for you. Send the key in the X-Api-Key header to POST /api/v1/invoice-documents."]</p>
+    </div>
+</header>
+
+@if (Model.NewPlainKey != null)
+{
+    <div class="alert alert--success" role="status">
+        <svg class="icon" aria-hidden="true"><use href="#i-circle-check"></use></svg>
+        <div class="alert__body">
+            <span class="alert__title">@T["Copy your new key now"]</span>
+            <span>@T["It is shown only once. If you lose it, revoke it and create a new one."]</span>
+            <input class="input" type="text" value="@Model.NewPlainKey" readonly aria-label="@T["New API key"]" onfocus="this.select()" />
+        </div>
+    </div>
+}
+
+<form asp-action="Create" method="post" class="card form narrow">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div class="field">
+        <label for="Name" class="field__label">@T["Name"]</label>
+        <input id="Name" name="name" class="input" value="@Model.Name" maxlength="128" required placeholder="@T["e.g. Gmail forwarder"]" />
+        <span asp-validation-for="Name"></span>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn--primary"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>@T["Create key"]</button>
+        <a asp-controller="AppUsers" asp-action="Edit" class="btn btn--ghost">@T["Back to settings"]</a>
+    </div>
+</form>
+
+<div class="card table-card">
+    <table class="data-table">
+        <thead><tr><th>@T["Name"]</th><th>@T["Key"]</th><th>@T["Created"]</th><th>@T["Last used"]</th><th>@T["Status"]</th><th class="actions-col"><span class="visually-hidden">@T["Actions"]</span></th></tr></thead>
+        <tbody>
+        @foreach (var apiKey in Model.ApiKeys)
+        {
+            <tr>
+                <td>@apiKey.Name</td>
+                <td class="nowrap"><code>@apiKey.KeyPrefix…</code></td>
+                <td class="nowrap secondary">@Fmt.Timestamp(apiKey.CreatedAt)</td>
+                <td class="nowrap secondary">@Fmt.Timestamp(apiKey.LastUsedAt, T["Never"])</td>
+                <td>
+                    @if (apiKey.IsActive) { <span class="badge badge--success">@T["Active"]</span> }
+                    else { <span class="badge badge--neutral">@T["Revoked"]</span> }
+                </td>
+                <td class="actions-col">
+                    @if (apiKey.IsActive)
+                    {
+                        <div class="row-actions">
+                            <form asp-action="Revoke" asp-route-id="@apiKey.Id" method="post"
+                                  data-confirm="@T["Programs using the key {0} can no longer upload PDFs.", apiKey.Name]" data-confirm-title="@T["Revoke key?"]" data-confirm-action="@T["Revoke"]" data-confirm-tone="danger">
+                                <button type="submit" class="btn btn--ghost btn--sm">@T["Revoke"]</button>
+                            </form>
+                        </div>
+                    }
+                </td>
+            </tr>
+        }
+        @if (!Model.ApiKeys.Any())
+        {
+            <tr><td colspan="6" class="empty"><span>@T["No API keys yet."]</span></td></tr>
+        }
+        </tbody>
+    </table>
+</div>

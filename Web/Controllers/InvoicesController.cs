@@ -150,6 +150,7 @@ public class InvoicesController(AppDbContext context, ICreateInvoiceService crea
         if (existing == null) return NotFound();
         var entity = mapper.ToEntity(dto);
         StampExisting(entity, userId, existing);
+        entity.InvoiceDocumentId = existing.InvoiceDocumentId;
         context.Update(entity);
         await context.SaveChangesAsync();
 

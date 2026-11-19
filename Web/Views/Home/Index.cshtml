@@ -45,7 +45,7 @@ else if (!o.Invoices.Any())
         <div class="next-step__copy">
             <span class="kicker">@T["Next step"]</span>
             <h2 class="next-step__title">@T["Add invoices for {0}", period.Label]</h2>
-            <p>@T["Enter invoices manually or import Telia and Enefit PDFs."]@(o.MissingInvoices.Any() ? " " + T.Plural(o.MissingInvoices.Count, "Last month you had {0} recurring invoice.", "Last month you had {0} recurring invoices.") : "")</p>
+            <p>@T["Enter invoices manually or import invoice PDFs."]@(o.MissingInvoices.Any() ? " " + T.Plural(o.MissingInvoices.Count, "Last month you had {0} recurring invoice.", "Last month you had {0} recurring invoices.") : "")</p>
         </div>
         <div class="actions">
             <a asp-controller="InvoiceImports" asp-action="Upload" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>@T["Import PDF"]</a>

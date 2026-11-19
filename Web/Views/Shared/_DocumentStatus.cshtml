@@ -1,0 +1,12 @@
+@model DTO.DataAccess.Web.DTO.InvoiceDocumentDetailsDto
+@{
+    var tone = Model.IsTimedOut ? "warning" : Model.Status switch
+    {
+        Domain.EInvoiceDocumentStatus.Processing => "accent",
+        Domain.EInvoiceDocumentStatus.Completed => "success",
+        Domain.EInvoiceDocumentStatus.NeedsReview => "warning",
+        Domain.EInvoiceDocumentStatus.Failed => "danger",
+        _ => "neutral"
+    };
+}
+<span class="badge badge--@tone">@Fmt.DocumentStatusLabel(Model.Status, Model.IsTimedOut)</span>

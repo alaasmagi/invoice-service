@@ -20,6 +20,8 @@ public class Invoice : BaseEntityUser
 
     public decimal TotalSum { get; set; }
 
+    public Guid? InvoiceDocumentId { get; set; }
+
     public ICollection<InvoiceAllocation> Allocations { get; set; }
         = new List<InvoiceAllocation>();
 }

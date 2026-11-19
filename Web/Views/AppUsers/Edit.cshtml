@@ -26,6 +26,9 @@
         <p class="kicker">@T["Account"]</p>
         <h1>@T["Settings"]</h1>
     </div>
+    <div class="page-header__actions">
+        <a asp-controller="ApiKeys" asp-action="Index" class="btn btn--secondary"><svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg>@T["API keys"]</a>
+    </div>
 </header>
 
 <form asp-action="Edit" method="post" class="card form narrow">

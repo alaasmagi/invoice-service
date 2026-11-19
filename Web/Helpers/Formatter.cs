@@ -53,6 +53,26 @@ public class Formatter(IHttpContextAccessor httpContextAccessor, IStringLocalize
         return TimeZoneInfo.ConvertTimeFromUtc(utc, Preferences.TimeZone).ToString("g", Culture);
     }
 
+    public string DocumentStatusLabel(EInvoiceDocumentStatus status, bool timedOut = false) => timedOut ? t["Timed out"] : status switch
+    {
+        EInvoiceDocumentStatus.Uploaded => t["Not sent for reading"],
+        EInvoiceDocumentStatus.Processing => t["Reading"],
+        EInvoiceDocumentStatus.Completed => t["Done"],
+        EInvoiceDocumentStatus.NeedsReview => t["Needs review"],
+        EInvoiceDocumentStatus.Failed => t["Failed"],
+        _ => status.ToString()
+    };
+
+    public string RowOutcomeLabel(EInvoiceDocumentRowOutcome outcome) => outcome switch
+    {
+        EInvoiceDocumentRowOutcome.Created => t["Invoice created"],
+        EInvoiceDocumentRowOutcome.Duplicate => t["Already exists"],
+        EInvoiceDocumentRowOutcome.Unmatched => t["Needs review"],
+        EInvoiceDocumentRowOutcome.Invalid => t["Incomplete"],
+        EInvoiceDocumentRowOutcome.Discarded => t["Discarded"],
+        _ => outcome.ToString()
+    };
+
     public string Range(DateOnly? start, DateOnly? end) =>
         start == null && end == null ? "—" : $"{Date(start, "…")} – {Date(end, "…")}";
 

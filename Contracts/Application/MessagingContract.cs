@@ -16,6 +16,14 @@ public static class MessagingContract
     public const string InvoiceAction = "email-invoice";
     public const string InvoiceContentVersion = "1.0";
 
+    // Outbound "invoice-parse" command published to ai-hub.commands, and its replies consumed from
+    // ai-hub.events (ai-hub.invoice-service.invoice-parsed / invoice-parse-failed).
+    public const string AiHubSource = "ai-hub";
+    public const string InvoiceParseAction = "invoice-parse";
+    public const string InvoiceParsedAction = "invoice-parsed";
+    public const string InvoiceParseFailedAction = "invoice-parse-failed";
+    public const string InvoiceParseContentVersion = "1.0";
+
     // Inbound identity events consumed from the invoice-service queue: the concrete publisher slug in
     // the envelope 'source' (and first routing-key segment). Matches the live wire, the shared
     // package's Base.Message.DefaultSources.IdentityHub, and the exchange name identity-hub.events.
